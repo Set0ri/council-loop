@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.council/runs/
+.council/elders/
+.venv/
+.pytest_cache/

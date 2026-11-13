@@ -1,0 +1,22 @@
+{
+  "id": "2026-11-13-example",
+  "tier": "full",
+  "max_loops": 3,
+  "original_ask": "Pick the queue technology for the billing pipeline.",
+  "intent_brief": "Choose a queue for billing events: reliable, cheap to run, easy to operate.",
+  "rubric": {"R1": 30, "R2": 25, "R3": 20, "R4": 15, "R5": 10},
+  "loops": [
+    {
+      "eli5": "Seven experts suggested queues; we kept the five most reliable and cheap.",
+      "ideas": {"L1": ["idea one", "idea two", "idea three", "idea four", "idea five", "idea six",
+                        "idea seven", "idea eight", "idea nine", "idea ten", "idea eleven",
+                        "idea twelve", "idea thirteen"]},
+      "candidates": [{"id": "C1", "body": "Managed queue with dead-letter topic and idempotent consumers.",
+                      "eli5": "A post office that never loses letters."}],
+      "red_team": [{"finding": "Consumer retries can double-charge.", "severity": "S1", "response": "fixed: idempotency keys"}],
+      "elder_reviews": [{"model": "Claude Fable 5.2"}, {"model": "GPT-6.1 Sol"}, {"model": "Gemini 4 Argon"}],
+      "survivors": ["C1", "C2", "C3", "C4", "C5"]
+    }
+  ],
+  "retro": "Lesson proposed: always include idempotency in billing designs."
+}

@@ -1,0 +1,86 @@
+# Council Loop - model policy (the RULES, not the model names)
+#
+# ELI5: We never hard-code "use model X". We write rules like "the chair is the
+# smartest model we can afford" and let a script pick today's best models from
+# Artificial Analysis data. New model next week? Run the refresh, review the diff.
+#
+# Picks are resolved by scripts/refresh_models.py into models/lock.yaml.
+# Review lock.yaml changes in a PR. Never edit lock.yaml by hand: use pins/bans below.
+
+version: 1
+
+data:
+  provider: artificial_analysis        # https://artificialanalysis.ai (attribution required)
+  api_url: https://artificialanalysis.ai/api/v2/language/models
+  quality: intelligence_index          # AA Intelligence Index (v5.x in Nov 2026)
+  cost: cost_per_task                  # AA cost per task in USD (falls back to blended $/1M)
+  stale_after_days: 30                 # skill warns when lock.yaml is older than this
+
+# One formula for every pick:   score = quality - k * log2(cost_per_task_usd)
+# ELI5: "each doubling of cost must buy at least k more index points".
+# k = 0 means "ignore cost". floor = minimum quality as a fraction of the chair's quality.
+# Diversity seats: up to N experts come from OTHER families (or other models in a one-family mode),
+# but only if they score within diversity_margin points of the main workhorse. Research shows that
+# mixing in much weaker models lowers quality (Self-MoA, 2025), so diversity is earned, not forced.
+profiles:
+  max:
+    chair:    {k: 0}
+    experts:  {k: 2, floor: 0.85, diversity_seats: 2, diversity_margin: 12}
+    red_team: {k: 0, other_family: true, floor: 0.80}
+    elders:   {k: 0, floor: 0.80}
+    verifier: {k: 2, max_minutes: 5, min_quality: 30}
+  balanced:
+    chair:    {k: 2}
+    experts:  {k: 6, floor: 0.75, diversity_seats: 2, diversity_margin: 12}
+    red_team: {k: 2, other_family: true, floor: 0.75}
+    elders:   {k: 2, floor: 0.80}
+    verifier: {k: 6, max_minutes: 5, min_quality: 30}
+  efficient:
+    chair:    {k: 6, floor_vs_best: 0.80}
+    experts:  {k: 8, floor: 0.60, diversity_seats: 2, diversity_margin: 12}
+    red_team: {k: 5, other_family: true, floor: 0.70}
+    elders:   {k: 6, floor: 0.80}
+    verifier: {k: 10, max_minutes: 5, min_quality: 30}
+
+tie_break:
+  within_points: 0.5     # scores this close count as a tie...
+  prefer: faster         # ...and the faster model (AA minutes per task) wins
+
+# Solo mode: the current model plays every role. Only the effort level changes.
+solo_efforts:
+  max:       {chair: max,    experts: high,   red_team: high,   elders: max,    verifier: medium}
+  balanced:  {chair: high,   experts: medium, red_team: high,   elders: high,   verifier: low}
+  efficient: {chair: medium, experts: low,    red_team: medium, elders: medium, verifier: low}
+
+# Families used by fan-out modes. Add a family by adding a filter here.
+families:
+  claude:     {creators: [Anthropic]}
+  openai:     {creators: [OpenAI]}
+  gemini:     {creators: [Google]}
+  open:       {open_weights_only: true}
+  openrouter: {requires: openrouter_id}   # filled from live AA data (openrouter_api_id)
+  mix:        {creators: any}
+
+modes:
+  solo:     "One model plays every role. Elders are fresh contexts of that model (no cross-lab check)."
+  fanout:   "Strong chair + cheaper workhorse experts, limited to one family. Elders come from the same family."
+  crosslab: "Experts from the mix family with one seat per lab that clears the quality floor; elders are one flagship each from Anthropic, OpenAI and Google."
+
+crosslab_labs: [Anthropic, OpenAI, Google]
+
+# Rough cost model for one Full council run, in AA cost-per-task units.
+# Only used to compare configurations against each other, not to quote dollars.
+cost_model:
+  loops: 3
+  expert_passes_per_loop: 2.0   # ideate + self-critique/vote, per expert
+  red_team_passes_per_loop: 1.0
+  elder_passes_per_loop: 0.5    # each elder reads a short blinded packet
+  chair_passes_per_loop: 1.0
+  final_chair_passes: 2.0
+
+# Models you cannot call. Restricted programs stay off unless you have access.
+access:
+  "Gemini 4 Carbon": {has_access: false}
+
+pins: {}   # e.g. {"balanced/crosslab/elders/Google": "Gemini 4 Argon (high)"}
+bans: []   # e.g. ["Grok 4.7"]

@@ -1,0 +1,23 @@
+name: council-guard
+on: [pull_request, push]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install pyyaml pytest "mcp[cli]"
+      - run: pytest -q
+      - name: Model data freshness (warn only)
+        run: python3 skills/council-loop/scripts/refresh_models.py --check || echo "::warning::model data is stale - run refresh_models.py"
+  locks:
+    # Copy this job into product repos: it enforces locked tests below the agent, for every tool.
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'council-unlock') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install pyyaml
+      - run: python3 skills/council-loop/scripts/council.py verify-locks
