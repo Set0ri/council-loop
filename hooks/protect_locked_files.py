@@ -23,22 +23,23 @@ def main() -> int:
     lock = project / ".council" / "locks.json"
     if not lock.exists():
         return 0
-    locked = set(json.loads(lock.read_text()))
+    locked = {p.replace("\\", "/") for p in json.loads(lock.read_text(encoding="utf-8"))}
     tool = event.get("tool_name", "")
     inp = event.get("tool_input") or {}
     hit = None
     if tool in ("Edit", "Write", "MultiEdit", "NotebookEdit"):
         target = inp.get("file_path") or inp.get("notebook_path") or inp.get("path") or ""
         try:
-            rel = str(Path(target).resolve().relative_to(project.resolve()))
+            rel = Path(target).resolve().relative_to(project.resolve()).as_posix()
         except ValueError:
-            rel = target
-        hit = rel if (rel in locked or target in locked) else None
+            rel = target.replace("\\", "/")
+        hit = rel if (rel in locked or target.replace("\\", "/") in locked) else None
     elif tool == "Bash":
         cmd = inp.get("command", "")
         writes = re.search(r"(>|>>|\btee\b|\bsed\s+-i|\brm\b|\bmv\b|\bcp\b|\btruncate\b|\bgit\s+(checkout|restore)\b)", cmd)
         if writes:
-            hit = next((p for p in locked if p in cmd), None)
+            cmd_norm = cmd.replace("\\", "/")
+            hit = next((p for p in locked if p in cmd or p in cmd_norm), None)
     if not hit:
         return 0
     print(json.dumps({"hookSpecificOutput": {

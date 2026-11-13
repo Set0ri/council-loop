@@ -10,7 +10,7 @@ SNAP = SKILL / "models" / "snapshot-2026-11-13.json"
 
 
 def resolve():
-    policy = yaml.safe_load((SKILL / "models" / "policy.yaml").read_text())
+    policy = yaml.safe_load((SKILL / "models" / "policy.yaml").read_text(encoding="utf-8"))
     models, _ = rm.load_offline(SNAP)
     return rm.resolve(models, policy)
 
@@ -46,7 +46,7 @@ def test_open_family_is_open_weights_only():
 
 
 def test_new_model_is_picked_up_without_code_changes():
-    policy = yaml.safe_load((SKILL / "models" / "policy.yaml").read_text())
+    policy = yaml.safe_load((SKILL / "models" / "policy.yaml").read_text(encoding="utf-8"))
     models, _ = rm.load_offline(SNAP)
     models.append(rm.Model(name="Claude Future 9 (high)", creator="Anthropic", quality=80, cost=2.0, minutes=5.0))
     configs, _ = rm.resolve(models, policy)

@@ -90,10 +90,10 @@ def ask(provider: str, prompt: str, model: str | None = None, timeout: int = 900
         if not shutil.which(cmd[0]):
             return {"ok": False, "provider": provider, "error": f"CLI not found: {cmd[0]}", "command": shown}
         try:
-            proc = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+            proc = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=timeout)
         except subprocess.TimeoutExpired:
             return {"ok": False, "provider": provider, "error": f"timeout after {timeout}s"}
-        text = out_file.read_text() if out_file.exists() else proc.stdout
+        text = out_file.read_text(encoding="utf-8") if out_file.exists() else proc.stdout
         if provider == "gemini":
             try:
                 text = json.loads(proc.stdout).get("response", proc.stdout)
@@ -134,7 +134,7 @@ def elder_review(packet: str, profile: str = "balanced", providers: list[str] | 
         results = {p: f.result() for p, f in futs.items()}
     reviews = {}
     for p, r in results.items():
-        (out_dir / f"{p}.json").write_text(json.dumps(r, indent=1))
+        (out_dir / f"{p}.json").write_text(json.dumps(r, indent=1), encoding="utf-8")
         if r.get("ok") and not r.get("dry_run"):
             reviews[p] = parse_json(r.get("text", ""))
     preferred = [v.get("preferred") for v in reviews.values() if v and v.get("preferred")]

@@ -31,7 +31,7 @@ mcp = _Server("council-loop")
 
 
 def _read(path: Path) -> str:
-    return path.read_text() if path.exists() else f"(missing: {path.name})"
+    return path.read_text(encoding="utf-8") if path.exists() else f"(missing: {path.name})"
 
 
 # ---------------------------------------------------------------- resources (read-only context)

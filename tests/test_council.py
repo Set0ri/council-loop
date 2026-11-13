@@ -47,7 +47,7 @@ def test_cut_keeps_one_pareto_wildcard():
 
 
 def test_check_run_example_passes_and_catches_violations():
-    run = json.loads((Path(council.SKILL_DIR) / "templates" / "run.example.json").read_text())
+    run = json.loads((Path(council.SKILL_DIR) / "templates" / "run.example.json").read_text(encoding="utf-8"))
     assert council.check_run(run)["ok"]
     run["loops"][0]["ideas"]["L1"] = run["loops"][0]["ideas"]["L1"][:5]
     run["loops"] = run["loops"] * 4
@@ -58,10 +58,10 @@ def test_check_run_example_passes_and_catches_violations():
 def test_locks_detect_changes(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     (tmp_path / "tests").mkdir()
-    (tmp_path / "tests" / "test_x.py").write_text("assert True\n")
+    (tmp_path / "tests" / "test_x.py").write_text("assert True\n", encoding="utf-8")
     council.lock_files(["tests"])
     assert council.verify_locks()["ok"]
-    (tmp_path / "tests" / "test_x.py").write_text("assert 1\n")
+    (tmp_path / "tests" / "test_x.py").write_text("assert 1\n", encoding="utf-8")
     out = council.verify_locks()
     assert not out["ok"] and out["changed"] == ["tests/test_x.py"]
 

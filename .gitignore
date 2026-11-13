@@ -4,3 +4,4 @@ __pycache__/
 .council/elders/
 .venv/
 .pytest_cache/
+*.zip

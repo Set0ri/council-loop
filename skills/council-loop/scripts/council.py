@@ -60,7 +60,7 @@ def _words(text: str) -> int:
 
 def _load_yaml(path: Path):
     import yaml  # PyYAML
-    return yaml.safe_load(path.read_text())
+    return yaml.safe_load(path.read_text(encoding="utf-8"))
 
 
 def _labels(n: int) -> list[str]:
@@ -254,21 +254,21 @@ def _sha(path: Path) -> str:
 
 
 def lock_files(paths: list[str], lock_file: Path = LOCK_FILE) -> dict:
-    data = json.loads(lock_file.read_text()) if lock_file.exists() else {}
+    data = json.loads(lock_file.read_text(encoding="utf-8")) if lock_file.exists() else {}
     for p in paths:
         fp = Path(p)
         files = [x for x in fp.rglob("*") if x.is_file()] if fp.is_dir() else [fp]
         for f in files:
-            data[str(f)] = _sha(f)
+            data[f.as_posix()] = _sha(f)
     lock_file.parent.mkdir(parents=True, exist_ok=True)
-    lock_file.write_text(json.dumps(data, indent=1, sort_keys=True))
+    lock_file.write_text(json.dumps(data, indent=1, sort_keys=True), encoding="utf-8")
     return {"locked": len(data), "file": str(lock_file)}
 
 
 def verify_locks(lock_file: Path = LOCK_FILE) -> dict:
     if not lock_file.exists():
         return {"ok": True, "changed": [], "note": "no locks"}
-    data = json.loads(lock_file.read_text())
+    data = json.loads(lock_file.read_text(encoding="utf-8"))
     changed = [p for p, h in data.items() if not Path(p).exists() or _sha(Path(p)) != h]
     return {"ok": not changed, "changed": changed}
 
@@ -276,17 +276,17 @@ def verify_locks(lock_file: Path = LOCK_FILE) -> dict:
 def is_locked(path: str, lock_file: Path = LOCK_FILE) -> bool:
     if not lock_file.exists():
         return False
-    data = json.loads(lock_file.read_text())
+    data = {k.replace("\\", "/"): v for k, v in json.loads(lock_file.read_text(encoding="utf-8")).items()}
     try:
-        rel = str(Path(path).resolve().relative_to(Path.cwd().resolve()))
+        rel = Path(path).resolve().relative_to(Path.cwd().resolve()).as_posix()
     except ValueError:
-        rel = path
-    return rel in data or path in data
+        rel = path.replace("\\", "/")
+    return rel in data or path.replace("\\", "/") in data
 
 
 # ----------------------------------------------------------------------------- CLI
 def _read_json(arg: str):
-    return json.loads(Path(arg).read_text()) if Path(arg).exists() else json.loads(arg)
+    return json.loads(Path(arg).read_text(encoding="utf-8")) if Path(arg).exists() else json.loads(arg)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -355,8 +355,8 @@ def main(argv: list[str] | None = None) -> int:
     if a.cmd == "blind":
         out = blind(_read_json(a.cards), a.seed, a.max_words)
         if a.out:
-            Path(a.out).write_text(out["packet"])
-            Path(a.out + ".mapping.json").write_text(json.dumps(out["mapping"], indent=1))
+            Path(a.out).write_text(out["packet"], encoding="utf-8")
+            Path(a.out + ".mapping.json").write_text(json.dumps(out["mapping"], indent=1), encoding="utf-8")
             print(f"packet -> {a.out}; mapping (keep away from judges) -> {a.out}.mapping.json")
         else:
             print(json.dumps(out, indent=1))
@@ -382,12 +382,12 @@ def main(argv: list[str] | None = None) -> int:
         return 0 if out["ok"] else 1
     if a.cmd == "ask":
         import providers
-        out = providers.ask(a.provider, Path(a.prompt_file).read_text(), a.model, dry_run=a.dry_run)
+        out = providers.ask(a.provider, Path(a.prompt_file).read_text(encoding="utf-8"), a.model, dry_run=a.dry_run)
         print(json.dumps(out, indent=1))
         return 0 if out.get("ok") else 1
     if a.cmd == "elders":
         import providers
-        out = providers.elder_review(Path(a.packet).read_text(), a.profile,
+        out = providers.elder_review(Path(a.packet).read_text(encoding="utf-8"), a.profile,
                                      [p.strip() for p in a.providers.split(",") if p.strip()],
                                      Path(a.out), dry_run=a.dry_run)
         print(json.dumps(out, indent=1))

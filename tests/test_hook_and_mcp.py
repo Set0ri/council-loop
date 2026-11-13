@@ -13,13 +13,14 @@ HOOK = ROOT / "hooks" / "protect_locked_files.py"
 def run_hook(tmp_path, event):
     env = {**os.environ, "CLAUDE_PROJECT_DIR": str(tmp_path)}
     env.pop("COUNCIL_ALLOW_LOCKED", None)
-    p = subprocess.run([sys.executable, str(HOOK)], input=json.dumps(event), capture_output=True, text=True, env=env)
+    p = subprocess.run([sys.executable, str(HOOK)], input=json.dumps(event), capture_output=True, text=True,
+                       encoding="utf-8", env=env)
     return json.loads(p.stdout) if p.stdout.strip() else None
 
 
 def test_hook_denies_edit_of_locked_file(tmp_path):
     (tmp_path / ".council").mkdir()
-    (tmp_path / ".council" / "locks.json").write_text(json.dumps({"tests/test_x.py": "abc"}))
+    (tmp_path / ".council" / "locks.json").write_text(json.dumps({"tests/test_x.py": "abc"}), encoding="utf-8")
     out = run_hook(tmp_path, {"tool_name": "Edit", "tool_input": {"file_path": str(tmp_path / "tests/test_x.py")}})
     assert out["hookSpecificOutput"]["permissionDecision"] == "deny"
     assert run_hook(tmp_path, {"tool_name": "Edit", "tool_input": {"file_path": str(tmp_path / "src/app.py")}}) is None
@@ -29,7 +30,7 @@ def test_hook_denies_edit_of_locked_file(tmp_path):
 
 
 def test_mcp_server_lists_tools_resources_prompts():
-    pytest.importorskip("mcp")
+    pytest.importorskip("mcp.client.stdio")
     import asyncio
     from mcp import ClientSession, StdioServerParameters
     from mcp.client.stdio import stdio_client
