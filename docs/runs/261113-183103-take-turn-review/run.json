@@ -1,0 +1,656 @@
+{
+ "id": "261113-183103-take-turn-review",
+ "created": "2026-11-13T18:31:03",
+ "ask": "Take a turn to review and iterate. Im handing the reigns to you, to make this more useful for yourself. Be free",
+ "gate": "GATE tier=lite mode=fanout:claude profile=balanced loops<=1 calls~9 rel_cost=1.86 (chair: stakes=medium)",
+ "tier": "lite",
+ "mode": "fanout:claude",
+ "profile": "balanced",
+ "tripwires": [],
+ "gate_reason": "chair: stakes=medium",
+ "calls_estimate": 9,
+ "deviations": [
+  "loop 1 fuse: the vote counter (tally) was replaced before any ballot was cast: red-team finding 1 (S1) showed the old one scored co-written cards 0.0 and treated a ballot gap as a last place; new head-to-head count has unit tests",
+  "loop 1 elders: the chair opened the elder packet to check it and so saw the blinded control arm before the elder review; no candidate was edited afterwards (single loop), but the tool did not warn against it",
+  "loop 1 cut: elders split or an S1 was open and Logan could not be asked; safer option taken: build the winner with the elder's S1 fix grafted in (a vote must never cut a card it could not judge) and the control arm sealed; nothing is released yet, so every step can be undone"
+ ],
+ "friction": [
+  "L1 (ideate, loop 1): Packet lists scripts/providers.py; it is at skills/council-loop/scripts/providers.py.",
+  "L2 (ideate, loop 1): The lens lists _collect and verify_locks as evidence, but chair edits to seat out.json files before ingest are out of scope for any deterministic fix; say if that is accepted.",
+  "L3 (ideate, loop 1): Seats get no word counter, yet idea lines over 27 words are hard errors; the packet should give a counting rule or the check should only warn.",
+  "RT (redteam, loop 1): The packet does not say whether a pre-existing bug that a candidate amplifies (tally's zero scores under A) counts against that candidate; I treated it as yes.",
+  "L1 (rank, loop 1): R2 and R5 are marked machine-checked but no machine results are in the packet; judged from descriptions.",
+  "L2 (rank, loop 1): R2 says 'machine' checked, but no candidate states which machine checks verify blinding, so R2 was judged on described mechanisms.",
+  "L3 (rank, loop 1): R3 is ambiguous between runtime seat cost and build effort; I read it as runtime cost, and no candidate states per-run savings.",
+  "EA (elders, loop 1): Facts cite scripts/providers.py (it is skills/council-loop/scripts/providers.py), and council.py/run.py changed mid-run, so some quoted reproductions predate the current tally; say which code version "
+ ],
+ "calls": {
+  "ideate": 4,
+  "redteam": 1,
+  "rank": 3,
+  "elders": 1
+ },
+ "loops": [
+  {
+   "started": "2026-11-13T18:31:18",
+   "ideas": {
+    "L1": [
+     "Dispatch re-runs rejected CLI seats: today existing bad output blocks retry, so elder retries stall forever.",
+     "Next prints only missing or invalid seats: a reset mid-fan-out stops re-spawning seven 60k-token agents.",
+     "Script counts attempts per seat and prints the exact --force line: 'fails twice' survives context resets.",
+     "Simpler: status ends with the literal next command and pending seats, not a generic 'next: council.py next'.",
+     "Simpler: delete SKILL.md prose that next already prints; shorter rulebook, fewer places for chair to drift.",
+     "Contrarian: chair casts no-tool ballots through one batched script call instead of 42 subagent spawns; saves most overhead.",
+     "Contrarian: make body under 90 words a warning, not an error; each length retry costs a full spawn.",
+     "Cut refuses when elders split and neither --asked nor --unattended given: stops silent drift past judgment point.",
+     "Ingest prints one-line 'you are here' (step k of n, calls used) so a reset chair never needs status."
+    ],
+    "L2": [
+     "Derive pool and candidate authors from from/parents refs at ingest; the chair can no longer mislabel authors and let seats vote for their own cards.",
+     "Render each voter's packet in its own seeded order (same labels); a single shared order adds identical position bias to every Borda ballot.",
+     "Block the final cut when the leader after elder kills was never elder-reviewed; today a killed top pick hands the win to an unreviewed card.",
+     "Log a deviation when cut --stop is used without unanimous ship-and-prefer from elders; early stops currently need no justification.",
+     "Make check_run errors block the retro-to-done transition instead of just printing them; a failing protocol check should not close a run.",
+     "Record sha256 of every seat out.json at ingest; a new audit command re-tallies from raw ballots plus the private mapping and flags any mismatch.",
+     "Contrarian: drop the shortlist vote in Full and send top pool cards by red-team triage instead; saves 7 seat calls per loop.",
+     "Contrarian: stop trusting approved_by: logan typed by the chair; require Logan's own words via --override-style flag, else record unattended.",
+     "Simpler: treat an empty red-team result after --force as a hard deviation in check_run, not a silently empty list.",
+     "Simpler: add model names to blind() forbidden tokens so cards mentioning 'Gemini thinks' or a seat model cannot leak authorship."
+    ],
+    "L3": [
+     "Demote errors on data nobody reads (idea length, elder score gaps) to warnings: each avoided rejection saves a full respawn and protects the seven-lens quorum.",
+     "Repair near-complete ballots (missing, repeated or unknown labels, up to one in ten) instead of rejecting them; tally already ranks gaps neutrally. Log each repair.",
+     "Fix the dispatch dead end: move a rejected CLI seat's output aside so the printed retry step reruns it instead of saying nothing to dispatch.",
+     "Narrow the leak regex to real seat ids: 'seat call' and 'seat cost' currently fail the blind check and force the chair to rewrite cards.",
+     "Later loops keep one card per expert: seven cards meet the existing small-pool rule, skipping the shortlist vote and cutting 76 calls to 69.",
+     "Contrarian: run a phase's seven voters in one spawn writing seven ballots. Saves 36 spawns but destroys independent voting, so reject it.",
+     "Contrarian: route tool-less judge seats (shortlist vote, rank, elders) through direct API or CLI calls, skipping spawn overhead on 54 of 76 calls. Unverified here.",
+     "Contrarian: relax early stop to unanimous preference, no kill, no S1, so loop two can end a converged Full run and save 25 calls.",
+     "Simple: print calls times 60k as estimated host tokens on the GATE line, so tier choices see roughly 4.6M tokens for Full.",
+     "Simple: never trim packet words. Measured packets total about 134k tokens against 4.56M of spawn overhead, so only spawns and retries matter.",
+     "Simple: cap vote and rank seats at medium effort, since blind ranking is mechanical work. Quality effect unverified.",
+     "Probe each CLI inside init and label unauthenticated ones as stand-ins before assigning seats, so a logged-out codex cannot stall the quorum."
+    ]
+   },
+   "kept": {
+    "L1": [
+     {
+      "title": "Let dispatch retry rejected CLI seats",
+      "body": "When a CLI or API seat returns invalid output, ingest writes a retry prompt and prints `RUN council.py dispatch`. But cmd_dispatch skips every seat whose output file already exists unless --seat is passed, so the rejected file blocks its own retry: dispatch answers `nothing to dispatch`, ingest rejects the same file again, and the chair loops or guesses. All three cross-lab elders travel this path. Fix: dispatch re-runs any seat that has a retry prompt newer than its output, and the printed retry line names the seats. One unit test: invalid elder output, ingest, dispatch --dry-run must list that seat. No new concept; the two-command loop stays as it is.",
+      "eli5": "A broken answer from an outside model currently blocks asking again. Let the tool ask again.",
+      "wins": [
+       "R1",
+       "R5",
+       "R4"
+      ],
+      "evidence": "skills/council-loop/scripts/run.py: cmd_dispatch (`if o.exists() and not seat: continue`), spawn_lines (retry line prints plain `council.py dispatch`), _collect (writes .retry.md, leaves the bad .out.json). Found by reading the code; not executed. tests/test_run.py covers the retry prompt only for subagent seats."
+     },
+     {
+      "title": "Next resumes: spawn only missing seats",
+      "body": "After a context reset the chair runs status, then next. Today next rewrites every prompt and prints SPAWN lines for all seats of the phase, including seats whose valid output is already on disk, so a reset mid-fan-out re-spawns up to seven agents at roughly 60k tokens each and overwrites good work. Fix: next validates existing outputs first and prints only the seats still missing or invalid, with a line such as `5 of 7 in`. It stores an attempt count per seat and prints the exact --force command at the second failure, so the `fails twice` rule no longer lives in chair memory. Status shows the same pending list.",
+      "eli5": "After a restart, only redo the seats that have not answered, and let the tool count failures.",
+      "wins": [
+       "R1",
+       "R3",
+       "R2"
+      ],
+      "evidence": "skills/council-loop/scripts/run.py: next_ideate, next_vote, next_rank, next_elders call spawn_lines with only=None; cmd_status ends `next: council.py next`; run['retries'] is one global counter. 60k per spawn is from the packet facts. Found by reading the code; not executed."
+     }
+    ],
+    "L2": [
+     {
+      "title": "Derive card authors from provenance, not chair input",
+      "body": "Self-vote exclusion in tally() trusts each card's authors list, and the chair types that list by hand twice: in pool.json at merge and in candidates.json at fuse. _check_cards only checks that authors is a non-empty list of expert seat ids; nothing reads the from or parents fields. A fused card built from L2 and L3 cards but labelled [L1] lets L2 and L3 rank their own work, unrecorded. Fix: ingest_merge requires every from ref to be a real kept-card ref and sets authors to those seats; ingest_fuse requires parents to be shortlisted pool ids and sets authors to the union of the parents' authors. One unit test covers both.",
+      "eli5": "The computer, not the referee, writes whose idea each card came from, so nobody can vote for their own.",
+      "wins": [
+       "R2",
+       "R5"
+      ],
+      "evidence": "skills/council-loop/scripts/run.py: _check_cards (lines 974-983), ingest_merge, ingest_fuse (line 1084 copies parents unchecked); council.py tally() own-label exclusion (line 349). Read on paper; no exploit test run."
+     },
+     {
+      "title": "Give each voter its own candidate order",
+      "body": "blind() is seeded only by run, loop and phase, so every voter in a phase gets the identical packet, and the same card sits first on all seven ballots. LLM judges show measurable position bias (Zheng et al. 2023, MT-Bench), so a shared order adds the same tilt to every ballot and Borda sums it instead of cancelling it. Fix: keep one label-to-card mapping per phase, but have write_seat_prompts render each seat's copy in a rotated order (Latin square over seats), so each card leads about equally often. Labels, mapping and tally are unchanged; no model calls. Test: with seats at least equal to cards, every label leads some packet.",
+      "eli5": "Everyone sees the cards in a different order, so being listed first stops giving a free boost.",
+      "wins": [
+       "R2",
+       "R5",
+       "R1"
+      ],
+      "evidence": "skills/council-loop/scripts/run.py seed_for() and _vote_prompts() write one packet for all seats; council.py blind() emits cards in label order. Position bias: Zheng et al. 2023 'Judging LLM-as-a-Judge' (from memory, not re-checked this session)."
+     }
+    ],
+    "L3": [
+     {
+      "title": "Reject agents only for faults the run reads",
+      "body": "Every rejected expert is a full respawn: about 60k tokens of host overhead plus the whole task again, and after two failures the chair must drop that voice, breaking the seven-lens rule. Three checks guard nothing downstream: ideas over 25 words (only counted; check_run already treats them as a warning), incomplete elder scores (stored, never read by cut or final), and ballots missing, repeating or misnaming a label (tally already ranks gaps neutrally). Make the first two warnings, repair ballots missing up to one in ten labels, and log each repair in run.json. Self-vote exclusion and blind labels stay untouched. Idea count, card shape and verdicts stay hard errors.",
+      "eli5": "Do not make an expert redo everything because one idea line ran long or a ballot skipped one name.",
+      "wins": [
+       "R1",
+       "R3",
+       "R5"
+      ],
+      "evidence": "run.py v_ideate, v_elder, v_ballot (lines 341-424), ingest_ideate 956-966, ingest_elders 1120; council.py check_run 459-464 and tally; tests/sim.py 'partial' mode is never used by test_run.py. Counted with a script: 7 of my own 11 first-draft idea lines exceeded 27 words (one model, small sample). Real rejection rates for other agents: unverified."
+     },
+     {
+      "title": "Remove two stalls found by running the kit",
+      "body": "Running the kit in a scratch copy reproduced two stalls. First, when a CLI-run expert's output is rejected, ingest prints 'RUN council.py dispatch', but dispatch skips any agent whose output file exists and answers 'nothing to dispatch'; only --seat works. Fix: move the rejected file aside to a .rejected.json name when the retry prompt is written. Second, the identity-leak check flags ordinary cost phrases built on the word for a council place (five of five tried), so the chair must rewrite cards at merge. Narrow it to real ids: an L-number, RT, an E-letter or CTRL after that word; bare ids stay forbidden. Add one test for each.",
+      "eli5": "Two stuck buttons: a retry that does nothing, and a blind-check alarm that rings at ordinary words.",
+      "wins": [
+       "R1",
+       "R2",
+       "R5"
+      ],
+      "evidence": "Reproduced in a /tmp copy: cmd_dispatch (run.py, 'if o.exists() and not seat: continue') printed 'nothing to dispatch' for a rejected codex agent; council.blind flagged 5 of 5 'seat call / seat cost / seat vote / seat fan-out' style phrases tried; council.py LEAK_RE. The codex and gemini live paths themselves: unverified."
+     }
+    ]
+   },
+   "pool": [
+    {
+     "id": "P1",
+     "title": "Unblock CLI retries; stop false leak alarms",
+     "body": "Two stalls, both reproduced by running the kit in a scratch copy. First: when a CLI or API agent returns invalid output, ingest writes a retry prompt and prints `RUN council.py dispatch`, but cmd_dispatch skips any agent whose output file exists, so it answers `nothing to dispatch` and ingest rejects the same file again. Every cross-lab elder travels this path. Fix: move the rejected file aside when the retry prompt is written, and name the agents in the printed retry line. Second: the identity-leak check flags ordinary cost phrases built on the word for a council place (five of five tried), forcing rewrites at merge. Narrow it to real ids. One unit test for each.",
+     "eli5": "Two stuck buttons: a retry that does nothing, and a blind-check alarm that rings at ordinary words.",
+     "authors": [
+      "L1",
+      "L3"
+     ],
+     "from": [
+      "L1#1",
+      "L3#2"
+     ]
+    },
+    {
+     "id": "P2",
+     "title": "Next resumes: spawn only missing seats",
+     "body": "After a context reset the chair runs status, then next. Today next rewrites every prompt and prints SPAWN lines for all seats of the phase, including seats whose valid output is already on disk, so a reset mid-fan-out re-spawns up to seven agents at roughly 60k tokens each and overwrites good work. Fix: next validates existing outputs first and prints only the seats still missing or invalid, with a line such as `5 of 7 in`. It stores an attempt count per agent and prints the exact --force command at the second failure, so the `fails twice` rule no longer lives in chair memory. Status shows the same pending list.",
+     "eli5": "After a restart, only redo the seats that have not answered, and let the tool count failures.",
+     "authors": [
+      "L1"
+     ],
+     "from": [
+      "L1#2"
+     ]
+    },
+    {
+     "id": "P3",
+     "title": "Derive card authors from provenance, not chair input",
+     "body": "Self-vote exclusion in tally() trusts each card's authors list, and the chair types that list by hand twice: in pool.json at merge and in candidates.json at fuse. _check_cards only checks that authors is a non-empty list of expert ids; nothing reads the from or parents fields. A fused card built from two experts' cards but labelled with a third expert's id lets those two rank their own work, unrecorded. Fix: ingest_merge requires every from ref to be a real kept-card ref and sets authors to those experts; ingest_fuse requires parents to be shortlisted pool ids and sets authors to the union of the parents' authors. One unit test covers both.",
+     "eli5": "The computer, not the referee, writes whose idea each card came from, so nobody can vote for their own.",
+     "authors": [
+      "L2"
+     ],
+     "from": [
+      "L2#1"
+     ]
+    },
+    {
+     "id": "P4",
+     "title": "Give each voter its own candidate order",
+     "body": "blind() is seeded only by run, loop and phase, so every voter in a phase gets the identical packet, and the same card sits first on all seven ballots. LLM judges show measurable position bias (Zheng et al. 2023, MT-Bench), so a shared order adds the same tilt to every ballot and Borda sums it instead of cancelling it. Fix: keep one label-to-card mapping per phase, but have write_seat_prompts render each seat's copy in a rotated order (Latin square over seats), so each card leads about equally often. Labels, mapping and tally are unchanged; no model calls. Test: with seats at least equal to cards, every label leads some packet.",
+     "eli5": "Everyone sees the cards in a different order, so being listed first stops giving a free boost.",
+     "authors": [
+      "L2"
+     ],
+     "from": [
+      "L2#2"
+     ]
+    },
+    {
+     "id": "P5",
+     "title": "Reject agents only for faults the run reads",
+     "body": "Every rejected expert is a full respawn: about 60k tokens of host overhead plus the whole task again, and after two failures the chair must drop that voice, breaking the seven-lens rule. Three checks guard nothing downstream: ideas over 25 words (only counted; check_run already treats them as a warning), incomplete elder scores (stored, never read by cut or final), and ballots missing, repeating or misnaming a label (tally already ranks gaps neutrally). Make the first two warnings, repair ballots missing up to one in ten labels, and log each repair in run.json. Self-vote exclusion and blind labels stay untouched. Idea count, card shape and verdicts stay hard errors.",
+     "eli5": "Do not make an expert redo everything because one idea line ran long or a ballot skipped one name.",
+     "authors": [
+      "L3"
+     ],
+     "from": [
+      "L3#1"
+     ]
+    }
+   ],
+   "shortlist": [
+    "P1",
+    "P2",
+    "P3",
+    "P4",
+    "P5"
+   ],
+   "red_team": [
+    {
+     "n": 1,
+     "candidate_id": "P3",
+     "severity": "S1",
+     "finding": "Union authorship shrinks each voter's eligible set; tally turns a one-eligible-card ballot into a last-place vote and scores a card every voter co-wrote 0.0. Three two-author Lite candidates: ballots carry no signal, shuffle order ranks them.",
+     "evidence": "council.py:358 pts=(n-1-pos)/max(1,n-1) is 0 when n=1; council.py:376 avg is 0.0 when no ballot counts. Probe with the real tally(): three candidates authored {X,Y}, {Y,Z}, {X,Z}; three identical ballots, then three reversed ones: every card scores 0.0 both times, agreement 0.0, order = label order. A card written by all three experts and ranked first on every ballot scores 0.0. This run's five-card pool already holds a two-author card. Under A, listing fewer parents raises a card's score, so the chair gains by an incomplete record.",
+     "fix": "Fix tally first: one-eligible-card ballots add nothing; where exclusion leaves a card under two voters, count all ballots for it and log a deviation. Test the Lite three-author case.",
+     "response": {
+      "action": "fixed",
+      "note": "The vote counter now reads ballots as head-to-heads: a voter sits out only those where exactly one card is theirs, so co-written cards score normally (test_tally_cowritten_cards_still_get_a_fair_count). All three candidates include it."
+     }
+    },
+    {
+     "n": 2,
+     "candidate_id": "P5",
+     "severity": "S1",
+     "finding": "Its premise is false: tally gives missing or unknown labels the bottom places, not a neutral rank. A repaired ballot that skipped or misspelt its top pick votes that card last, and only run.json records it.",
+     "evidence": "council.py:363-369: unranked labels share positions len(ranking)..n-1, i.e. the bottom (docstring: 'share the remaining places'). Probe with the real tally(), 10 labels: top pick omitted -> 0.000, rank 10 of 10, problems=[]; top pick written with a 'Candidate ' prefix -> 0.000, rank 10 of 10. Neither the ledger nor fuse-input shows repairs, so the flip is invisible to the chair.",
+     "fix": "Normalise label spelling (prefixes, case) before counting gaps; place repaired labels at the ballot's middle, not bottom; print repairs in the ledger. Test both cases.",
+     "response": {
+      "action": "fixed",
+      "note": "A ballot gap is now no opinion and label spelling is cleaned before counting (test_tally_gap_is_no_opinion_and_labels_are_cleaned). Kept-with-gaps ballots are counted in the ledger line."
+     }
+    },
+    {
+     "n": 3,
+     "candidate_id": "P2",
+     "severity": "S2",
+     "finding": "ingest --force drops every invalid or unreturned seat, not just the one that failed twice. Printed while another seat is pending, it drops that seat too; in loop-1 ideate, the control arm for the whole run.",
+     "evidence": "run.py _collect (854, 874-875): with --force and quorum met, every entry in bad, including 'no output yet', is dropped; --force takes only a reason. Unreturned seats are never re-spawned by the ingest message ('Still waiting for'), so they sit at zero recorded failures. Probe (Lite, scratch project): one expert invalid, CTRL unreturned, --force citing only the expert -> control {'done': False}, and the deviation logs CTRL under the expert's reason. SKILL.md: 'Do what next prints, nothing more.'",
+     "fix": "Add ingest --drop <seat>: drops only named seats with two rejections in this phase, refusing while others are pending. Print that, never bare --force.",
+     "response": {
+      "action": "fixed",
+      "note": "Candidates 2 and 3 replace bare --force with ingest --drop <agent>, which drops only the named agent. Candidate 1 leaves --force as it is, which is a known weakness of that scope."
+     }
+    },
+    {
+     "n": 4,
+     "candidate_id": "P5",
+     "severity": "S2",
+     "finding": "Demoting elder score gaps is not enough: ingest_elders indexes o['scores'][label] directly, so an elder that skips one card's scores passes validation, then crashes ingest with an uncaught KeyError after the costliest calls.",
+     "evidence": "run.py:1120 builds 'scores': {ident(l): o['scores'][l] for l in labels}; council.py main() catches only RunError (653-655). Probe (scratch project): v_elder score errors moved to warnings, one label deleted from an elder's scores -> uncaught KeyError; phase stays elders and no retry prompt is written.",
+     "fix": "Read scores with (o.get('scores') or {}).get(l, {}) in ingest_elders; unit-test an elder output missing a whole label and one missing a criterion.",
+     "response": {
+      "action": "fixed",
+      "note": "All three candidates read elder scores with a safe lookup and add tests for an elder that omits one card or one criterion."
+     }
+    },
+    {
+     "n": 5,
+     "candidate_id": "P4",
+     "severity": "S2",
+     "finding": "Loop-1 shortlist votes always have more cards than voters (10-21 vs 7), so 'each card leads about equally often' cannot hold; rotating by seat index leaves 21 cards at mean positions 3 to 17, untested.",
+     "evidence": "run.py ingest_merge runs the vote only when the pool exceeds N+2 = 9; Full keeps up to 7 x 3 = 21 cards. Computed for 21 cards x 7 seats: offset = seat index gives per-card mean positions 3.0 to 17.0 (one shared order: 0 to 20); offset = seat x 21 // 7 gives 9.0 to 11.0. Only 7 of 21 cards can ever lead. Even spacing stays within cards/seats slots of the middle for every size from 3 to 21 cards and 5 to 7 seats; rotate-by-one does not.",
+     "fix": "Space offsets evenly (seat \u00d7 cards // seats); test every card's mean position is within cards/seats slots of the middle, for 21 cards and 7 seats.",
+     "response": {
+      "action": "fixed",
+      "note": "Per-voter order in candidates 2 and 3 uses evenly spaced offsets (voter index x cards // voters) with the mean-position test for 21 cards and 7 voters."
+     }
+    },
+    {
+     "n": 6,
+     "candidate_id": "P3",
+     "severity": "S3",
+     "finding": "It trusts from and parents, which the chair still types: a merged card listing the wrong ref keeps the hole, and nothing checks that every kept card reached the pool, so a dropped direction goes unrecorded.",
+     "evidence": "run.py next_merge drafts from=[ref] per card for the chair to edit; no code compares the refs used in pool.json with the set of kept refs. next_merge already computes word overlap between cards (_tokens, Jaccard >= 0.25), which could compare each pool body with its listed sources. SKILL.md: keep every distinct direction. The ELI5 ('nobody can vote for their own') overclaims.",
+     "fix": "Require every kept ref in some pool card's from; warn when a pool body overlaps \u226525% with a kept card it does not list, reusing next_merge's word overlap."
+    },
+    {
+     "n": 7,
+     "candidate_id": "P1",
+     "severity": "S3",
+     "finding": "After the move-aside, an ingest before dispatch lists those CLI seats as 'Still waiting for' with no dispatch line. CLI seats never arrive by waiting, so the stall returns in a new form.",
+     "evidence": "run.py _collect 863-869: only seats with a rejected file on disk get spawn lines; seats with none get 'Still waiting for'. Probe (scratch project, COUNCIL_SEATS_VIA=cli:claude): dispatch --dry-run after a rejection runs only the unreturned seat, confirming the dead end; then three rejected outputs renamed aside and ingest re-run -> 'Still waiting for: L1, L2, L3, CTRL', no RUN line. A never-dispatched CLI seat already shows the same today.",
+     "fix": "In _collect, print the dispatch command for missing seats whose via is cli or openrouter, not 'Still waiting for'; test it with the moved-aside case."
+    },
+    {
+     "n": 8,
+     "candidate_id": "P4",
+     "severity": "S3",
+     "finding": "Suspected: labels stay fixed per phase, so any preference for a label token such as 'A' still lands on the same card in every ballot. C spreads position bias but leaves label bias summed by Borda.",
+     "evidence": "Zheng et al., ICLR 2024, 'Large Language Models Are Not Robust Multiple Choice Selectors', trace most option-selection bias to preference for option-ID tokens rather than position. Unverified for listwise ranking. Check: rank one packet twice with labels permuted and compare per-card Borda.",
+     "fix": "Give each seat its own label permutation too, kept in the private mapping; translate each ballot to canonical labels at ingest, before tally."
+    },
+    {
+     "n": 9,
+     "candidate_id": "P2",
+     "severity": "S3",
+     "finding": "Suspected: if next and status validate through _collect, every call re-appends friction notes (retried ingests already duplicate them), and an attempt counter placed there turns two status calls into 'failed twice', triggering the --force line.",
+     "evidence": "run.py _collect 851-852 appends friction for each valid seat on every call and saves before raising (871). Probe: one failed ingest, then a forced one, left the same friction note twice in run.json. cmd_next saves run.json (475); cmd_status is read-only today.",
+     "fix": "Split a pure validate() out of _collect; record friction and count attempts only inside ingest; test that repeated status and next calls leave friction and attempt counts unchanged."
+    },
+    {
+     "n": 10,
+     "candidate_id": "P1",
+     "severity": "S3",
+     "finding": "Suspected: the unit test can only mock providers.ask, and the codex and gemini adapters have never run, so the first real cross-lab retry likely fails upstream; with the dead end gone, nothing in the tool caps paid re-dispatches.",
+     "evidence": "Facts: codex and gemini CLI paths are written from docs and untested; a nested claude -p fails auth here. providers._command builds 'codex exec -o <file> -' and 'gemini -o json -p <nudge>'; no test runs a subprocess. run['retries'] (run.py:870) is one global counter that nothing reads.",
+     "fix": "Test with a fake codex script on PATH that answers prose then valid JSON, exercising dispatch, parse and retry; stop re-dispatching a seat after two rejections."
+    }
+   ],
+   "red_team_eli5": "If the computer lists everyone who helped, a card everyone helped write gets no fair votes and loses.",
+   "candidates": [
+    {
+     "id": "C1",
+     "title": "Fix the five proven defects, then release",
+     "body": "Ship only what has a reproduction or a failing probe, one unit test each, and change nothing structural. (1) Vote count: head-to-heads, so co-written cards score fairly and a ballot gap is no opinion. (2) Rejected output from a CLI or API agent is moved aside so the printed retry really reruns it, and missing CLI agents get a dispatch line instead of `still waiting`. (3) The identity-leak check matches real ids only. (4) Elder scores are read safely: no crash on a missing entry. (5) Over-long idea lines warn instead of rejecting. Resume logic, authorship records and packet order stay as they are until a later release.",
+     "eli5": "Fix the five things we watched break. Touch nothing else before release.",
+     "authors": [
+      "L1",
+      "L3"
+     ],
+     "parents": [
+      "P1",
+      "P5"
+     ]
+    },
+    {
+     "id": "C2",
+     "title": "Full hardening in dependency order",
+     "body": "Do every fix the council raised, in an order where each step rests on a tested one. First the five proven defects (vote count, dead retry, leak alarm, elder-score crash, idea-length rejection). Then restart safety: `next` lists only agents still missing, validation becomes a pure function, attempts are counted per agent at ingest, and `ingest --drop <agent>` replaces bare `--force`. Then vote integrity: authors are derived from `from` and `parents`, every kept card must reach the pool, and each voter gets its own evenly spaced order and its own label letters. Roughly twelve changes, one test each; nothing is deferred.",
+     "eli5": "Fix everything the team found, one tested step at a time.",
+     "authors": [
+      "L1",
+      "L2",
+      "L3"
+     ],
+     "parents": [
+      "P1",
+      "P2",
+      "P3",
+      "P4",
+      "P5"
+     ]
+    },
+    {
+     "id": "C3",
+     "title": "Defects plus four changes that remove typing",
+     "body": "Ship the five proven defects, then only the four structural changes that take work or risk away from the chair. `next` lists just the agents still missing after a restart. `ingest --drop <agent>` drops one named agent and can never drop the control arm by accident. Authors are derived from `from` and `parents`, so the chair stops typing them and nobody can rank a card they fed. Each voter reads the cards in its own evenly spaced order. Deferred, with reasons recorded: per-voter label letters (suspected bias, unmeasured), attempt counters, overlap warnings. Nine changes, one test each.",
+     "eli5": "Fix what broke, plus four changes that mean less typing and fairer votes. Park the rest.",
+     "authors": [
+      "L1",
+      "L2",
+      "L3"
+     ],
+     "parents": [
+      "P1",
+      "P2",
+      "P3",
+      "P4",
+      "P5"
+     ]
+    }
+   ],
+   "checks": {},
+   "rank": {
+    "order": [
+     "C3",
+     "C2",
+     "C1"
+    ],
+    "ranking": [
+     {
+      "id": "C3",
+      "score": 0.775,
+      "check": "n/a"
+     },
+     {
+      "id": "C2",
+      "score": 0.475,
+      "check": "n/a"
+     },
+     {
+      "id": "C1",
+      "score": 0.25,
+      "check": "n/a"
+     }
+    ],
+    "agreement": 1.0,
+    "agreement_note": "strong",
+    "ballots": 3,
+    "head_to_heads": 7,
+    "recused": 2,
+    "gaps": 0,
+    "unjudged": [],
+    "ties": [],
+    "best_on": {}
+   },
+   "reviewed": [
+    "C3",
+    "C2"
+   ],
+   "elder_reviews": [
+    {
+     "seat": "EA",
+     "model": "Claude Opus 5.5 (max)",
+     "stand_in_for": null,
+     "model_source": null,
+     "preferred": "C3",
+     "verdict": {
+      "C3": "revise",
+      "CONTROL": "revise",
+      "C2": "revise"
+     },
+     "scores": {
+      "C3": {
+       "R1": 8,
+       "R2": 7,
+       "R3": 8,
+       "R4": 9,
+       "R5": 8
+      },
+      "CONTROL": {
+       "R1": 6,
+       "R2": 8,
+       "R3": 5,
+       "R4": 8,
+       "R5": 8
+      },
+      "C2": {
+       "R1": 7,
+       "R2": 8,
+       "R3": 8,
+       "R4": 9,
+       "R5": 6
+      }
+     },
+     "confidence": 0.6,
+     "top_risks": [
+      {
+       "risk": "Unjudged head-to-heads count as even (0.5). On the current tally a candidate 6 of 7 seats wrote, ranked first on all 7 ballots, scores 0.50 while the runner-up leads with 0.69. In the last Full loop only the leader reaches the elders, so the favourite is cut and no deviation is logged (reproduced). A's derived authors make many-author cards common. C has the same gap; B's escalation is the right fix.",
+       "severity": "S1",
+       "candidate": "A"
+      },
+      {
+       "risk": "Control arm lifecycle. The control card is blind-checked only at next_elders, so 'Each seat gets' or 'L1 cache' stalls the run there and only unblinding gets it moving (reproduced: 'CONTROL: identity leak: seat gets'). If the private store is missing on resume, next_elders silently drops the control and cut records that the council won (reproduced). A and C leave both open; B fixes only the first.",
+       "severity": "S2",
+       "candidate": "all"
+      },
+      {
+       "risk": "C counts attempts 'per agent at ingest', but ingest re-runs while the chair waits. Today one rejected output re-ingested 4 times already counts 4 retries (reproduced). Auto-dropping on that count would drop seats that were never retried. Count distinct rejected outputs (by hash) instead.",
+       "severity": "S2",
+       "candidate": "C"
+      }
+     ],
+     "key_fix": "Graft B's guard, re-specified for the current head-to-head tally: a vote never cuts what it could not judge. If a top-2 candidate has a head-to-head no unconflicted voter could judge (or fewer than 2 judges), send the top 2 to the elders even in the last Full loop, keep such cards on the shortlist, and log a deviation. Test: a unanimous favourite written by 6 of 7 seats must reach the elders.",
+     "own_idea": "Seal the control arm, beyond B's ingest-time blind check. At init, write the private store's resolved path into run.json; at ingest_ideate, also store the control card's sha256. next_elders and cut must stop when the sealed card is missing or changed; after an explicit --drop CTRL they log a deviation and record 'control not run'. Today, resuming in a shell without COUNCIL_PRIVATE_DIR and following the tool's own 'Re-run council.py next' advice drops the control silently, and the record says 'the council's answer was preferred by 1 of 1 elder(s)' (reproduced).",
+     "eli5": "Ship the typing-saving fixes, but never let a vote silently drop a card nobody could fairly judge."
+    }
+   ],
+   "survivors": [
+    "C3"
+   ],
+   "eliminated": [
+    "C2",
+    "C1"
+   ],
+   "wildcard": null,
+   "eli5": "Three experts found real stalls and a vote-counting bug; all three ranked the mid-size fix package first; the elder agreed but asked for one more guard.",
+   "changed": "",
+   "control_votes": 0,
+   "finished": "2026-11-13T19:24:45",
+   "unattended": "build the winner with the elder's S1 fix grafted in (a vote must never cut a card it could not judge) and the control arm sealed; nothing is released yet, so every step can be undone"
+  }
+ ],
+ "shape": {
+  "experts": 3,
+  "ideas_min": 5,
+  "keep": 2,
+  "elders": 1,
+  "start": 3,
+  "loops": 1,
+  "rubric": [
+   3,
+   7
+  ],
+  "schedule": [
+   3,
+   1
+  ]
+ },
+ "max_loops": 1,
+ "schedule": [
+  3,
+  1
+ ],
+ "chair": {
+  "model": "Claude Fable 5.2 (high)",
+  "creator": "Anthropic",
+  "quality": 62,
+  "cost_per_task": 9.08
+ },
+ "seats": {
+  "L1": {
+   "role": "expert",
+   "model": "Claude Fable 5.2 (low)",
+   "creator": "Anthropic",
+   "effort": "low",
+   "via": "subagent",
+   "alias": "fable"
+  },
+  "L2": {
+   "role": "expert",
+   "model": "Claude Opus 5.5 (high)",
+   "creator": "Anthropic",
+   "effort": "high",
+   "via": "subagent",
+   "alias": "opus"
+  },
+  "L3": {
+   "role": "expert",
+   "model": "Claude Sonnet 5.5 (xhigh)",
+   "creator": "Anthropic",
+   "effort": "xhigh",
+   "via": "subagent",
+   "alias": "sonnet"
+  },
+  "RT": {
+   "role": "red_team",
+   "model": "Claude Opus 5.5 (max)",
+   "creator": "Anthropic",
+   "effort": "max",
+   "via": "subagent",
+   "alias": "opus"
+  },
+  "EA": {
+   "role": "elder",
+   "model": "Claude Opus 5.5 (max)",
+   "creator": "Anthropic",
+   "effort": "max",
+   "via": "subagent",
+   "alias": "opus"
+  },
+  "CTRL": {
+   "role": "control",
+   "model": "Claude Fable 5.2 (high)",
+   "creator": "Anthropic",
+   "effort": "high",
+   "via": "subagent",
+   "alias": "fable"
+  }
+ },
+ "loop": 1,
+ "phase": "done",
+ "updated": "2026-11-13T19:26:58",
+ "brief": {
+  "restated": "Decide the changes that would most improve the council-loop kit (v0.2, in this repo) for the AI that runs it: the chair, and the seats that receive its packets. Pick what to change before release.\n",
+  "eli5": "Find the fixes that make the AI team's rulebook easiest to follow correctly.",
+  "rubric": [
+   {
+    "id": "R1",
+    "name": "Fewer wrong, stalled or drifting runs by the executing model",
+    "weight": 35,
+    "check": "judgment"
+   },
+   {
+    "id": "R2",
+    "name": "Integrity: bias controls hold and the record stays honest",
+    "weight": 25,
+    "check": "machine"
+   },
+   {
+    "id": "R3",
+    "name": "Lower cost: seat calls, tokens, wall-clock",
+    "weight": 15,
+    "check": "source"
+   },
+   {
+    "id": "R4",
+    "name": "Keeps Logan's process whole (7 x 13, up to 3 loops, cross-lab elders, 7-5-3-1, ELI5s)",
+    "weight": 15,
+    "check": "judgment"
+   },
+   {
+    "id": "R5",
+    "name": "Small and testable: can ship today with a unit test",
+    "weight": 10,
+    "check": "machine"
+   }
+  ],
+  "evidence_plan": [
+   "Unit tests: tests/test_run.py drives a whole run with fake seats (tests/sim.py); a proposed fix should be testable there.",
+   "Read the code paths named in facts; cite file and function for every claim.",
+   "This run itself is evidence: seats report friction with their own packets."
+  ],
+  "lenses": [
+   {
+    "id": "L1",
+    "name": "Executor ergonomics",
+    "maximize": "The odds that an LLM chair with a finite context, possibly reset mid-run, finishes a Full council correctly",
+    "respect": "Add no new concept that Logan has to learn",
+    "method": "Walk the next / ingest loop step by step as the chair; find every point where a model would stall, guess or drift",
+    "evidence": "skills/council-loop/SKILL.md; the next_* and ingest_* functions in scripts/run.py"
+   },
+   {
+    "id": "L2",
+    "name": "Integrity under pressure",
+    "maximize": "Resistance to quiet failure: biased votes, broken blinding, gamed checks, wrong tallies, deviations that go unrecorded",
+    "respect": "The referee stays deterministic and unit-testable (no LLM inside the script)",
+    "method": "Read scripts/council.py and scripts/run.py adversarially; try to break each invariant on paper",
+    "evidence": "tally, cut, blind, verify_locks in scripts/council.py; _collect, _standing, cmd_cut in scripts/run.py; tests/"
+   },
+   {
+    "id": "L3",
+    "name": "Cost and simplicity",
+    "maximize": "Decision quality per token and per minute",
+    "respect": "Logan's process stays whole: 7 lenses x 13 ideas, up to 3 loops, elders each loop, 7-5-3-1",
+    "method": "Delete, merge or cheapen steps; count calls and words in the packets",
+    "evidence": "templates/packets/*.md; estimate_calls in scripts/council.py; reference/protocol.md"
+   }
+  ],
+  "facts": "Repo root: <repo>. Read these: skills/council-loop/SKILL.md (what the chair reads), skills/council-loop/reference/protocol.md, skills/council-loop/scripts/run.py (state machine), skills/council-loop/scripts/council.py (gate, blind, tally, cut, locks), scripts/providers.py (CLI adapters), skills/council-loop/templates/packets/*.md (what seats read), tests/test_run.py and tests/sim.py. Numbers: a Full run is about 76 seat calls (25 per loop x 3 + 1 control); Lite about 9. In the Cowork host each subagent spawn carries roughly 60k tokens of overhead before it reads its packet. Known limits today: the codex and gemini CLI paths are written from docs and untested; a nested `claude -p` call fails authentication in this sandbox; README.md, AGENTS.md and mcp/server.py still describe v0.1 and will be rewritten after this council, so do not spend ideas on them.\n",
+  "lessons_applied": [
+   "L-20261113-1",
+   "L-20261113-2"
+  ],
+  "approved_by": "unattended"
+ },
+ "control": {
+  "done": true
+ },
+ "winner": "C3",
+ "control_result": "won",
+ "control_line": "the council's answer was preferred by 1 of 1 elder(s)",
+ "final": {
+  "file": "final.md",
+  "words": 1531
+ },
+ "retro": {
+  "file": "retro.md",
+  "lessons": [
+   "- [L-20261113-4] (helpful: 0 | harmful: 0) Before releasing a change to the referee scripts, run a Lite council on the kit itself: three experts, a red team and one elder found 13 real defects that review by one model had missed. Evidence: 261113-183103-take-turn-review",
+   "- [L-20261113-5] (helpful: 0 | harmful: 0) Tell the red team and the elders to reproduce claims by running code in a scratch copy: every S1 in this run came from a reproduction, none from reading alone. Evidence: 261113-183103-take-turn-review",
+   "- [L-20261113-6] (helpful: 0 | harmful: 0) Count tokens, not calls: a blind vote cost about 64,000 tokens per spawned agent here, nearly all start-up overhead, so route vote, rank and elder seats through a lean no-tool call where one exists. Evidence: 261113-183103-take-turn-review"
+  ]
+ }
+}

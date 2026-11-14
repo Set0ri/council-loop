@@ -1,0 +1,40 @@
+{
+ "lens": "L2",
+ "eli5": "The vote counter is solid, but the chair still hand-writes who authored what and everyone sees one order.",
+ "ideas": [
+  "Derive pool and candidate authors from from/parents refs at ingest; the chair can no longer mislabel authors and let seats vote for their own cards.",
+  "Render each voter's packet in its own seeded order (same labels); a single shared order adds identical position bias to every Borda ballot.",
+  "Block the final cut when the leader after elder kills was never elder-reviewed; today a killed top pick hands the win to an unreviewed card.",
+  "Log a deviation when cut --stop is used without unanimous ship-and-prefer from elders; early stops currently need no justification.",
+  "Make check_run errors block the retro-to-done transition instead of just printing them; a failing protocol check should not close a run.",
+  "Record sha256 of every seat out.json at ingest; a new audit command re-tallies from raw ballots plus the private mapping and flags any mismatch.",
+  "Contrarian: drop the shortlist vote in Full and send top pool cards by red-team triage instead; saves 7 seat calls per loop.",
+  "Contrarian: stop trusting approved_by: logan typed by the chair; require Logan's own words via --override-style flag, else record unattended.",
+  "Simpler: treat an empty red-team result after --force as a hard deviation in check_run, not a silently empty list.",
+  "Simpler: add model names to blind() forbidden tokens so cards mentioning 'Gemini thinks' or a seat model cannot leak authorship."
+ ],
+ "cards": [
+  {
+   "title": "Derive card authors from provenance, not chair input",
+   "body": "Self-vote exclusion in tally() trusts each card's authors list, and the chair types that list by hand twice: in pool.json at merge and in candidates.json at fuse. _check_cards only checks that authors is a non-empty list of expert seat ids; nothing reads the from or parents fields. A fused card built from L2 and L3 cards but labelled [L1] lets L2 and L3 rank their own work, unrecorded. Fix: ingest_merge requires every from ref to be a real kept-card ref and sets authors to those seats; ingest_fuse requires parents to be shortlisted pool ids and sets authors to the union of the parents' authors. One unit test covers both.",
+   "wins": [
+    "R2",
+    "R5"
+   ],
+   "evidence": "skills/council-loop/scripts/run.py: _check_cards (lines 974-983), ingest_merge, ingest_fuse (line 1084 copies parents unchecked); council.py tally() own-label exclusion (line 349). Read on paper; no exploit test run.",
+   "eli5": "The computer, not the referee, writes whose idea each card came from, so nobody can vote for their own."
+  },
+  {
+   "title": "Give each voter its own candidate order",
+   "body": "blind() is seeded only by run, loop and phase, so every voter in a phase gets the identical packet, and the same card sits first on all seven ballots. LLM judges show measurable position bias (Zheng et al. 2023, MT-Bench), so a shared order adds the same tilt to every ballot and Borda sums it instead of cancelling it. Fix: keep one label-to-card mapping per phase, but have write_seat_prompts render each seat's copy in a rotated order (Latin square over seats), so each card leads about equally often. Labels, mapping and tally are unchanged; no model calls. Test: with seats at least equal to cards, every label leads some packet.",
+   "wins": [
+    "R2",
+    "R5",
+    "R1"
+   ],
+   "evidence": "skills/council-loop/scripts/run.py seed_for() and _vote_prompts() write one packet for all seats; council.py blind() emits cards in label order. Position bias: Zheng et al. 2023 'Judging LLM-as-a-Judge' (from memory, not re-checked this session).",
+   "eli5": "Everyone sees the cards in a different order, so being listed first stops giving a free boost."
+  }
+ ],
+ "friction": "The lens lists _collect and verify_locks as evidence, but chair edits to seat out.json files before ingest are out of scope for any deterministic fix; say if that is accepted."
+}

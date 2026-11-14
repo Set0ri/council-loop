@@ -1,0 +1,43 @@
+{
+ "lens": "L3",
+ "eli5": "Packets cost almost nothing; spawns and retries cost everything. Stop rejecting agents for faults nobody reads, and unblock dead-end retries.",
+ "ideas": [
+  "Demote errors on data nobody reads (idea length, elder score gaps) to warnings: each avoided rejection saves a full respawn and protects the seven-lens quorum.",
+  "Repair near-complete ballots (missing, repeated or unknown labels, up to one in ten) instead of rejecting them; tally already ranks gaps neutrally. Log each repair.",
+  "Fix the dispatch dead end: move a rejected CLI seat's output aside so the printed retry step reruns it instead of saying nothing to dispatch.",
+  "Narrow the leak regex to real seat ids: 'seat call' and 'seat cost' currently fail the blind check and force the chair to rewrite cards.",
+  "Later loops keep one card per expert: seven cards meet the existing small-pool rule, skipping the shortlist vote and cutting 76 calls to 69.",
+  "Contrarian: run a phase's seven voters in one spawn writing seven ballots. Saves 36 spawns but destroys independent voting, so reject it.",
+  "Contrarian: route tool-less judge seats (shortlist vote, rank, elders) through direct API or CLI calls, skipping spawn overhead on 54 of 76 calls. Unverified here.",
+  "Contrarian: relax early stop to unanimous preference, no kill, no S1, so loop two can end a converged Full run and save 25 calls.",
+  "Simple: print calls times 60k as estimated host tokens on the GATE line, so tier choices see roughly 4.6M tokens for Full.",
+  "Simple: never trim packet words. Measured packets total about 134k tokens against 4.56M of spawn overhead, so only spawns and retries matter.",
+  "Simple: cap vote and rank seats at medium effort, since blind ranking is mechanical work. Quality effect unverified.",
+  "Probe each CLI inside init and label unauthenticated ones as stand-ins before assigning seats, so a logged-out codex cannot stall the quorum."
+ ],
+ "cards": [
+  {
+   "title": "Reject agents only for faults the run reads",
+   "body": "Every rejected expert is a full respawn: about 60k tokens of host overhead plus the whole task again, and after two failures the chair must drop that voice, breaking the seven-lens rule. Three checks guard nothing downstream: ideas over 25 words (only counted; check_run already treats them as a warning), incomplete elder scores (stored, never read by cut or final), and ballots missing, repeating or misnaming a label (tally already ranks gaps neutrally). Make the first two warnings, repair ballots missing up to one in ten labels, and log each repair in run.json. Self-vote exclusion and blind labels stay untouched. Idea count, card shape and verdicts stay hard errors.",
+   "wins": [
+    "R1",
+    "R3",
+    "R5"
+   ],
+   "evidence": "run.py v_ideate, v_elder, v_ballot (lines 341-424), ingest_ideate 956-966, ingest_elders 1120; council.py check_run 459-464 and tally; tests/sim.py 'partial' mode is never used by test_run.py. Counted with a script: 7 of my own 11 first-draft idea lines exceeded 27 words (one model, small sample). Real rejection rates for other agents: unverified.",
+   "eli5": "Do not make an expert redo everything because one idea line ran long or a ballot skipped one name."
+  },
+  {
+   "title": "Remove two stalls found by running the kit",
+   "body": "Running the kit in a scratch copy reproduced two stalls. First, when a CLI-run expert's output is rejected, ingest prints 'RUN council.py dispatch', but dispatch skips any agent whose output file exists and answers 'nothing to dispatch'; only --seat works. Fix: move the rejected file aside to a .rejected.json name when the retry prompt is written. Second, the identity-leak check flags ordinary cost phrases built on the word for a council place (five of five tried), so the chair must rewrite cards at merge. Narrow it to real ids: an L-number, RT, an E-letter or CTRL after that word; bare ids stay forbidden. Add one test for each.",
+   "wins": [
+    "R1",
+    "R2",
+    "R5"
+   ],
+   "evidence": "Reproduced in a /tmp copy: cmd_dispatch (run.py, 'if o.exists() and not seat: continue') printed 'nothing to dispatch' for a rejected codex agent; council.blind flagged 5 of 5 'seat call / seat cost / seat vote / seat fan-out' style phrases tried; council.py LEAK_RE. The codex and gemini live paths themselves: unverified.",
+   "eli5": "Two stuck buttons: a retry that does nothing, and a blind-check alarm that rings at ordinary words."
+  }
+ ],
+ "friction": "Seats get no word counter, yet idea lines over 27 words are hard errors; the packet should give a counting rule or the check should only warn."
+}

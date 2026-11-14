@@ -1,0 +1,11 @@
+### Candidate A: Full hardening in dependency order
+Do every fix the council raised, in an order where each step rests on a tested one. First the five proven defects (vote count, dead retry, leak alarm, elder-score crash, idea-length rejection). Then restart safety: `next` lists only agents still missing, validation becomes a pure function, attempts are counted per agent at ingest, and `ingest --drop <agent>` replaces bare `--force`. Then vote integrity: authors are derived from `from` and `parents`, every kept card must reach the pool, and each voter gets its own evenly spaced order and its own label letters. Roughly twelve changes, one test each; nothing is deferred.
+ELI5: Fix everything the team found, one tested step at a time.
+
+### Candidate B: Defects plus four changes that remove typing
+Ship the five proven defects, then only the four structural changes that take work or risk away from the chair. `next` lists just the agents still missing after a restart. `ingest --drop <agent>` drops one named agent and can never drop the control arm by accident. Authors are derived from `from` and `parents`, so the chair stops typing them and nobody can rank a card they fed. Each voter reads the cards in its own evenly spaced order. Deferred, with reasons recorded: per-voter label letters (suspected bias, unmeasured), attempt counters, overlap warnings. Nine changes, one test each.
+ELI5: Fix what broke, plus four changes that mean less typing and fairer votes. Park the rest.
+
+### Candidate C: Fix the five proven defects, then release
+Ship only what has a reproduction or a failing probe, one unit test each, and change nothing structural. (1) Vote count: head-to-heads, so co-written cards score fairly and a ballot gap is no opinion. (2) Rejected output from a CLI or API agent is moved aside so the printed retry really reruns it, and missing CLI agents get a dispatch line instead of `still waiting`. (3) The identity-leak check matches real ids only. (4) Elder scores are read safely: no crash on a missing entry. (5) Over-long idea lines warn instead of rejecting. Resume logic, authorship records and packet order stay as they are until a later release.
+ELI5: Fix the five things we watched break. Touch nothing else before release.

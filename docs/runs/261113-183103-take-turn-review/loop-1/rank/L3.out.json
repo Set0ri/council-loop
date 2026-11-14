@@ -1,0 +1,8 @@
+{"voter": "L3",
+ "ranking": ["B", "A", "C"],
+ "reasons": {
+  "B": "R1, R2: restart and authorship fixes cut stalls and bias; unmeasured extras deferred, R5 intact.",
+  "A": "R1, R2: fullest restart and vote integrity, but twelve changes strain R5, R3."
+ },
+ "best_on": {"R1": "A", "R2": "A", "R3": "B", "R4": "A", "R5": "C"},
+ "friction": "R3 is ambiguous between runtime seat cost and build effort; I read it as runtime cost, and no candidate states per-run savings."}

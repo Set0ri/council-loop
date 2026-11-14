@@ -1,0 +1,4 @@
+#!/bin/sh
+# council: the Council Loop command, from a checkout or a plugin folder. Put this folder on PATH,
+# or call the file by its path. See skills/council-loop/scripts/council for what it runs.
+exec sh "$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)/skills/council-loop/scripts/council" "$@"

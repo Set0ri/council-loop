@@ -1,0 +1,11 @@
+### Candidate A: Defects plus four changes that remove typing
+Ship the five proven defects, then only the four structural changes that take work or risk away from the chair. `next` lists just the agents still missing after a restart. `ingest --drop <agent>` drops one named agent and can never drop the control arm by accident. Authors are derived from `from` and `parents`, so the chair stops typing them and nobody can rank a card they fed. Each voter reads the cards in its own evenly spaced order. Deferred, with reasons recorded: per-voter label letters (suspected bias, unmeasured), attempt counters, overlap warnings. Nine changes, one test each.
+ELI5: Fix what broke, plus four changes that mean less typing and fairer votes. Park the rest.
+
+### Candidate B: Stop shared authorship from corrupting the blind tally
+Fix council.tally before release: self-vote removal breaks once cards have several authors, and merge and fuse create those by design. Reproduced: a pool card that all seven experts wrote, ranked first on every ballot, lands 11th of 12 and misses the shortlist; three Lite candidates with two authors each all score 0.00, so label order picks the winner and no deviation is logged. Change: skip ballots with under two eligible cards; mark a card with under two eligible voters unranked, send it to the elders, and log a deviation. Also blind-check the control card at ingest_ideate: today an innocent phrase stalls next_elders, unfixable without unblinding. Add three unit tests.
+ELI5: When everyone helped write an idea, nobody may vote for it, so it wrongly loses. Fix the counting.
+
+### Candidate C: Full hardening in dependency order
+Do every fix the council raised, in an order where each step rests on a tested one. First the five proven defects (vote count, dead retry, leak alarm, elder-score crash, idea-length rejection). Then restart safety: `next` lists only agents still missing, validation becomes a pure function, attempts are counted per agent at ingest, and `ingest --drop <agent>` replaces bare `--force`. Then vote integrity: authors are derived from `from` and `parents`, every kept card must reach the pool, and each voter gets its own evenly spaced order and its own label letters. Roughly twelve changes, one test each; nothing is deferred.
+ELI5: Fix everything the team found, one tested step at a time.

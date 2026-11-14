@@ -1,31 +1,37 @@
-# <Decision in one line: what we will do>
+# TODO(chair): the decision in one line
 
-**Answer:** <2–3 sentences, plain words, the recommendation and its main reason>
+**Answer:** TODO(chair): 2 to 3 plain sentences: the recommendation and its main reason.
 
-**ELI5:** <≤25 words>
+**ELI5:** TODO(chair): 25 words at most.
 
-<One diagram: the decision, the flow, or before/after>
+TODO(chair): one diagram of the decision, the flow, or before and after (or delete this line).
 
 ## Why this wins
-- <Evidence 1 with source or check result>
-- <Evidence 2>
+- TODO(chair): evidence with its source or check result.
 
 ## What we considered and dropped
 | Option | Why it lost |
 | --- | --- |
+$dropped_rows
 
 ## Risks and how we handle them
 | Risk | Severity | Mitigation | Owner |
 | --- | --- | --- | --- |
+$risk_rows
 
 ## Dissent (recorded, not averaged away)
-- <Elder or lens>: <view>
+$dissent
 
 ## How we'll know (falsifiable)
-- Success metric(s) at 30 / 90 days:
-- Kill criteria:
+- Success metric at 30 and 90 days: TODO(chair)
+- Kill criterion: TODO(chair)
 
 ## Next steps
-- [ ] ...
+- [ ] TODO(chair)
 
-Control arm: council output vs one-shot baseline → <won / lost / tie> (blind elder judgment)
+## Run facts
+- $gate
+- Winner: $winner_title
+- Control arm (one-shot baseline, judged blind by the elders): $control_line
+- Seats: $seat_line
+- Deviations: $deviations

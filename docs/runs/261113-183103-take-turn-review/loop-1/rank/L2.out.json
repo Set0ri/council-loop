@@ -1,0 +1,5 @@
+{"voter": "L2",
+ "ranking": ["B", "A", "C"],
+ "reasons": {"B": "R1, R2: derived authors and --drop close real integrity holes; deferrals recorded honestly.", "A": "R2: strongest bias controls, but twelve changes raise R1 drift and R5 size."},
+ "best_on": {"R1": "B", "R2": "A", "R3": "C", "R4": "C", "R5": "C"},
+ "friction": "R2 says 'machine' checked, but no candidate states which machine checks verify blinding, so R2 was judged on described mechanisms."}

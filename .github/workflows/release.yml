@@ -1,0 +1,40 @@
+name: release
+# Builds the `council` binary for each system when a tag like v0.4.0 is pushed, and attaches the
+# archives to the GitHub release. This workflow had not run when it was written: check the first
+# release it makes before pointing anyone at it.
+# To do before a public release: pack the licence notices of the crates the binary contains (all are
+# permissive; `cargo about generate` can collect them) next to LICENSE.
+on:
+  push:
+    tags: ["v*"]
+permissions:
+  contents: write
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {os: ubuntu-latest, target: x86_64-unknown-linux-gnu, exe: council}
+          - {os: ubuntu-24.04-arm, target: aarch64-unknown-linux-gnu, exe: council}
+          - {os: macos-latest, target: aarch64-apple-darwin, exe: council}
+          - {os: macos-13, target: x86_64-apple-darwin, exe: council}
+          - {os: windows-latest, target: x86_64-pc-windows-msvc, exe: council.exe}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with: {targets: "${{ matrix.target }}"}
+      - run: cargo build --release --locked --target ${{ matrix.target }}
+      - name: Pack
+        shell: bash
+        run: |
+          name="council-${GITHUB_REF_NAME}-${{ matrix.target }}"
+          mkdir "$name"
+          cp "target/${{ matrix.target }}/release/${{ matrix.exe }}" LICENSE README.md "$name/"
+          if [ "${{ runner.os }}" = "Windows" ]; then 7z a "$name.zip" "$name" > /dev/null; else tar -czf "$name.tar.gz" "$name"; fi
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            council-*.tar.gz
+            council-*.zip

@@ -1,0 +1,40 @@
+{
+ "lens": "L1",
+ "eli5": "Fix the two places where the chair is told to repeat work or gets stuck retrying; both are small.",
+ "ideas": [
+  "Dispatch re-runs rejected CLI seats: today existing bad output blocks retry, so elder retries stall forever.",
+  "Next prints only missing or invalid seats: a reset mid-fan-out stops re-spawning seven 60k-token agents.",
+  "Script counts attempts per seat and prints the exact --force line: 'fails twice' survives context resets.",
+  "Simpler: status ends with the literal next command and pending seats, not a generic 'next: council.py next'.",
+  "Simpler: delete SKILL.md prose that next already prints; shorter rulebook, fewer places for chair to drift.",
+  "Contrarian: chair casts no-tool ballots through one batched script call instead of 42 subagent spawns; saves most overhead.",
+  "Contrarian: make body under 90 words a warning, not an error; each length retry costs a full spawn.",
+  "Cut refuses when elders split and neither --asked nor --unattended given: stops silent drift past judgment point.",
+  "Ingest prints one-line 'you are here' (step k of n, calls used) so a reset chair never needs status."
+ ],
+ "cards": [
+  {
+   "title": "Let dispatch retry rejected CLI seats",
+   "body": "When a CLI or API seat returns invalid output, ingest writes a retry prompt and prints `RUN council.py dispatch`. But cmd_dispatch skips every seat whose output file already exists unless --seat is passed, so the rejected file blocks its own retry: dispatch answers `nothing to dispatch`, ingest rejects the same file again, and the chair loops or guesses. All three cross-lab elders travel this path. Fix: dispatch re-runs any seat that has a retry prompt newer than its output, and the printed retry line names the seats. One unit test: invalid elder output, ingest, dispatch --dry-run must list that seat. No new concept; the two-command loop stays as it is.",
+   "wins": [
+    "R1",
+    "R5",
+    "R4"
+   ],
+   "evidence": "skills/council-loop/scripts/run.py: cmd_dispatch (`if o.exists() and not seat: continue`), spawn_lines (retry line prints plain `council.py dispatch`), _collect (writes .retry.md, leaves the bad .out.json). Found by reading the code; not executed. tests/test_run.py covers the retry prompt only for subagent seats.",
+   "eli5": "A broken answer from an outside model currently blocks asking again. Let the tool ask again."
+  },
+  {
+   "title": "Next resumes: spawn only missing seats",
+   "body": "After a context reset the chair runs status, then next. Today next rewrites every prompt and prints SPAWN lines for all seats of the phase, including seats whose valid output is already on disk, so a reset mid-fan-out re-spawns up to seven agents at roughly 60k tokens each and overwrites good work. Fix: next validates existing outputs first and prints only the seats still missing or invalid, with a line such as `5 of 7 in`. It stores an attempt count per seat and prints the exact --force command at the second failure, so the `fails twice` rule no longer lives in chair memory. Status shows the same pending list.",
+   "wins": [
+    "R1",
+    "R3",
+    "R2"
+   ],
+   "evidence": "skills/council-loop/scripts/run.py: next_ideate, next_vote, next_rank, next_elders call spawn_lines with only=None; cmd_status ends `next: council.py next`; run['retries'] is one global counter. 60k per spawn is from the packet facts. Found by reading the code; not executed.",
+   "eli5": "After a restart, only redo the seats that have not answered, and let the tool count failures."
+  }
+ ],
+ "friction": "Packet lists scripts/providers.py; it is at skills/council-loop/scripts/providers.py."
+}

@@ -17,7 +17,7 @@ Re-check them with your golden set.
 | How much debate | One structured red-team pass per loop, no open-ended debate | Majority voting explains most debate gains ([Debate or Vote](https://arxiv.org/html/2508.17536v2)). Debate can flip right answers to wrong ([Talk Isn't Always Cheap](https://arxiv.org/html/2509.05396v2)) |
 | Token budget | The gate prints relative cost. Profiles trade quality for cost | Multi-agent runs use ~15x chat tokens, and token usage alone explained 80% of performance variance on BrowseComp ([Anthropic](https://www.anthropic.com/engineering/multi-agent-research-system)) |
 | Build step size | One item per verify loop | One feature per session ([Anthropic harness](https://anthropic.com/engineering/effective-harnesses-for-long-running-agents)). "One item per loop" ([Huntley](https://ghuntley.com/ralph/)). The 16-agent compiler broke work into small pieces ([Anthropic](https://anthropic.com/engineering/building-c-compiler)) |
-| Always-on instructions | CLAUDE.md section ~25 lines. Procedures live in this skill | Keep CLAUDE.md under 200 lines ([Claude Code docs](https://code.claude.com/docs/en/memory)). Models follow ~150–200 instructions with reasonable consistency ([HumanLayer](https://www.humanlayer.dev/blog/writing-a-good-claude-md)). Even top models hit only 68% at 500 instructions ([IFScale](https://arxiv.org/abs/2507.11538)) |
+| Always-on instructions | CLAUDE.md section of 30 lines. Procedures live in this skill | Keep CLAUDE.md under 200 lines ([Claude Code docs](https://code.claude.com/docs/en/memory)). Models follow ~150–200 instructions with reasonable consistency ([HumanLayer](https://www.humanlayer.dev/blog/writing-a-good-claude-md)). Even top models hit only 68% at 500 instructions ([IFScale](https://arxiv.org/abs/2507.11538)) |
 
 ## 2. Managing context inside one run
 
@@ -50,6 +50,24 @@ Re-check them with your golden set.
     last. Models use the middle of long contexts least well
     ([Lost in the Middle](https://arxiv.org/abs/2307.03172)).
 
+### How the kit applies these rules to the chair
+
+The chair runs for hours and is the one context that cannot be thrown away, so the kit keeps it small:
+
+- **Prompts travel as files.** `next` writes each seat's packet to disk and prints a one-line prompt
+  ("Read and follow <file>"). A Full loop puts about 25 short lines in the chair's context, not 25
+  packets.
+- **Seats answer with one line.** Their real output goes to a JSON file that the script reads. The
+  chair reads digests: `cards.md`, `fuse-input.md`, the standing at the cut.
+- **State is on disk.** `run.json` holds the run. After a context reset, `status` gives one screen
+  and `next` lists only what is still owed, so nothing is redone and nothing has to be remembered.
+- **Rules live in code where they can.** The chair does not count ballots, derive authors, remember
+  which seat failed twice, or keep the control arm secret by willpower. Each of those was a place
+  where a long-running model drifted or guessed (see `docs/council-run-2026-11-13-self-review.md`).
+- **Measured.** In that run the packets were about 2k tokens each and a spawned agent cost about
+  60k before reading one. Trimming packet words saves almost nothing; avoiding a respawn saves a lot.
+  So the script sends a seat back only for a fault the run would act on.
+
 ## 3. Chunking and retrieval
 
 - **Small corpus? Skip RAG.** Under ~200k tokens (~500 pages), put it all in the prompt, with prompt
@@ -71,10 +89,13 @@ Re-check them with your golden set.
 
 | Layer | Holds | Size rule | Who writes |
 | --- | --- | --- | --- |
-| `CLAUDE.md` / `AGENTS.md` | Always-true rules and pointers | < 200 lines; council section ~25 | Humans, via PR |
+| `CLAUDE.md` / `AGENTS.md` | Always-true rules and pointers | < 200 lines; council section 30 | Humans, via PR |
 | Skill (`SKILL.md` + `reference/`) | Procedures | SKILL.md < 500 lines; details load on demand | Humans |
 | Claude Code auto memory | Preferences and corrections | First 200 lines / 25 KB of `MEMORY.md` load each session | Claude |
 | Run ledger `.council/runs/<id>/` | One run's state: brief, ideas, votes, reviews | ≤1 page per loop | Agents |
+| Shared memory, research (`.council/memory/research/` or an Obsidian vault) | Facts, one per note: claim, source, exact quote, date, confidence | A packet carries at most 14 (the run's own first, then older ones that match the brief); the rest is one file read away | Only the script, from what seats and the chair report |
+| Shared memory, commons (`…/commons/<run>.md`) | What members said to each other in one run | Ten most recent notes per packet, unsigned | Only the script |
+| Codebase map `docs/ARCHITECTURE.md` | What the code is, how it is laid out, the rules that hold | 600 to 2,000 words; rewritten only when the structure changes | The mapper seat, checked by the script |
 | Lessons `docs/lessons.md` | Reusable lessons with helpful/harmful counters | Itemized; prune when harmful > helpful | Agents propose, humans merge |
 | Outcome ledger `docs/outcomes.md` | Predictions vs results at 30/90 days | One row per decision | Humans + agents |
 
@@ -92,6 +113,16 @@ Rules:
    ([Cherny](https://venturebeat.com/technology/the-creator-of-claude-code-just-revealed-his-workflow-and-developers-are)).
 5. **Memory is context, not enforcement.** Anything that must happen goes in a hook or CI, not in a
    memory file ([Claude Code docs](https://code.claude.com/docs/en/memory)). Never store secrets in memory.
+6. **A fact carries its source, and one writer files it.** Several agents writing one store at once
+   race each other ([Letta](https://docs.letta.com/guides/agents/shared-memory-blocks)). Here seats
+   report and one script files. A fact that turns out wrong is retired with its reason, not deleted
+   ([Graphiti](https://github.com/getzep/graphiti)).
+7. **Shared thoughts must not cost independence.** Facts reach every seat at once; thoughts arrive
+   one step later, unsigned, and never inside a blind vote. A request board kept apart from the
+   response board "prevents cross-influence among sub-agents" ([Salemi et al.](https://arxiv.org/abs/2510.01285v2)).
+8. **A map is ranked and budgeted, not dumped.** Give an agent the names the rest of the code leans
+   on, within a token budget ([aider's repo map](https://aider.chat/2023/10/22/repomap.html): 1k tokens
+   by default). Details: `reference/members-and-memory.md`.
 6. **Where it applies.** Long-running API agents use the memory tool plus context editing
    ([Anthropic](https://claude.com/resources/articles/context-management)). Claude Code uses CLAUDE.md,
    auto memory and this skill.

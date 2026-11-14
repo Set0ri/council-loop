@@ -4,4 +4,6 @@ __pycache__/
 .council/elders/
 .venv/
 .pytest_cache/
-*.zip
+.council/map/skeleton.md
+.council/map/MAP.*
+/target/

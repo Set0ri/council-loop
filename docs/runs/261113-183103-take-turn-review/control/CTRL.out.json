@@ -1,0 +1,5 @@
+{
+ "title": "Stop shared authorship from corrupting the blind tally",
+ "body": "Fix council.tally before release: self-vote removal breaks once cards have several authors, and merge and fuse create those by design. Reproduced: a pool card that all seven experts wrote, ranked first on every ballot, lands 11th of 12 and misses the shortlist; three Lite candidates with two authors each all score 0.00, so label order picks the winner and no deviation is logged. Change: skip ballots with under two eligible cards; mark a card with under two eligible voters unranked, send it to the elders, and log a deviation. Also blind-check the control card at ingest_ideate: today an innocent phrase stalls next_elders, unfixable without unblinding. Add three unit tests.",
+ "eli5": "When everyone helped write an idea, nobody may vote for it, so it wrongly loses. Fix the counting."
+}

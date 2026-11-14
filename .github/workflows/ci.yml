@@ -2,22 +2,66 @@ name: council-guard
 on: [pull_request, push]
 jobs:
   test:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    # Developed on Linux. Windows builds of both implementations pass this suite under Wine (docs/PORTING.md),
+    # but neither had run on a real Windows or macOS machine when this was written: until their first
+    # green run, a red job there is a finding to fix, not a reason to block a merge. Then delete the next line.
+    continue-on-error: ${{ matrix.os != 'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with: {components: "rustfmt, clippy"}
+      - uses: Swatinem/rust-cache@v2
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
+      - name: Format and lints (once is enough)
+        if: runner.os == 'Linux'
+        run: cargo fmt --check && cargo clippy --all-targets -- -D warnings
+      - name: Rust unit tests (the YAML writer against 1,803 documents as PyYAML writes them, and more)
+        run: cargo test
+      - name: The binary
+        run: cargo build --release
       - run: pip install pyyaml pytest "mcp[cli]"
-      - run: pytest -q
+      - name: The Python reference, and the Rust binary against it (whole runs, MCP, hook, launcher)
+        run: python -m pytest -q
+      - name: The same tests when the machine's default text encoding is not UTF-8
+        if: runner.os == 'Linux'
+        run: LC_ALL=C LANG=C PYTHONUTF8=0 PYTHONCOERCECLOCALE=0 COUNCIL_NESTED=1 python -m pytest -q
+      - name: The codebase map matches the code (refresh with `council map --packet`, or `--accept` if it still holds)
+        run: cargo run --release --quiet -- map --check
+      - name: The Windows launcher finds the binary
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: bin\council.cmd --version
       - name: Model data freshness (warn only)
-        run: python3 skills/council-loop/scripts/refresh_models.py --check || echo "::warning::model data is stale - run refresh_models.py"
-  locks:
-    # Copy this job into product repos: it enforces locked tests below the agent, for every tool.
-    if: ${{ !contains(github.event.pull_request.labels.*.name, 'council-unlock') }}
+        if: runner.os == 'Linux'
+        run: ./target/release/council refresh --check || echo "::warning::model data is stale - run council refresh"
+  msrv:
+    # Cargo.toml says rust-version 1.85: the oldest toolchain its dependencies allow, with the versions
+    # in Cargo.lock (resolver 3 picks them to fit). Prove the build and the unit tests there.
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.85
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo build --locked
+      - run: cargo test --locked
+  locks:
+    # Copy this job into product repos: it enforces locked tests below the agent, for every tool.
+    # The manifest is read from the BASE branch, so a PR that edits a test and its hash together still fails.
+    # An approved test change carries the PR label `council-unlock`.
+    # It uses the Python reference because that needs no build. With the binary installed, the step is
+    # `council verify-locks --against "origin/<base>"`.
+    if: ${{ github.event_name == 'pull_request' && !contains(github.event.pull_request.labels.*.name, 'council-unlock') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
       - run: pip install pyyaml
-      - run: python3 skills/council-loop/scripts/council.py verify-locks
+      - run: python skills/council-loop/scripts/council.py verify-locks --against "origin/${{ github.base_ref }}"

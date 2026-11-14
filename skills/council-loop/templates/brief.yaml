@@ -1,0 +1,28 @@
+# Intent brief for run $run_id. Fill every field, then run:  council ingest
+#
+# The ask (verbatim; kept in run.json, do not retype it):
+$ask_commented
+#
+# Write the rubric BEFORE anyone has ideas. It is frozen for the run.
+
+restated: ""        # 3 lines at most: what is being decided, in plain words
+eli5: ""            # 20 words at most
+
+rubric:             # $rubric_min to $rubric_max criteria; weights sum to 100; check = machine | source | judgment
+  - {id: R1, name: "", weight: 0, check: judgment}
+
+evidence_plan: []   # the tests, data or sources that can check the criteria
+
+research_questions: []  # 6 at most: what the two researchers should find out before anyone has ideas.
+                        # Ask what would change the decision. Write each so that a stranger could research
+                        # it: name the thing, no acronyms. Left empty, they get one question per criterion.
+
+lenses:             # exactly these ids. Define each by what it maximises, what it must respect and how
+                    # it works, not by a job title. If two lenses would produce the same ideas, change one.
+$lens_stubs
+
+facts: ""           # optional, 400 words at most: numbers, quotes and paths the seats need, verbatim.
+                    # Longer material: put it in facts.md next to this file.
+
+lessons_applied: [] # ids from docs/lessons.md that shaped this brief (look first; may be empty)
+approved_by: ""     # the name of the person who approved this brief (or "requester"), otherwise "unattended"

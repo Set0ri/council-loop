@@ -1,0 +1,66 @@
+#!/bin/sh
+# council: the Council Loop command, wherever this skill folder is installed.
+#
+# It runs the Rust binary when there is one: named by COUNCIL_BIN, built in this checkout
+# (target/release), or installed on PATH. Otherwise it runs the Python reference beside this
+# file, which takes the same commands and prints the same lines.
+#
+#   sh skills/council-loop/scripts/council doctor
+skill=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)        # .../skills/council-loop
+repo=$(CDPATH= cd -- "$skill/../.." 2>/dev/null && pwd)       # the plugin or checkout around it, if any
+: "${COUNCIL_SKILL_DIR:=$skill}"                              # this folder's templates and model data win
+export COUNCIL_SKILL_DIR
+
+for bin in "${COUNCIL_BIN:-}" "$repo/target/release/council" "$repo/target/release/council.exe"; do
+    if [ -n "$bin" ] && [ -f "$bin" ] && [ -x "$bin" ]; then
+        exec "$bin" "$@"
+    fi
+done
+if [ -z "${COUNCIL_LAUNCHER:-}" ]; then                       # a council on PATH, but never a launcher again
+    COUNCIL_LAUNCHER=1
+    export COUNCIL_LAUNCHER
+    old_ifs=$IFS
+    IFS=:
+    for dir in $PATH; do
+        IFS=$old_ifs
+        for name in council council.exe; do
+            # a file that starts with "#!" is a script (this launcher, most likely): the binary is wanted
+            if [ -n "$dir" ] && [ -f "$dir/$name" ] && [ -x "$dir/$name" ] && [ "$(dd if="$dir/$name" bs=2 count=1 2>/dev/null)" != "#!" ]; then
+                exec "$dir/$name" "$@"
+            fi
+        done
+    done
+    IFS=$old_ifs
+fi
+
+py=${COUNCIL_PYTHON:-}
+if [ -z "$py" ]; then
+    for name in python3 python py; do
+        case "$(command -v "$name" 2>/dev/null)" in
+            "" | */WindowsApps/*) ;;                              # not there, or the Microsoft Store's placeholder
+            *) py=$name; break ;;
+        esac
+    done
+fi
+if [ -z "$py" ] || ! command -v "$py" >/dev/null 2>&1; then
+    echo "council: no council binary and no Python found. Install one: cargo install --path <this repo>, or Python 3.10+ with PyYAML." >&2
+    exit 127
+fi
+case "${1:-}" in
+    mcp | hook)
+        if [ "$1" = mcp ]; then script="$repo/mcp/server.py"; else script="$repo/hooks/protect_locked_files.py"; fi
+        if [ ! -f "$script" ]; then
+            echo "council $1: the Python fallback for this is not in this folder ($script). Install the council binary: it serves '$1' itself." >&2
+            exit 127
+        fi
+        if [ "$1" = mcp ] && command -v uv >/dev/null 2>&1; then     # the Python server needs the mcp package
+            shift
+            exec uv run --quiet --with "mcp[cli]" --with pyyaml python "$script" "$@"
+        fi
+        shift
+        exec "$py" "$script" "$@"
+        ;;
+    *)
+        exec "$py" "$skill/scripts/council.py" "$@"
+        ;;
+esac

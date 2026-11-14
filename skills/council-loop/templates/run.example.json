@@ -1,126 +1,738 @@
 {
-  "id": "2026-11-13-example",
-  "tier": "full",
-  "max_loops": 3,
-  "original_ask": "Pick the queue technology for the billing pipeline.",
-  "intent_brief": "Choose a queue for billing events: reliable, cheap to run, easy to operate.",
-  "rubric": {"R1": 30, "R2": 25, "R3": 20, "R4": 15, "R5": 10},
-  "loops": [
+ "id": "261113-120000-pick-queue-technology",
+ "created": "2026-11-13T21:36:00",
+ "ask": "Pick the queue technology for the billing pipeline",
+ "paths": [],
+ "gate": "GATE tier=lite mode=fanout:claude profile=balanced loops<=1 calls~12 tokens~1.8M rel_cost=1.86 (explicit)",
+ "tier": "lite",
+ "mode": "fanout:claude",
+ "profile": "balanced",
+ "tripwires": [],
+ "gate_reason": "explicit",
+ "calls_estimate": 12,
+ "deviations": [],
+ "friction": [
+  "L1 (ideate, loop 1): the facts section was thin"
+ ],
+ "calls": {
+  "research": 3,
+  "ideate": 4,
+  "redteam": 1,
+  "rank": 3,
+  "elders": 1
+ },
+ "loops": [
+  {
+   "research_seats": [
+    "RA",
+    "RB",
+    "MAP"
+   ],
+   "research_asked": 0,
+   "started": "2026-11-13T21:36:00",
+   "research": {
+    "seats": [
+     "RA",
+     "RB",
+     "MAP"
+    ],
+    "left_out": [],
+    "synthesis": {
+     "RA": "The papers sources agree that retries need idempotency keys and that order holds per partition only.",
+     "RB": "The field sources agree that retries need idempotency keys and that order holds per partition only."
+    },
+    "gaps": [
+     "no public cost figures above ten thousand events per second"
+    ],
+    "conflicts": [
+     "One papers source prices a managed queue at half of what another does: the newer one is trusted more",
+     "One field source prices a managed queue at half of what another does: the newer one is trusted more"
+    ],
+    "queries": [
+     "papers queue idempotency keys",
+     "billing queue ordering",
+     "field queue idempotency keys"
+    ],
+    "facts_added": 5,
+    "facts_merged": 1
+   },
+   "ideas": {
+    "L1": [
+     "idea 0 here: use latency to cut retries risk",
+     "idea 1 here: use latency to cut metric risk",
+     "idea 2 here: use queue to cut replay risk",
+     "idea 3 here: use metric to cut throttle risk",
+     "idea 4 here: use snapshot to cut canary risk"
+    ],
+    "L2": [
+     "idea 0 here: use batch to cut idempotent risk",
+     "idea 1 here: use stream to cut circuit risk",
+     "idea 2 here: use latency to cut tenant risk",
+     "idea 3 here: use tenant to cut throttle risk",
+     "idea 4 here: use tenant to cut replay risk"
+    ],
+    "L3": [
+     "idea 0 here: use tenant to cut metric risk",
+     "idea 1 here: use latency to cut replay risk",
+     "idea 2 here: use budget to cut audit risk",
+     "idea 3 here: use cache to cut metric risk",
+     "idea 4 here: use budget to cut queue risk"
+    ]
+   },
+   "kept": {
+    "L1": [
+     {
+      "title": "schema plan 798",
+      "body": "audit index latency cache queue audit canary metric circuit snapshot replica backoff retries metric stream audit latency idempotent replica ledger shard metric metric schema circuit idempotent cache ledger fallback cache fallback rollout budget circuit ledger canary throttle retries metric circuit audit stream backoff cache cache index shard cache tenant stream ledger replica replay replica canary retries throttle stream latency snapshot replica budget circuit replay schema shard replica shard throttle rollout index replica queue idempotent rollout idempotent replica shard metric metric ledger fallback quorum quorum snapshot quorum queue batch replica replica replica stream latency retries tenant latency queue shard",
+      "eli5": "a safer way to do it",
+      "wins": [
+       "R1"
+      ],
+      "evidence": "unverified"
+     },
+     {
+      "title": "audit plan 720",
+      "body": "cache rollout canary snapshot audit circuit stream ledger snapshot retries replay rollout replica metric backoff idempotent backoff canary replica snapshot budget shard replay rollout replica metric schema cache audit queue idempotent queue batch shard rollout throttle schema fallback cache tenant tenant cache schema throttle index cache circuit canary index budget latency latency backoff schema quorum stream snapshot metric idempotent audit audit snapshot idempotent idempotent circuit schema batch batch cache quorum queue circuit retries circuit fallback idempotent backoff schema circuit audit tenant latency index index stream tenant metric latency quorum throttle latency schema circuit canary canary stream batch metric",
+      "eli5": "a safer way to do it",
+      "wins": [
+       "R1"
+      ],
+      "evidence": "unverified"
+     }
+    ],
+    "L2": [
+     {
+      "title": "cache plan 395",
+      "body": "schema cache idempotent retries circuit snapshot fallback tenant retries budget budget circuit shard budget idempotent index backoff latency snapshot circuit throttle canary fallback throttle replay audit fallback canary retries idempotent audit metric schema retries snapshot cache audit snapshot index rollout retries fallback metric snapshot tenant fallback canary queue replay replay fallback retries fallback replay index retries idempotent replay quorum stream retries cache index replica snapshot replay shard queue schema batch circuit latency batch quorum stream quorum schema budget tenant replica replay index index snapshot retries canary latency stream budget quorum budget metric replay tenant schema audit replica backoff",
+      "eli5": "a safer way to do it",
+      "wins": [
+       "R1"
+      ],
+      "evidence": "unverified"
+     },
+     {
+      "title": "shard plan 486",
+      "body": "snapshot quorum index latency index retries latency fallback rollout rollout audit fallback budget circuit replay tenant fallback queue replica snapshot shard backoff metric metric fallback tenant budget index shard shard audit budget idempotent budget rollout shard schema canary rollout replay index stream cache replica backoff stream audit queue idempotent metric queue retries index cache latency retries stream circuit throttle latency retries ledger shard schema cache canary queue cache budget index snapshot replica fallback retries budget cache retries quorum metric audit replay stream latency metric replay fallback schema snapshot tenant throttle metric replica metric queue tenant tenant index retries",
+      "eli5": "a safer way to do it",
+      "wins": [
+       "R1"
+      ],
+      "evidence": "unverified"
+     }
+    ],
+    "L3": [
+     {
+      "title": "metric plan 566",
+      "body": "index budget throttle stream replay throttle cache snapshot shard fallback audit batch budget queue stream index circuit audit audit shard cache replay quorum fallback cache latency stream shard batch circuit idempotent fallback canary tenant idempotent stream cache latency shard backoff fallback cache tenant batch stream snapshot fallback quorum shard backoff backoff cache circuit fallback replica rollout shard snapshot budget idempotent backoff canary stream ledger index audit ledger canary queue canary latency fallback stream metric cache audit replay backoff fallback replay batch idempotent schema canary throttle latency canary tenant quorum cache schema backoff latency canary index cache shard cache",
+      "eli5": "a safer way to do it",
+      "wins": [
+       "R1"
+      ],
+      "evidence": "unverified"
+     },
+     {
+      "title": "schema plan 867",
+      "body": "fallback metric fallback idempotent shard snapshot latency cache rollout queue fallback latency rollout backoff retries ledger cache idempotent canary canary canary cache replay backoff fallback audit rollout stream latency latency queue replica schema rollout replay idempotent snapshot snapshot audit replay idempotent canary queue audit backoff metric audit replica throttle tenant replay latency backoff metric replica backoff idempotent audit snapshot ledger ledger index queue batch idempotent tenant schema replica quorum fallback ledger batch fallback throttle schema ledger latency replica queue retries fallback index queue retries fallback backoff idempotent tenant snapshot cache throttle tenant metric idempotent batch stream schema shard",
+      "eli5": "a safer way to do it",
+      "wins": [
+       "R1"
+      ],
+      "evidence": "unverified"
+     }
+    ]
+   },
+   "pool": [
     {
-      "eli5": "Seven experts suggested queues; we kept the five most reliable and cheap.",
-      "ideas": {
-        "L1": [
-          "Managed cloud queue with dead-letter topic and SLA.",
-          "Zero-ops serverless queue billing strictly per request.",
-          "Built-in priority lanes for urgent invoice retries.",
-          "Schema registry enforced before publishing billing events.",
-          "One-click replay from dead-letter to main topic.",
-          "Multi-region active-passive queue replication for disaster recovery.",
-          "Per-tenant fair queueing to prevent noisy neighbors.",
-          "Native batch consumer trigger reducing worker wakeups.",
-          "Retention window of fourteen days for audit replay.",
-          "Automatic backoff policy configured at queue level.",
-          "Pre-built Terraform module for zero manual provisioning.",
-          "Vendor-managed encryption keys rotated automatically.",
-          "Simple web console for support team inspection."
-        ],
-        "L2": [
-          "Transactional outbox table polling inside existing Postgres.",
-          "Idempotency key unique index preventing double-billing.",
-          "Deterministic state machine transitions recorded in ledger.",
-          "Fencing tokens on consumer leases to stop stale writes.",
-          "End-to-end checksums validated at producer and consumer.",
-          "Dead-letter alerts with exact failing payload snapshot.",
-          "Strict FIFO ordering partitioned by customer account ID.",
-          "Chaos tests injecting duplicate and out-of-order deliveries.",
-          "Verify consumer commit only after ledger write succeeds.",
-          "Sequence numbers per invoice detecting dropped events early.",
-          "Two-phase reservation before dispatching external charge.",
-          "Automated reconciliation cron comparing ledger against queue.",
-          "Contract tests locking billing event JSON schema."
-        ],
-        "L3": [
-          "Single Postgres SKIP LOCKED worker queue, zero new infra.",
-          "Drop message broker completely; run synchronous charge calls.",
-          "Thin Python consumer loop using standard library HTTP.",
-          "Embed queue abstraction behind five-line interface.",
-          "Avoid Kafka cluster until throughput exceeds ten thousand RPS.",
-          "Use SQLite WAL local buffer only if cloud fails.",
-          "Single monorepo package shared by producer and worker.",
-          "Fixed retry count of three before manual review.",
-          "Stateless worker binary with zero local disk state.",
-          "No custom serialization; plain UTF-8 JSON payloads.",
-          "Skip schema registry; validate with Pydantic on edge.",
-          "Run workers as existing ECS service containers.",
-          "Plain cron sweeper replacing complex delayed-queue timers."
-        ],
-        "L4": [
-          "Batch ten billing events per SQS send call.",
-          "Long-polling consumers cutting empty receive requests ninety percent.",
-          "Compress payloads over four kilobytes with zstd.",
-          "Spot-instance autoscaling workers driven by queue depth.",
-          "Tiered storage offloading payloads over 64KB to S3.",
-          "Partition hot merchants across dedicated shard keys.",
-          "Connection pooling in workers to avoid DB exhaustion.",
-          "Benchmark p99 enqueue-to-ledger latency under peak billing.",
-          "Cap max inflight messages per worker to bound RAM.",
-          "Pre-warm consumer pools before monthly billing run.",
-          "Deduplicate identical webhook retries at ingress cache.",
-          "Measure dollar cost per million settled invoices.",
-          "Adaptive prefetch count tuned to database commit time."
-        ],
-        "L5": [
-          "Separate dead-letter queue for malformed poison messages.",
-          "Encrypt sensitive PII fields inside payload before enqueue.",
-          "Least-privilege IAM role splitting producer and consumer rights.",
-          "Circuit breaker pausing consumers when gateway errors spike.",
-          "Rate-limit retries to protect downstream payment processor.",
-          "Alert immediately on queue age exceeding five minutes.",
-          "Sign event payloads with HMAC to block tampering.",
-          "Audit trail logging every manual message redrive.",
-          "Strip raw card tokens; pass vault references only.",
-          "Quarantine single failing tenant without stalling others.",
-          "Fail closed if idempotency store becomes unreachable.",
-          "Timeout visibility leases shorter than gateway SLA.",
-          "Redact secrets from structured error logs automatically."
-        ],
-        "L6": [
-          "Skip queues; compute monthly bills via batch DuckDB.",
-          "Use Temporal workflows instead of raw message queues.",
-          "Append-only object storage log replacing broker altogether.",
-          "Let payment provider webhooks drive billing state directly.",
-          "Use NATS JetStream single binary across three nodes.",
-          "Replace async billing with prepaid credit drawdown.",
-          "Run DuckLake nightly settlement instead of streaming.",
-          "Use Redis Streams with AOF persistence for speed.",
-          "Turn billing into materialized Postgres view triggers.",
-          "Outsource metered aggregation and queueing to Stripe.",
-          "Combine Postgres LISTEN/NOTIFY with periodic sweep fallback.",
-          "Use Cloudflare Queues at edge near API ingress.",
-          "Keep queue ephemeral; rebuild state from event store."
-        ],
-        "L7": [
-          "OpenTelemetry trace context propagated inside message headers.",
-          "Structured Prometheus gauges for lag and DLQ depth.",
-          "Runbook documenting exact steps to drain and replay.",
-          "Blue-green consumer deployment draining inflight messages first.",
-          "Synthetic canary invoice pushed every five minutes.",
-          "Automated Terraform drift checks in CI pipeline.",
-          "PagerDuty escalation routed directly to billing on-call.",
-          "CLI tool to inspect, skip, or replay messages.",
-          "Zero-downtime schema evolution using additive fields only.",
-          "Load-shedding flag to pause non-urgent receipt emails.",
-          "Dashboard pairing queue lag with bank settlement lag.",
-          "Weekly automated backup test of dead-letter archives.",
-          "Graceful SIGTERM shutdown finishing active batch before exit."
-        ]
-      },
-      "candidates": [{"id": "C1", "body": "Managed queue with dead-letter topic and idempotent consumers.",
-                      "eli5": "A post office that never loses letters."}],
-      "red_team": [{"finding": "Consumer retries can double-charge.", "severity": "S1", "response": "fixed: idempotency keys"}],
-      "elder_reviews": [{"model": "Claude Fable 5.2"}, {"model": "GPT-6.1 Sol"}, {"model": "Gemini 4 Argon"}],
-      "survivors": ["C1", "C2", "C3", "C4", "C5"]
+     "id": "P1",
+     "title": "schema plan 798",
+     "body": "audit index latency cache queue audit canary metric circuit snapshot replica backoff retries metric stream audit latency idempotent replica ledger shard metric metric schema circuit idempotent cache ledger fallback cache fallback rollout budget circuit ledger canary throttle retries metric circuit audit stream backoff cache cache index shard cache tenant stream ledger replica replay replica canary retries throttle stream latency snapshot replica budget circuit replay schema shard replica shard throttle rollout index replica queue idempotent rollout idempotent replica shard metric metric ledger fallback quorum quorum snapshot quorum queue batch replica replica replica stream latency retries tenant latency queue shard",
+     "eli5": "a safer way to do it",
+     "authors": [
+      "L1"
+     ],
+     "from": [
+      "L1#1"
+     ]
+    },
+    {
+     "id": "P2",
+     "title": "audit plan 720",
+     "body": "cache rollout canary snapshot audit circuit stream ledger snapshot retries replay rollout replica metric backoff idempotent backoff canary replica snapshot budget shard replay rollout replica metric schema cache audit queue idempotent queue batch shard rollout throttle schema fallback cache tenant tenant cache schema throttle index cache circuit canary index budget latency latency backoff schema quorum stream snapshot metric idempotent audit audit snapshot idempotent idempotent circuit schema batch batch cache quorum queue circuit retries circuit fallback idempotent backoff schema circuit audit tenant latency index index stream tenant metric latency quorum throttle latency schema circuit canary canary stream batch metric",
+     "eli5": "a safer way to do it",
+     "authors": [
+      "L1"
+     ],
+     "from": [
+      "L1#2"
+     ]
+    },
+    {
+     "id": "P3",
+     "title": "cache plan 395",
+     "body": "schema cache idempotent retries circuit snapshot fallback tenant retries budget budget circuit shard budget idempotent index backoff latency snapshot circuit throttle canary fallback throttle replay audit fallback canary retries idempotent audit metric schema retries snapshot cache audit snapshot index rollout retries fallback metric snapshot tenant fallback canary queue replay replay fallback retries fallback replay index retries idempotent replay quorum stream retries cache index replica snapshot replay shard queue schema batch circuit latency batch quorum stream quorum schema budget tenant replica replay index index snapshot retries canary latency stream budget quorum budget metric replay tenant schema audit replica backoff",
+     "eli5": "a safer way to do it",
+     "authors": [
+      "L2"
+     ],
+     "from": [
+      "L2#1"
+     ]
+    },
+    {
+     "id": "P4",
+     "title": "shard plan 486",
+     "body": "snapshot quorum index latency index retries latency fallback rollout rollout audit fallback budget circuit replay tenant fallback queue replica snapshot shard backoff metric metric fallback tenant budget index shard shard audit budget idempotent budget rollout shard schema canary rollout replay index stream cache replica backoff stream audit queue idempotent metric queue retries index cache latency retries stream circuit throttle latency retries ledger shard schema cache canary queue cache budget index snapshot replica fallback retries budget cache retries quorum metric audit replay stream latency metric replay fallback schema snapshot tenant throttle metric replica metric queue tenant tenant index retries",
+     "eli5": "a safer way to do it",
+     "authors": [
+      "L2"
+     ],
+     "from": [
+      "L2#2"
+     ]
+    },
+    {
+     "id": "P5",
+     "title": "metric plan 566",
+     "body": "index budget throttle stream replay throttle cache snapshot shard fallback audit batch budget queue stream index circuit audit audit shard cache replay quorum fallback cache latency stream shard batch circuit idempotent fallback canary tenant idempotent stream cache latency shard backoff fallback cache tenant batch stream snapshot fallback quorum shard backoff backoff cache circuit fallback replica rollout shard snapshot budget idempotent backoff canary stream ledger index audit ledger canary queue canary latency fallback stream metric cache audit replay backoff fallback replay batch idempotent schema canary throttle latency canary tenant quorum cache schema backoff latency canary index cache shard cache",
+     "eli5": "a safer way to do it",
+     "authors": [
+      "L3"
+     ],
+     "from": [
+      "L3#1"
+     ]
+    },
+    {
+     "id": "P6",
+     "title": "schema plan 867",
+     "body": "fallback metric fallback idempotent shard snapshot latency cache rollout queue fallback latency rollout backoff retries ledger cache idempotent canary canary canary cache replay backoff fallback audit rollout stream latency latency queue replica schema rollout replay idempotent snapshot snapshot audit replay idempotent canary queue audit backoff metric audit replica throttle tenant replay latency backoff metric replica backoff idempotent audit snapshot ledger ledger index queue batch idempotent tenant schema replica quorum fallback ledger batch fallback throttle schema ledger latency replica queue retries fallback index queue retries fallback backoff idempotent tenant snapshot cache throttle tenant metric idempotent batch stream schema shard",
+     "eli5": "a safer way to do it",
+     "authors": [
+      "L3"
+     ],
+     "from": [
+      "L3#2"
+     ]
     }
+   ],
+   "shortlist": [
+    "P1",
+    "P2",
+    "P3",
+    "P4",
+    "P5",
+    "P6"
+   ],
+   "red_team": [
+    {
+     "n": 1,
+     "candidate_id": "P2",
+     "severity": "S1",
+     "finding": "retries can double-charge customers",
+     "evidence": "no idempotency key in the design",
+     "fix": "add idempotency keys",
+     "response": {
+      "action": "fixed",
+      "note": "added idempotency keys to every consumer"
+     }
+    },
+    {
+     "n": 2,
+     "candidate_id": "P1",
+     "severity": "S3",
+     "finding": "naming is inconsistent",
+     "evidence": "",
+     "fix": ""
+    }
+   ],
+   "red_team_eli5": "it might charge people twice",
+   "candidates": [
+    {
+     "id": "C1",
+     "title": "schema plan 798",
+     "body": "audit index latency cache queue audit canary metric circuit snapshot replica backoff retries metric stream audit latency idempotent replica ledger shard metric metric schema circuit idempotent cache ledger fallback cache fallback rollout budget circuit ledger canary throttle retries metric circuit audit stream backoff cache cache index shard cache tenant stream ledger replica replay replica canary retries throttle stream latency snapshot replica budget circuit replay schema shard replica shard throttle rollout index replica queue idempotent rollout idempotent replica shard metric metric ledger fallback quorum quorum snapshot quorum queue batch replica replica replica stream latency retries tenant latency queue shard",
+     "eli5": "a safer way to do it",
+     "authors": [
+      "L1"
+     ],
+     "parents": [
+      "P1"
+     ]
+    },
+    {
+     "id": "C2",
+     "title": "audit plan 720",
+     "body": "cache rollout canary snapshot audit circuit stream ledger snapshot retries replay rollout replica metric backoff idempotent backoff canary replica snapshot budget shard replay rollout replica metric schema cache audit queue idempotent queue batch shard rollout throttle schema fallback cache tenant tenant cache schema throttle index cache circuit canary index budget latency latency backoff schema quorum stream snapshot metric idempotent audit audit snapshot idempotent idempotent circuit schema batch batch cache quorum queue circuit retries circuit fallback idempotent backoff schema circuit audit tenant latency index index stream tenant metric latency quorum throttle latency schema circuit canary canary stream batch metric",
+     "eli5": "a safer way to do it",
+     "authors": [
+      "L1"
+     ],
+     "parents": [
+      "P2"
+     ]
+    },
+    {
+     "id": "C3",
+     "title": "cache plan 395",
+     "body": "schema cache idempotent retries circuit snapshot fallback tenant retries budget budget circuit shard budget idempotent index backoff latency snapshot circuit throttle canary fallback throttle replay audit fallback canary retries idempotent audit metric schema retries snapshot cache audit snapshot index rollout retries fallback metric snapshot tenant fallback canary queue replay replay fallback retries fallback replay index retries idempotent replay quorum stream retries cache index replica snapshot replay shard queue schema batch circuit latency batch quorum stream quorum schema budget tenant replica replay index index snapshot retries canary latency stream budget quorum budget metric replay tenant schema audit replica backoff",
+     "eli5": "a safer way to do it",
+     "authors": [
+      "L2"
+     ],
+     "parents": [
+      "P3"
+     ]
+    }
+   ],
+   "not_carried": [
+    "P4",
+    "P5",
+    "P6"
+   ],
+   "checks": {},
+   "rank": {
+    "order": [
+     "C1",
+     "C3",
+     "C2"
+    ],
+    "ranking": [
+     {
+      "id": "C1",
+      "score": 0.733,
+      "check": "n/a"
+     },
+     {
+      "id": "C3",
+      "score": 0.5,
+      "check": "n/a"
+     },
+     {
+      "id": "C2",
+      "score": 0.267,
+      "check": "n/a"
+     }
+    ],
+    "agreement": 1.0,
+    "agreement_note": "strong",
+    "ballots": 3,
+    "head_to_heads": 5,
+    "recused": 4,
+    "gaps": 0,
+    "thin": [],
+    "ties": [],
+    "best_on": {
+     "R1": "C1",
+     "R2": "C1",
+     "R3": "C1",
+     "R4": "C1",
+     "R5": "C1"
+    }
+   },
+   "reviewed": [
+    "C1",
+    "C3"
+   ],
+   "elder_reviews": [
+    {
+     "seat": "EA",
+     "model": "Claude Opus 5.5 (max)",
+     "stand_in_for": null,
+     "model_source": null,
+     "preferred": "C3",
+     "verdict": {
+      "C3": "ship",
+      "CONTROL": "ship",
+      "C1": "ship"
+     },
+     "scores": {
+      "C3": {
+       "R1": 7,
+       "R2": 7,
+       "R3": 7,
+       "R4": 7,
+       "R5": 7
+      },
+      "CONTROL": {
+       "R1": 7,
+       "R2": 7,
+       "R3": 7,
+       "R4": 7,
+       "R5": 7
+      },
+      "C1": {
+       "R1": 7,
+       "R2": 7,
+       "R3": 7,
+       "R4": 7,
+       "R5": 7
+      }
+     },
+     "confidence": 0.7,
+     "top_risks": [
+      {
+       "risk": "operational load",
+       "severity": "S2",
+       "candidate": "all"
+      }
+     ],
+     "key_fix": "add a rollback plan",
+     "own_idea": "replay a golden set first",
+     "eli5": "looks solid"
+    }
+   ],
+   "survivors": [
+    "C3"
+   ],
+   "eliminated": [
+    "C1",
+    "C2"
+   ],
+   "wildcard": null,
+   "eli5": "three experts proposed queues; one clear winner",
+   "changed": "",
+   "control_votes": 0,
+   "finished": "2026-11-13T21:36:01"
+  }
+ ],
+ "shape": {
+  "experts": 3,
+  "ideas_min": 5,
+  "keep": 2,
+  "elders": 1,
+  "start": 3,
+  "loops": 1,
+  "rubric": [
+   3,
+   7
   ],
-  "retro": "Lesson proposed: always include idempotency in billing designs."
+  "schedule": [
+   3,
+   1
+  ]
+ },
+ "max_loops": 1,
+ "schedule": [
+  3,
+  1
+ ],
+ "chair": {
+  "model": "Claude Fable 5.2 (high)",
+  "creator": "Anthropic",
+  "quality": 62,
+  "cost_per_task": 9.08
+ },
+ "support": {
+  "research": {
+   "budget": {
+    "lite": 10,
+    "full": 15
+   },
+   "seats": 2,
+   "later_loops": "on_request",
+   "model": "auto",
+   "beats": []
+  },
+  "map": {
+   "when": "stale",
+   "model": "chair",
+   "focus_tokens": 700,
+   "skeleton_lines": 420,
+   "path": "",
+   "due": true,
+   "reason": "no map yet at docs/ARCHITECTURE.md"
+  },
+  "digest": 14,
+  "origin": {
+   "research.seats": "default",
+   "research.budget.lite": "default",
+   "research.budget.full": "default",
+   "research.later_loops": "default",
+   "research.model": "default",
+   "research.beats": "default",
+   "map.when": "default",
+   "map.model": "default",
+   "map.focus_tokens": "default",
+   "map.skeleton_lines": "default",
+   "map.path": "default",
+   "digest": "default"
+  },
+  "problems": []
+ },
+ "memory": {
+  "backend": "files",
+  "dir": "<project>/.council/memory",
+  "links": "markdown",
+  "source": "default",
+  "ok": true,
+  "problem": null
+ },
+ "commons": [
+  {
+   "loop": 1,
+   "phase": "research",
+   "by": "RA",
+   "role": "researcher",
+   "to": "all",
+   "text": "Two papers sources disagree on cost: treat any price claim as unverified"
+  },
+  {
+   "loop": 1,
+   "phase": "research",
+   "by": "RB",
+   "role": "researcher",
+   "to": "all",
+   "text": "Two field sources disagree on cost: treat any price claim as unverified"
+  },
+  {
+   "loop": 1,
+   "phase": "ideate",
+   "by": "L1",
+   "role": "expert",
+   "to": "research",
+   "text": "L1 asks: does any managed queue keep order across partitions?"
+  },
+  {
+   "loop": 1,
+   "phase": "ideate",
+   "by": "L1",
+   "role": "expert",
+   "to": "all",
+   "text": "Every plan here assumes one region: say so on the card"
+  },
+  {
+   "loop": 1,
+   "phase": "ideate",
+   "by": "L2",
+   "role": "expert",
+   "to": "research",
+   "text": "L2 asks: does any managed queue keep order across partitions?"
+  },
+  {
+   "loop": 1,
+   "phase": "ideate",
+   "by": "L2",
+   "role": "expert",
+   "to": "all",
+   "text": "Every plan here assumes one region: say so on the card"
+  },
+  {
+   "loop": 1,
+   "phase": "ideate",
+   "by": "L3",
+   "role": "expert",
+   "to": "research",
+   "text": "L3 asks: does any managed queue keep order across partitions?"
+  },
+  {
+   "loop": 1,
+   "phase": "ideate",
+   "by": "L3",
+   "role": "expert",
+   "to": "all",
+   "text": "Every plan here assumes one region: say so on the card"
+  }
+ ],
+ "seats": {
+  "L1": {
+   "role": "expert",
+   "model": "Claude Fable 5.2 (low)",
+   "creator": "Anthropic",
+   "effort": "low",
+   "via": "subagent",
+   "alias": "fable"
+  },
+  "L2": {
+   "role": "expert",
+   "model": "Claude Opus 5.5 (high)",
+   "creator": "Anthropic",
+   "effort": "high",
+   "via": "subagent",
+   "alias": "opus"
+  },
+  "L3": {
+   "role": "expert",
+   "model": "Claude Sonnet 5.5 (xhigh)",
+   "creator": "Anthropic",
+   "effort": "xhigh",
+   "via": "subagent",
+   "alias": "sonnet"
+  },
+  "RT": {
+   "role": "red_team",
+   "model": "Claude Opus 5.5 (max)",
+   "creator": "Anthropic",
+   "effort": "max",
+   "via": "subagent",
+   "alias": "opus"
+  },
+  "EA": {
+   "role": "elder",
+   "model": "Claude Opus 5.5 (max)",
+   "creator": "Anthropic",
+   "effort": "max",
+   "via": "subagent",
+   "alias": "opus"
+  },
+  "CTRL": {
+   "role": "control",
+   "model": "Claude Fable 5.2 (high)",
+   "creator": "Anthropic",
+   "effort": "high",
+   "via": "subagent",
+   "alias": "fable"
+  },
+  "RA": {
+   "role": "researcher",
+   "beat": "Papers and primary research",
+   "beat_text": "Peer-reviewed papers and preprints (arXiv, ACL Anthology, OpenReview, Semantic Scholar), benchmarks and their leaderboards, replications, surveys and standards. Find what was measured, on what data, and whether it held up when others tried it.",
+   "model": "Claude Fable 5.2 (low)",
+   "creator": "Anthropic",
+   "effort": "low",
+   "via": "subagent",
+   "alias": "fable",
+   "web": "yes"
+  },
+  "RB": {
+   "role": "researcher",
+   "beat": "Practice in the field",
+   "beat_text": "How teams really do it: engineering blogs and architecture write-ups from companies, postmortems, official documentation and changelogs, conference talks, and open-source repositories. Find what runs in production, what broke, and what it cost.",
+   "model": "Claude Opus 5.5 (high)",
+   "creator": "Anthropic",
+   "effort": "high",
+   "via": "subagent",
+   "alias": "opus",
+   "web": "yes"
+  },
+  "MAP": {
+   "role": "mapper",
+   "model": "Claude Fable 5.2 (high)",
+   "creator": "Anthropic",
+   "effort": "high",
+   "via": "subagent",
+   "alias": "fable"
+  }
+ },
+ "loop": 1,
+ "phase": "done",
+ "updated": "2026-11-13T21:36:01",
+ "brief": {
+  "approved_by": "requester",
+  "eli5": "choose the safest mail system",
+  "evidence_plan": [
+   "load test"
+  ],
+  "facts": "Peak is 4,000 events per second.",
+  "lenses": [
+   {
+    "evidence": "facts",
+    "id": "L1",
+    "maximize": "one thing",
+    "method": "first principles",
+    "name": "lens 1",
+    "respect": "a limit"
+   },
+   {
+    "evidence": "facts",
+    "id": "L2",
+    "maximize": "one thing",
+    "method": "first principles",
+    "name": "lens 2",
+    "respect": "a limit"
+   },
+   {
+    "evidence": "facts",
+    "id": "L3",
+    "maximize": "one thing",
+    "method": "first principles",
+    "name": "lens 3",
+    "respect": "a limit"
+   }
+  ],
+  "lessons_applied": [
+   "L-20261113-1"
+  ],
+  "restated": "Pick the queue technology for the billing pipeline.",
+  "rubric": [
+   {
+    "check": "judgment",
+    "id": "R1",
+    "name": "reliability",
+    "weight": 40
+   },
+   {
+    "check": "judgment",
+    "id": "R2",
+    "name": "cost",
+    "weight": 20
+   },
+   {
+    "check": "judgment",
+    "id": "R3",
+    "name": "simplicity",
+    "weight": 20
+   },
+   {
+    "check": "judgment",
+    "id": "R4",
+    "name": "speed to ship",
+    "weight": 10
+   },
+   {
+    "check": "judgment",
+    "id": "R5",
+    "name": "operability",
+    "weight": 10
+   }
+  ]
+ },
+ "map": {
+  "path": "docs/ARCHITECTURE.md",
+  "applies": true,
+  "stale": false,
+  "reason": "written in this run",
+  "written_in": "261113-120000-pick-queue-technology"
+ },
+ "attempts": {},
+ "hashes": {
+  "loop-1/research/RA.out.json": "93e4bc87c841bd2e2c680731deebaf13f1029727c7bb7be7a8e08f1d82f55ab8",
+  "loop-1/research/RB.out.json": "81e4e0dad6bb8dbf93cc353ce967e14e358a39569b8bce4a564c1f20dcaa0d5c",
+  "loop-1/research/MAP.out.md": "bde6a7d97df5380eccf0ebfdd6c5f1c58996171da4090e0adfbdc545403dd04e",
+  "loop-1/ideate/L1.out.json": "5076cdc36cdc918c208c405c45d170d032c11a5c79a90dfc91b09790a3b9ccdd",
+  "loop-1/ideate/L2.out.json": "c9cc971999fac47308ab7f2901584001d2cf249da9166004087497b04a639c96",
+  "loop-1/ideate/L3.out.json": "ae953bffaf429ff6392d7a225c1bafe1d3677cdd27c4ad267b762f87679e6e88",
+  "control/CTRL.out.json": "92d048a3531a46b39624dba926b840d1ccb62b86b616f049a0b0e9e540d89efb",
+  "loop-1/redteam/RT.out.json": "6752c5b9840df08a03a10d9bdc4b4fe8765c3c361e295c8056cd2dcebc5f3486",
+  "loop-1/rank/L1.out.json": "834976a87a8f71718e63bdd524f122358049793c9dbdd7a6e612300e8274f101",
+  "loop-1/rank/L2.out.json": "8ac951254cf9c8b6cf7184226af886fda537d48cd9f3dd858131a38cac1c6928",
+  "loop-1/rank/L3.out.json": "265cdc66076061bd4242ffa45ff9d6fd5985f882f4df372a6ba87aa4e77bb11c",
+  "loop-1/elders/EA.out.json": "5bbd1261b311744c99718473d869efd91026af54f52439980c32daf86a36105e"
+ },
+ "shared": {
+  "facts_added": 6,
+  "facts_merged": 3,
+  "facts_refused": 0,
+  "notes": 8
+ },
+ "research_upto": 0,
+ "unsigned_facts": {
+  "billing-service-idempotency-key-consumer-today": "L1"
+ },
+ "control": {
+  "done": true,
+  "sha256": "dda1819e7a96b9ebdac7504401f5a8f953128c2c3314e4303687d8d7ef3baaef"
+ },
+ "winner": "C3",
+ "control_result": "won",
+ "control_line": "the council's answer was preferred by 1 of 1 elder(s)",
+ "final": {
+  "file": "final.md",
+  "words": 276
+ },
+ "retro": {
+  "file": "retro.md",
+  "lessons": [
+   "- [L-20261114-1] (helpful: 0 | harmful: 0) Lock the tests first. Evidence: this run"
+  ]
+ }
 }

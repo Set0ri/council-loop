@@ -78,9 +78,40 @@ cost_model:
   chair_passes_per_loop: 1.0
   final_chair_passes: 2.0
 
+# Measured tokens per seat call, as the host reported them (all context the call processed). They
+# feed the tokens~ figure on the GATE line, so that a tier is chosen with its real size in view.
+# ONE host, ONE Lite run: Claude-Code-style subagents with full tool access, where start-up overhead
+# is about 60k tokens per call. A blind vote was 64k tokens for a 2k-token packet. Replace these with
+# your own numbers after a few runs; delete the block to hide the figure.
+measured_tokens_per_call:
+  source: "run 261113-183103-take-turn-review (13 Nov 2026): 9 seat calls, 1,269,206 tokens"
+  ideate: 150000      # 96k, 121k and 225k measured (low, high and xhigh effort)
+  control: 150000     # 151k measured
+  vote: 64000         # 64k, 64k and 65k measured (rank vote; the shortlist vote is the same task)
+  rank: 64000
+  redteam: 240000     # 242k measured (max effort, ran probes)
+  elders: 64000       # packet-only review (Full, balanced and efficient): assumed equal to a blind vote, not yet measured
+  elders_verify: 240000   # 241k measured: the elder ran probes (Lite, and the max profile)
+
+# The researchers and the mapper have not been measured in a real run yet. These are assumptions,
+# sized from the ideate call (same tools, more reading). They are added to tokens~ and must be
+# replaced by measurements after the first real run with these seats.
+assumed_tokens_per_call:
+  research: 200000    # ASSUMED: about 10 to 15 searches and page reads on top of the start-up overhead
+  map: 150000         # ASSUMED: the skeleton plus the few files everything else leans on
+
 # Models you cannot call. Restricted programs stay off unless you have access.
 access:
   "Gemini 4 Carbon": {has_access: false}
+
+# Native model ids for the CLIs (claude --model, codex -m, gemini -m). Artificial Analysis names are
+# not CLI ids, so keep this small map current. A model missing here runs on the family alias
+# (Claude) or the CLI's default model, and the ledger says so.
+native_ids:
+  "Claude Fable 5.2": claude-fable-5-2
+  "Claude Opus 5.5": claude-opus-5-5
+  "GPT-6.1 Sol": gpt-6.1-sol
+  "Gemini 4 Argon": gemini-4-argon
 
 pins: {}   # e.g. {"balanced/crosslab/elders/Google": "Gemini 4 Argon (high)"}
 bans: []   # e.g. ["Grok 4.7"]

@@ -1,0 +1,37 @@
+# Council Loop settings. Every key is optional: delete what you do not need.
+#
+# Two files, same shape:
+#   <project>/.council/config.yaml    for one project (commit it)
+#   ~/.council/config.yaml            your own defaults on this machine
+# Who wins: a command-line flag, then the project's file, then your own file, then the defaults
+# shown here. The one exception is `memory:` where your own file wins, because a vault path is personal.
+# See what is in force, and who set it:  council config
+
+members:
+  research:                  # shorthand: `research: 3` (how many) or `research: false` (none)
+    seats: 2                 # 0 to 4 researchers. Flag: --research N, --no-research
+    budget:                  # searches or page reads per researcher. Flag: --research-budget N
+      lite: 10
+      full: 15
+    later_loops: on_request  # research again before loops 2 and 3: on_request (a member asked) | always | never
+    model: auto              # auto: models that can search the web, from different labs | chair: the strongest model
+    # beats:                 # replace the built-in beats (papers; practice; the case against; the project's own record)
+    #   - name: Regulation
+    #     text: Laws, regulator guidance and enforcement actions that apply to this decision, by jurisdiction.
+
+  map:                       # shorthand: `map: always` | `map: never`
+    when: stale              # stale: only when the map is missing or behind the code | always | never. Flag: --map, --no-map
+    path: docs/ARCHITECTURE.md   # where the map lives (default: docs/ARCHITECTURE.md if docs/ exists, else ARCHITECTURE.md)
+    model: chair             # chair: the strongest model writes the map | expert: an expert-seat model (cheaper)
+    skeleton_lines: 420      # length of the script-made skeleton the mapper reads
+    focus_tokens: 700        # size of the ranked code list packets carry when the ask names code; 0 = none. Flag: --focus-tokens N
+
+  digest: 14                 # how many facts from the shared memory each packet carries (0 to 40)
+
+memory:                      # set with: council memory setup --obsidian --vault "<path>"   (or --files)
+  backend: files             # files | obsidian
+  # dir: .council/memory     # for files
+  # vault: /path/to/your/vault         # for obsidian (put this in YOUR file, not the project's)
+  # folder: Council Loop/<project>     # folder inside the vault
+
+# tripwires:                 # extra words or path globs that force the Full tier (see reference/protocol.md)

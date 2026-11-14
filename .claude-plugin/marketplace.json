@@ -8,7 +8,7 @@
     {
       "name": "council-loop",
       "source": "./",
-      "description": "Council Loop: gate, 7-expert council, cross-lab elders, verified build loop, model routing from Artificial Analysis."
+      "description": "Council Loop: gate, researchers, codebase mapper, shared memory, 7-expert council, cross-lab elders, verified build loop, model routing from Artificial Analysis."
     }
   ]
 }

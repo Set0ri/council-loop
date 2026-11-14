@@ -1,0 +1,14 @@
+{"scores": {"A": {"R1": 8, "R2": 7, "R3": 8, "R4": 9, "R5": 8},
+            "B": {"R1": 6, "R2": 8, "R3": 5, "R4": 8, "R5": 8},
+            "C": {"R1": 7, "R2": 8, "R3": 8, "R4": 9, "R5": 6}},
+ "verdict": {"A": "revise", "B": "revise", "C": "revise"},
+ "preferred": "A",
+ "confidence": 0.6,
+ "top_risks": [
+  {"risk": "Unjudged head-to-heads count as even (0.5). On the current tally a candidate 6 of 7 seats wrote, ranked first on all 7 ballots, scores 0.50 while the runner-up leads with 0.69. In the last Full loop only the leader reaches the elders, so the favourite is cut and no deviation is logged (reproduced). A's derived authors make many-author cards common. C has the same gap; B's escalation is the right fix.", "severity": "S1", "candidate": "A"},
+  {"risk": "Control arm lifecycle. The control card is blind-checked only at next_elders, so 'Each seat gets' or 'L1 cache' stalls the run there and only unblinding gets it moving (reproduced: 'CONTROL: identity leak: seat gets'). If the private store is missing on resume, next_elders silently drops the control and cut records that the council won (reproduced). A and C leave both open; B fixes only the first.", "severity": "S2", "candidate": "all"},
+  {"risk": "C counts attempts 'per agent at ingest', but ingest re-runs while the chair waits. Today one rejected output re-ingested 4 times already counts 4 retries (reproduced). Auto-dropping on that count would drop seats that were never retried. Count distinct rejected outputs (by hash) instead.", "severity": "S2", "candidate": "C"}],
+ "key_fix": "Graft B's guard, re-specified for the current head-to-head tally: a vote never cuts what it could not judge. If a top-2 candidate has a head-to-head no unconflicted voter could judge (or fewer than 2 judges), send the top 2 to the elders even in the last Full loop, keep such cards on the shortlist, and log a deviation. Test: a unanimous favourite written by 6 of 7 seats must reach the elders.",
+ "own_idea": "Seal the control arm, beyond B's ingest-time blind check. At init, write the private store's resolved path into run.json; at ingest_ideate, also store the control card's sha256. next_elders and cut must stop when the sealed card is missing or changed; after an explicit --drop CTRL they log a deviation and record 'control not run'. Today, resuming in a shell without COUNCIL_PRIVATE_DIR and following the tool's own 'Re-run council.py next' advice drops the control silently, and the record says 'the council's answer was preferred by 1 of 1 elder(s)' (reproduced).",
+ "eli5": "Ship the typing-saving fixes, but never let a vote silently drop a card nobody could fairly judge.",
+ "friction": "Facts cite scripts/providers.py (it is skills/council-loop/scripts/providers.py), and council.py/run.py changed mid-run, so some quoted reproductions predate the current tally; say which code version candidates assume."}

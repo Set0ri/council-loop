@@ -1,0 +1,5 @@
+{"voter": "L1",
+ "ranking": ["B", "A", "C"],
+ "reasons": {"B": "R1, R3, R5: restart-safe next and derived authors cut chair errors; still shippable.", "A": "R1, R2: strongest restart and vote integrity, but twelve changes strain R5."},
+ "best_on": {"R1": "B", "R2": "A", "R3": "B", "R4": "C", "R5": "C"},
+ "friction": "R2 and R5 are marked machine-checked but no machine results are in the packet; judged from descriptions."}

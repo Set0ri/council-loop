@@ -6,7 +6,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python -c pass && python \"${CLAUDE_PLUGIN_ROOT}/hooks/protect_locked_files.py\" || python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/protect_locked_files.py\""
+            "command": "sh \"${CLAUDE_PLUGIN_ROOT}/bin/council\" hook; exit 0",
+            "timeout": 20
           }
         ]
       }

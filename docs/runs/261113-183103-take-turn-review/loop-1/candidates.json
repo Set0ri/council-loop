@@ -1,0 +1,82 @@
+{
+ "candidates": [
+  {
+   "id": "C1",
+   "title": "Fix the five proven defects, then release",
+   "body": "Ship only what has a reproduction or a failing probe, one unit test each, and change nothing structural. (1) Vote count: head-to-heads, so co-written cards score fairly and a ballot gap is no opinion. (2) Rejected output from a CLI or API agent is moved aside so the printed retry really reruns it, and missing CLI agents get a dispatch line instead of `still waiting`. (3) The identity-leak check matches real ids only. (4) Elder scores are read safely: no crash on a missing entry. (5) Over-long idea lines warn instead of rejecting. Resume logic, authorship records and packet order stay as they are until a later release.",
+   "eli5": "Fix the five things we watched break. Touch nothing else before release.",
+   "authors": [
+    "L1",
+    "L3"
+   ],
+   "parents": [
+    "P1",
+    "P5"
+   ]
+  },
+  {
+   "id": "C2",
+   "title": "Full hardening in dependency order",
+   "body": "Do every fix the council raised, in an order where each step rests on a tested one. First the five proven defects (vote count, dead retry, leak alarm, elder-score crash, idea-length rejection). Then restart safety: `next` lists only agents still missing, validation becomes a pure function, attempts are counted per agent at ingest, and `ingest --drop <agent>` replaces bare `--force`. Then vote integrity: authors are derived from `from` and `parents`, every kept card must reach the pool, and each voter gets its own evenly spaced order and its own label letters. Roughly twelve changes, one test each; nothing is deferred.",
+   "eli5": "Fix everything the team found, one tested step at a time.",
+   "authors": [
+    "L1",
+    "L2",
+    "L3"
+   ],
+   "parents": [
+    "P1",
+    "P2",
+    "P3",
+    "P4",
+    "P5"
+   ]
+  },
+  {
+   "id": "C3",
+   "title": "Defects plus four changes that remove typing",
+   "body": "Ship the five proven defects, then only the four structural changes that take work or risk away from the chair. `next` lists just the agents still missing after a restart. `ingest --drop <agent>` drops one named agent and can never drop the control arm by accident. Authors are derived from `from` and `parents`, so the chair stops typing them and nobody can rank a card they fed. Each voter reads the cards in its own evenly spaced order. Deferred, with reasons recorded: per-voter label letters (suspected bias, unmeasured), attempt counters, overlap warnings. Nine changes, one test each.",
+   "eli5": "Fix what broke, plus four changes that mean less typing and fairer votes. Park the rest.",
+   "authors": [
+    "L1",
+    "L2",
+    "L3"
+   ],
+   "parents": [
+    "P1",
+    "P2",
+    "P3",
+    "P4",
+    "P5"
+   ]
+  }
+ ],
+ "responses": [
+  {
+   "finding": 1,
+   "action": "fixed",
+   "note": "The vote counter now reads ballots as head-to-heads: a voter sits out only those where exactly one card is theirs, so co-written cards score normally (test_tally_cowritten_cards_still_get_a_fair_count). All three candidates include it."
+  },
+  {
+   "finding": 2,
+   "action": "fixed",
+   "note": "A ballot gap is now no opinion and label spelling is cleaned before counting (test_tally_gap_is_no_opinion_and_labels_are_cleaned). Kept-with-gaps ballots are counted in the ledger line."
+  },
+  {
+   "finding": 3,
+   "action": "fixed",
+   "note": "Candidates 2 and 3 replace bare --force with ingest --drop <agent>, which drops only the named agent. Candidate 1 leaves --force as it is, which is a known weakness of that scope."
+  },
+  {
+   "finding": 4,
+   "action": "fixed",
+   "note": "All three candidates read elder scores with a safe lookup and add tests for an elder that omits one card or one criterion."
+  },
+  {
+   "finding": 5,
+   "action": "fixed",
+   "note": "Per-voter order in candidates 2 and 3 uses evenly spaced offsets (voter index x cards // voters) with the mean-position test for 21 cards and 7 voters."
+  }
+ ],
+ "checks": {}
+}

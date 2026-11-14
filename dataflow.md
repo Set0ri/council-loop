@@ -1,61 +1,44 @@
-# Council Loop — Architecture & Dataflow
+# Council Loop v0.4.0 — Architecture & Dataflow
 
-This document describes the standalone dataflow, integration surfaces, state files, and error/fallback contracts of the `council-loop` repository.
+This document summarizes the runtime dataflow, dual-implementation surfaces, persisted state files, and Antigravity integration contracts for `council-loop` (`v0.4.0`). For the full developer architecture map, see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
-## 1. System Overview & Integration Surfaces
+## 1. Entry Surfaces & Parity Contract
 
-All surfaces route through a single enforcement module (`skills/council-loop/scripts/council.py`) so tier gating, blind shuffling, Borda tallying, lock verification, and run-ledger checks behave identically everywhere:
+All surfaces route through the same rules in Rust (`src/`, binary `council`) and the Python reference (`skills/council-loop/scripts/`, `mcp/server.py`, `hooks/protect_locked_files.py`), held to identical output and disk writes by `tests/test_parity.py` and `tests/test_surfaces.py`:
 
 | Surface | Entrypoint | Role |
 | --- | --- | --- |
-| **Agent Skill** | `skills/council-loop/SKILL.md` | Progressive-disclosure protocol instructions, templates (`skills/council-loop/templates/`), and references (`skills/council-loop/reference/`). |
-| **Antigravity Discovery** | `.agents/skills.json` | Registers `skills/` for automatic workspace discovery when `council-loop` is opened in Antigravity. |
-| **CLI** | `skills/council-loop/scripts/council.py` | Direct command-line enforcement (`plan`, `models`, `blind`, `tally`, `check`, `lock-tests`, `verify-locks`, `ask`, `elders`, `refresh`). |
-| **MCP Server** | `mcp/server.py` (configured via `.mcp.json`) | Exposes `skill://council-loop/SKILL.md`, `council://reference/{name}`, `council://templates/{name}`, `council://models/lock`, prompt `council_loop`, and 7 bookkeeping tools over stdio. |
-| **Claude Code Plugin** | `.claude-plugin/plugin.json`, `agents/*.md`, `hooks/hooks.json` | Bundles read-only subagent definitions (`council-expert`, `council-red-team`, `council-elder`) and the cross-platform `PreToolUse` file-lock hook (`hooks/protect_locked_files.py`). |
-| **Cross-Tool Rules** | `AGENTS.md`, `docs/CLAUDE.md-snippet.md` | Portable agent rules for Codex, Gemini CLI, Cursor, and Claude Code. |
-| **CI Backstop** | `.github/workflows/ci.yml` | Runs `pytest -q`, model freshness check (`refresh_models.py --check`), and lock verification (`council.py verify-locks`). |
+| **Rust Binary** | `src/main.rs`, `src/cli.rs` -> `council` (`council.exe`) | Standalone binary embedding `skills/council-loop/` assets via `build.rs` and `src/assets.rs` (disk skill folder overrides compiled-in copy). |
+| **Launcher** | `bin/council`, `bin/council.cmd`, `skills/council-loop/scripts/council` | Resolves `COUNCIL_BIN`, local `target/release/council`, or `PATH`, falling back to Python scripts (`council.py`, `mcp/server.py`, `hooks/protect_locked_files.py`). |
+| **MCP Server** | `council mcp` (`src/mcp.rs`) & `mcp/server.py` | Stdio JSON-RPC 2.0 server (`2024-11-05`..`2025-11-25`) exposing 23 tools (`project_dir`-scoped for run-loop verbs), 2 resources (`skill://council-loop/SKILL.md`, `council://models/lock`), 2 resource templates (`council://reference/{name}`, `council://templates/{name}`), and prompt `council_loop`. |
+| **Test-Lock Hook** | `council hook` (`src/hook.rs`) & `hooks/protect_locked_files.py` (via `hooks/hooks.json`) | `PreToolUse` guard blocking edits or shell writes to paths locked in `.council/locks.json` (plus `.council/locks.json` itself). |
+| **Antigravity Config** | `.agents/skills.json` + `~/.gemini/config/mcp_config.json` (`council-loop`) | Workspace skill discovery (`skills/`) and global stdio `council mcp` server registration for Antigravity sessions. |
+| **CI Guard** | `.github/workflows/ci.yml`, `.github/workflows/release.yml` | Runs `cargo fmt`, `clippy`, `cargo test`, `cargo build --release`, `pytest -q`, `council map --check`, `council refresh --check`, MSRV `1.85` build, and PR `verify-locks`. |
 
 ---
 
-## 2. End-to-End Council Loop Dataflow
+## 2. End-to-End Run Loop & Support-Member Dataflow
 
 ```mermaid
-flowchart TD
-  Ask["User Task + Optional Paths"] --> Gate["council.plan()<br/>Tripwires raise tier only"]
-  Gate -->|"Direct"| BuildDirect["Single Writer: Lock Tests -> Build -> Verify <=5"]
-  Gate -->|"Lite / Full"| Ideate["Independent Ideation<br/>(Lite: 3x5 | Full: 7 experts x >=13 ideas)"]
-  Ideate --> Blind["council.blind(cards, seed, max_words=120)<br/>Strip authors, shuffle, validate word caps & ELI5"]
-  Blind -->|"judge packet + private mapping"| Tally["council.tally(votes, mapping, scores, checks, keep)<br/>Normalised Borda, self-votes excluded, failed checks last"]
-  Tally --> Cut["council.cut()<br/>7 -> 5 -> 3 -> 1 + 1 Pareto wildcard"]
-  Cut --> RedTeam["Red-Team Pre-Mortem (S1 / S2 / S3)"]
-  RedTeam --> Elders["providers.elder_review()<br/>Parallel cross-lab review (Anthropic, OpenAI, Google) with original_ask"]
-  Elders -->|"next loop (<=3)"| Ideate
-  Elders -->|"winner"| Final["Elder Synthesis + Blind Control Arm + Final Write-Up"]
-  Final --> LockBuild["council.lock_files() -> .council/locks.json<br/>Hook + CI verify_locks()"]
-  LockBuild --> Retro["Retro: <=3 lessons appended to docs/lessons.md via PR"]
+flowchart LR
+  Ask["User Ask + Flags"] --> Init["council init / council_init<br/>src/gate.rs + src/core.rs"]
+  Init -->|"Tier, seats, members"| Brief["Chair writes brief.yaml<br/>ingest freezes rubric"]
+  Brief --> Support["Parallel Research & Code Map<br/>src/memory.rs + src/codemap.rs + src/pyread.rs"]
+  Support -->|"harvest -> notes & ARCHITECTURE.md"| LoopStart["next -> Packet Render (src/run/prompts.rs)<br/>collect / ingest -> Validate (src/run/validate.rs)"]
+  LoopStart -->|"Ideate -> Merge -> Blind Vote -> Red Team -> Fuse -> Rank -> Elders"| Cut["council cut (src/run/cut.rs)<br/>Borda + Check Priority + Wildcard"]
+  Cut -->|"Next loop (<=3)"| LoopStart
+  Cut -->|"Winner"| Final["Chair writes final.md + retro.md<br/>Unblind mapping & release commons"]
+  Final --> Locks["council lock-tests / verify-locks<br/>LF-normalised SHA-256 + council hook"]
 ```
 
 ---
 
-## 3. Model Registry & Routing Dataflow
+## 3. State Files, Error Handling & Fallback Contracts
 
-1. **Inputs**:
-   - Selection policy: `skills/council-loop/models/policy.yaml` (modes, `max`/`balanced`/`efficient` profiles, bans, access flags, pins, and `k` cost-quality weights).
-   - Benchmark source: Artificial Analysis API (`load_live` using `AA_API_KEY`) or offline snapshot JSON (`skills/council-loop/models/snapshot-*.json` via `--offline`).
-2. **Resolution (`refresh_models.py`)**:
-   - Filters banned/restricted models, computes `quality - k * log2(cost)`, assigns `chair`, `experts` (7 seats), `red_team`, `elders`, and `verifier` across `solo`, `crosslab`, and `fanout:<family>`, and normalizes `relative_cost` so `balanced/crosslab == 1.0`.
-3. **Output (`skills/council-loop/models/lock.yaml`)**:
-   - Read by `council.models_for(mode, profile)` and `providers.elder_review(...)`.
-   - Checked for staleness against `stale_after_days` via `refresh_models.py --check`.
-
----
-
-## 4. State Files, Validation & Error / Fallback Contracts
-
-| Artifact / State | Schema & Writer | Enforcement & Fallback Contract |
+| State / Module | Writer & Schema | Enforcement & Fallback Behaviour |
 | --- | --- | --- |
-| `.council/locks.json` | JSON map of POSIX-normalised relative file paths -> SHA-256 hex digest, written by `council.lock_files()`. | **Hook**: `hooks/hooks.json` invokes `python` with `python3` fallback and quoted `${CLAUDE_PLUGIN_ROOT}`; `hooks/protect_locked_files.py` reads `.council/locks.json` with `utf-8-sig` (BOM-tolerant), normalises Windows/POSIX paths, and denies `Edit`/`Write`/`MultiEdit`/`NotebookEdit` and mutating `Bash` commands unless `COUNCIL_ALLOW_LOCKED=1`. **CI/MCP**: `council.verify_locks()` reads with `utf-8-sig` and exits `1` if any locked file is missing or modified. |
-| `.council/runs/<id>/run.json` | Loop ledger validated by `council.check_run()`. | Rejects missing `intent_brief`, `rubric`, `original_ask`, missing ELI5s, `<7` (full) or `<3` (lite) experts per loop, `<13` (full) or `<5` (lite) ideas per expert, `>120` word cards, missing red-team entries, or `loops > max_loops`. Emits warnings for missing retros, survivor count mismatches, or `<3` full-tier elders. |
-| `.council/elders/<provider>.json` | Raw per-provider response written by `providers.elder_review()`. | `providers.parse_json()` extracts the first balanced JSON object via `JSONDecoder.raw_decode`, staying resilient to markdown code fences, preamble braces, and trailing commentary. Missing CLIs (`claude`, `codex`, `gemini`) or missing `OPENROUTER_API_KEY` return structured `{"ok": false, "error": ...}` and populate `missing` + `stand_in_note` without crashing. Split elder preferences or any `S1` risk halt progression with an instruction to ask the user one targeted question. |
-| `blind()` / `tally()` inputs | UTF-8 (`utf-8-sig` BOM-tolerant) JSON card lists and vote ballots. | `blind()` reports word-cap violations, missing ELI5s, and `>1.5x` length spread (`ok: false`, exit `2` on CLI). `tally()` drops self-votes (`author == voter`) and forces `"fail"` check items to the bottom regardless of Borda score. |
+| `.council/runs/<id>/run.json` | Tool-only ledger (`src/run/mod.rs`, `src/run/steps.rs`, `src/run/ingest.rs`). | Resumable step machine (`init` -> `next` -> `dispatch` -> `ingest` -> `cut` -> `status` -> `audit`). Rejected seat outputs move aside with a retry prompt; `--drop <seat> --reason` advances explicitly; malformed input yields plain exit code `1`/`2` errors rather than panicking. |
+| `docs/ARCHITECTURE.md` & `.council/map/state.json` | `src/codemap.rs` + `src/pyread.rs` (`tree-sitter-python` + deterministic cross-language structure extractors & PageRank focus maps). | `map --check` detects structural drift while ignoring whitespace/function-body edits and `test_*` additions; never overwrites a human-authored `docs/ARCHITECTURE.md` lacking the `council-loop:map` marker. |
+| `.council/memory/` or Obsidian Vault | `src/memory.rs` (`add_research`, `write_commons`, `digest`, `retire`). | Research facts require a source (recall facts are tagged accordingly) and are injected immediately; inter-seat thoughts arrive unsigned one step later and never enter blind votes. |
+| `skills/council-loop/models/policy.yaml` & `lock.yaml` | `src/refresh.rs` (`council refresh`) using Artificial Analysis data + `--offline` snapshots. | Resolves `solo`, `crosslab`, and `fanout:*` across `max`/`balanced`/`efficient`; `src/providers.rs` dispatches `claude`, `codex`, `gemini`, or `OPENROUTER_API_KEY` with unreachable seats routed to stand-ins or reported cleanly in `council doctor`. |
+| `.council/locks.json` | JSON map of forward-slash relative file paths -> LF-normalised SHA-256 digests (`src/core.rs`). | Tolerates CRLF, UTF-8 BOM, and UTF-16 reads while writing `\n` UTF-8 everywhere (`tests/test_portability.py`). Hook checks exit `0` defensively when no lock manifest applies so misconfigured shells never wedge unrelated tool calls. |

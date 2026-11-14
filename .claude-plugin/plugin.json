@@ -1,20 +1,24 @@
 {
   "name": "council-loop",
   "displayName": "Council Loop",
-  "version": "0.1.0",
-  "description": "Research-backed looped engineering: gate -> 7-expert council with blind votes, red team and cross-lab elders (7->5->3->1) -> verified build loop -> lessons. Model picks per role from Artificial Analysis data.",
+  "version": "0.4.0",
+  "description": "Research-backed looped engineering: gate -> researchers and a codebase mapper -> 7-expert council with blind votes, red team and cross-lab elders (7->5->3->1) -> verified build loop -> lessons. A shared memory of sourced facts (project files or Obsidian). A resumable run loop (next / ingest) does the bookkeeping. Model picks per role from Artificial Analysis data.",
   "author": {
     "name": "Sylvan Labs"
   },
   "license": "MIT",
   "keywords": [
+    "architecture",
+    "context-engineering",
     "council",
-    "multi-agent",
-    "review",
     "decision",
     "eval",
-    "context-engineering",
-    "mcp"
+    "mcp",
+    "memory",
+    "multi-agent",
+    "obsidian",
+    "research",
+    "review"
   ],
   "icon": "./.claude-plugin/icon.png"
 }

@@ -1,0 +1,50 @@
+restated: >
+  Decide the changes that would most improve the council-loop kit (v0.2, in this repo) for the AI
+  that runs it: the chair, and the seats that receive its packets. Pick what to change before release.
+eli5: Find the fixes that make the AI team's rulebook easiest to follow correctly.
+
+rubric:
+  - {id: R1, name: "Fewer wrong, stalled or drifting runs by the executing model", weight: 35, check: judgment}
+  - {id: R2, name: "Integrity: bias controls hold and the record stays honest", weight: 25, check: machine}
+  - {id: R3, name: "Lower cost: seat calls, tokens, wall-clock", weight: 15, check: source}
+  - {id: R4, name: "Keeps Logan's process whole (7 x 13, up to 3 loops, cross-lab elders, 7-5-3-1, ELI5s)", weight: 15, check: judgment}
+  - {id: R5, name: "Small and testable: can ship today with a unit test", weight: 10, check: machine}
+
+evidence_plan:
+  - "Unit tests: tests/test_run.py drives a whole run with fake seats (tests/sim.py); a proposed fix should be testable there."
+  - "Read the code paths named in facts; cite file and function for every claim."
+  - "This run itself is evidence: seats report friction with their own packets."
+
+lenses:
+  - id: L1
+    name: "Executor ergonomics"
+    maximize: "The odds that an LLM chair with a finite context, possibly reset mid-run, finishes a Full council correctly"
+    respect: "Add no new concept that Logan has to learn"
+    method: "Walk the next / ingest loop step by step as the chair; find every point where a model would stall, guess or drift"
+    evidence: "skills/council-loop/SKILL.md; the next_* and ingest_* functions in scripts/run.py"
+  - id: L2
+    name: "Integrity under pressure"
+    maximize: "Resistance to quiet failure: biased votes, broken blinding, gamed checks, wrong tallies, deviations that go unrecorded"
+    respect: "The referee stays deterministic and unit-testable (no LLM inside the script)"
+    method: "Read scripts/council.py and scripts/run.py adversarially; try to break each invariant on paper"
+    evidence: "tally, cut, blind, verify_locks in scripts/council.py; _collect, _standing, cmd_cut in scripts/run.py; tests/"
+  - id: L3
+    name: "Cost and simplicity"
+    maximize: "Decision quality per token and per minute"
+    respect: "Logan's process stays whole: 7 lenses x 13 ideas, up to 3 loops, elders each loop, 7-5-3-1"
+    method: "Delete, merge or cheapen steps; count calls and words in the packets"
+    evidence: "templates/packets/*.md; estimate_calls in scripts/council.py; reference/protocol.md"
+
+facts: >
+  Repo root: <repo>. Read these: skills/council-loop/SKILL.md (what the chair reads),
+  skills/council-loop/reference/protocol.md, skills/council-loop/scripts/run.py (state machine),
+  skills/council-loop/scripts/council.py (gate, blind, tally, cut, locks), scripts/providers.py (CLI adapters),
+  skills/council-loop/templates/packets/*.md (what seats read), tests/test_run.py and tests/sim.py.
+  Numbers: a Full run is about 76 seat calls (25 per loop x 3 + 1 control); Lite about 9.
+  In the Cowork host each subagent spawn carries roughly 60k tokens of overhead before it reads its packet.
+  Known limits today: the codex and gemini CLI paths are written from docs and untested; a nested
+  `claude -p` call fails authentication in this sandbox; README.md, AGENTS.md and mcp/server.py still
+  describe v0.1 and will be rewritten after this council, so do not spend ideas on them.
+
+lessons_applied: [L-20261113-1, L-20261113-2]
+approved_by: "unattended"

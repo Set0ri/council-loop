@@ -56,7 +56,12 @@ class Model:
         return EFFORT_RE.sub("", self.name).strip()
 
     def card(self) -> dict:
-        return {"model": self.name, "quality": self.quality, "cost_per_task": self.cost}
+        d = {"model": self.name, "creator": self.creator, "quality": self.quality, "cost_per_task": self.cost}
+        if self.openrouter_id:
+            d["openrouter_id"] = self.openrouter_id
+        if self.open_weights:
+            d["open_weights"] = True
+        return d
 
 
 # ---------------------------------------------------------------- data loading
@@ -100,18 +105,29 @@ def load_live(policy: dict) -> tuple[list[Model], dict]:
             restricted=bool(row.get("trusted_access", False)),
             openrouter_id=row.get("openrouter_api_id"),
         ))
-    today = dt.date.today().isoformat()
+    today = _today().isoformat()
     meta = {"source": "Artificial Analysis API (artificialanalysis.ai)", "collected": today,
             "index": "AA Intelligence Index (live)"}
     snap = ROOT / "models" / f"snapshot-{today}.json"
-    snap.write_text(json.dumps({**meta, "models": [m.__dict__ for m in models]}, indent=1), encoding="utf-8")
+    rows = [{"name": m.name, "creator": m.creator, "quality": m.quality, "cost_per_task": m.cost, "minutes": m.minutes,
+             "open_weights": m.open_weights, "restricted": m.restricted, "openrouter_id": m.openrouter_id} for m in models]
+    snap.write_text(json.dumps({**meta, "models": rows}, indent=1), encoding="utf-8", newline="\n")
     return models, meta
 
 
 def load_offline(path: Path) -> tuple[list[Model], dict]:
-    raw = json.loads(path.read_text(encoding="utf-8"))
+    try:
+        raw = json.loads(path.read_text(encoding="utf-8"))
+    except OSError as err:
+        sys.exit(f"cannot read the snapshot {path}: {err}")
+    except ValueError as err:
+        sys.exit(f"the snapshot {path} is not valid JSON: {err}")
+    if not isinstance(raw, dict) or not isinstance(raw.get("models"), list):
+        sys.exit(f'the snapshot {path} has no "models" list')
+    if not all(isinstance(r, dict) and isinstance(r.get("name"), str) and isinstance(r.get("creator"), str) for r in raw["models"]):
+        sys.exit(f"the snapshot {path} has a model without a name or a creator")
     models = [Model(name=r["name"], creator=r["creator"], quality=r.get("quality"),
-                    cost=r.get("cost_per_task"), minutes=r.get("minutes"),
+                    cost=r.get("cost_per_task", r.get("cost")), minutes=r.get("minutes"),
                     open_weights=r.get("open_weights", False), restricted=r.get("restricted", False),
                     openrouter_id=r.get("openrouter_id")) for r in raw["models"]]
     meta = {k: raw.get(k) for k in ("source", "collected", "index")}
@@ -324,8 +340,8 @@ def apply_pins(lock: dict, pins: dict, models: list[Model]) -> None:
             continue
         card = by_name[name].card()
         if role in ("experts", "elders") and rest:          # e.g. .../elders/Google
-            cfg[role] = [card if (x["model"].startswith(rest[0]) or by_name.get(x["model"], None)
-                                  and by_name[x["model"]].creator == rest[0]) else x for x in cfg[role]]
+            cfg[role] = [card if (x.get("creator") == rest[0] or x["model"].startswith(rest[0])) else x
+                         for x in cfg[role]]
         elif role in ("experts", "elders"):
             cfg[role] = [card] * len(cfg[role])
         else:
@@ -352,7 +368,23 @@ def markdown_table(lock: dict, profile: str) -> str:
     return "\n".join(rows)
 
 
+def _today():
+    """Today, or the day in COUNCIL_NOW when the clock is frozen for a test."""
+    frozen = os.environ.get("COUNCIL_NOW")
+    if frozen:
+        try:
+            return dt.datetime.strptime(frozen.strip(), "%Y-%m-%dT%H:%M:%S").date()
+        except ValueError:
+            pass
+    return dt.date.today()
+
+
 def main() -> int:
+    for stream in (sys.stdout, sys.stderr):                    # UTF-8 and \\n whatever the system (Windows pipes)
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace", newline="\n")
+        except (AttributeError, ValueError, OSError):
+            pass
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--offline", type=Path, help="snapshot JSON instead of the live AA API")
     ap.add_argument("--policy", type=Path, default=POLICY)
@@ -364,16 +396,16 @@ def main() -> int:
 
     if args.check:
         if not args.out.exists():
-            print("lock.yaml missing: run refresh_models.py"); return 1
+            print("lock.yaml missing: run `council refresh`"); return 1
         lock = yaml.safe_load(args.out.read_text(encoding="utf-8"))
-        age = (dt.date.today() - dt.date.fromisoformat(str(lock["data"]["collected"]))).days
+        age = (_today() - dt.date.fromisoformat(str(lock["data"]["collected"]))).days
         limit = policy["data"]["stale_after_days"]
         print(f"model data is {age} days old (limit {limit})")
         return 1 if age > limit else 0
 
     models, meta = load_offline(args.offline) if args.offline else load_live(policy)
     configs, warnings = resolve(models, policy)
-    lock = {"generated": dt.date.today().isoformat(),
+    lock = {"generated": _today().isoformat(),
             "data": {**meta, "attribution": "Model data: Artificial Analysis (https://artificialanalysis.ai)"},
             "policy_version": policy["version"], "warnings": warnings, "configs": to_plain(configs)}
     apply_pins(lock, policy.get("pins"), models)
@@ -381,10 +413,10 @@ def main() -> int:
     old = flat_picks(yaml.safe_load(args.out.read_text(encoding="utf-8"))) if args.out.exists() else {}
     new = flat_picks(lock)
     changes = [f"  {k}: {old.get(k, '(none)')} -> {v}" for k, v in sorted(new.items()) if old.get(k) != v]
-    header = ("# GENERATED by scripts/refresh_models.py from models/policy.yaml (k values and floors are\n"
+    header = ("# GENERATED by `council refresh` from models/policy.yaml (k values and floors are\n"
               "# starting defaults: tune them against your golden set, see reference/model-modes.md).\n"
               "# Do not edit by hand: change policy.yaml (rules, pins, bans) and re-run. Review diffs in a PR.\n")
-    args.out.write_text(header + yaml.safe_dump(lock, sort_keys=False, width=120), encoding="utf-8")
+    args.out.write_text(header + yaml.safe_dump(lock, sort_keys=False, width=120), encoding="utf-8", newline="\n")
     print(f"wrote {args.out} ({len(new)} picks, {len(changes)} changed)")
     if old and changes:
         print("changes since last lock:\n" + "\n".join(changes))
