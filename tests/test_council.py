@@ -72,3 +72,22 @@ def test_models_for_every_mode_and_profile():
             out = council.models_for(mode, profile)
             assert "error" not in out, (mode, profile, out)
             assert "chair" in out and "experts" in out
+
+
+def test_check_run_enforces_expert_count():
+    base = json.loads((Path(council.SKILL_DIR) / "templates" / "run.example.json").read_text(encoding="utf-8"))
+    one_expert = json.loads(json.dumps(base))
+    one_expert["loops"][0]["ideas"] = {"L1": [f"idea {i}" for i in range(13)]}
+    res_full = council.check_run(one_expert)
+    assert not res_full["ok"] and any("experts < 7" in e for e in res_full["errors"])
+
+    lite = json.loads(json.dumps(base))
+    lite["tier"] = "lite"
+    lite["schedule"] = [3, 1]
+    lite["loops"][0]["survivors"] = ["C1"]
+    lite["loops"][0]["ideas"] = {f"L{k}": [f"idea {i}" for i in range(5)] for k in (1, 2)}
+    res_lite_bad = council.check_run(lite)
+    assert not res_lite_bad["ok"] and any("experts < 3" in e for e in res_lite_bad["errors"])
+
+    lite["loops"][0]["ideas"]["L3"] = [f"idea {i}" for i in range(5)]
+    assert council.check_run(lite)["ok"]

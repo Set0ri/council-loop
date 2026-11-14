@@ -210,6 +210,7 @@ def check_run(run: dict) -> dict:
     errs, warns = [], []
     tier = run.get("tier", "full")
     min_ideas = {"full": 13, "lite": 5}.get(tier, 0)
+    min_experts = {"full": 7, "lite": 3}.get(tier, 0)
     max_loops = run.get("max_loops", 3)
     loops = run.get("loops", [])
     if len(loops) > max_loops:
@@ -222,7 +223,10 @@ def check_run(run: dict) -> dict:
     schedule = run.get("schedule") or (DEFAULT_SCHEDULE if tier == "full" else [3, 1])
     for i, loop in enumerate(loops):
         tag = f"loop {i + 1}"
-        for expert, ideas in (loop.get("ideas") or {}).items():
+        ideas_by_expert = loop.get("ideas") or {}
+        if min_experts and len(ideas_by_expert) < min_experts:
+            errs.append(f"{tag}: {len(ideas_by_expert)} experts < {min_experts}")
+        for expert, ideas in ideas_by_expert.items():
             if len(ideas) < min_ideas:
                 errs.append(f"{tag}: {expert} has {len(ideas)} ideas < {min_ideas}")
             long = [x for x in ideas if _words(x) > 25]
@@ -254,7 +258,7 @@ def _sha(path: Path) -> str:
 
 
 def lock_files(paths: list[str], lock_file: Path = LOCK_FILE) -> dict:
-    data = json.loads(lock_file.read_text(encoding="utf-8")) if lock_file.exists() else {}
+    data = json.loads(lock_file.read_text(encoding="utf-8-sig")) if lock_file.exists() else {}
     for p in paths:
         fp = Path(p)
         files = [x for x in fp.rglob("*") if x.is_file()] if fp.is_dir() else [fp]
@@ -268,7 +272,7 @@ def lock_files(paths: list[str], lock_file: Path = LOCK_FILE) -> dict:
 def verify_locks(lock_file: Path = LOCK_FILE) -> dict:
     if not lock_file.exists():
         return {"ok": True, "changed": [], "note": "no locks"}
-    data = json.loads(lock_file.read_text(encoding="utf-8"))
+    data = json.loads(lock_file.read_text(encoding="utf-8-sig"))
     changed = [p for p, h in data.items() if not Path(p).exists() or _sha(Path(p)) != h]
     return {"ok": not changed, "changed": changed}
 
@@ -276,7 +280,7 @@ def verify_locks(lock_file: Path = LOCK_FILE) -> dict:
 def is_locked(path: str, lock_file: Path = LOCK_FILE) -> bool:
     if not lock_file.exists():
         return False
-    data = {k.replace("\\", "/"): v for k, v in json.loads(lock_file.read_text(encoding="utf-8")).items()}
+    data = {k.replace("\\", "/"): v for k, v in json.loads(lock_file.read_text(encoding="utf-8-sig")).items()}
     try:
         rel = Path(path).resolve().relative_to(Path.cwd().resolve()).as_posix()
     except ValueError:
@@ -286,7 +290,7 @@ def is_locked(path: str, lock_file: Path = LOCK_FILE) -> bool:
 
 # ----------------------------------------------------------------------------- CLI
 def _read_json(arg: str):
-    return json.loads(Path(arg).read_text(encoding="utf-8")) if Path(arg).exists() else json.loads(arg)
+    return json.loads(Path(arg).read_text(encoding="utf-8-sig")) if Path(arg).exists() else json.loads(arg)
 
 
 def main(argv: list[str] | None = None) -> int:

@@ -105,13 +105,17 @@ def ask(provider: str, prompt: str, model: str | None = None, timeout: int = 900
 
 
 def parse_json(text: str) -> dict | None:
-    m = re.search(r"\{.*\}", text or "", re.S)
-    if not m:
+    if not text:
         return None
-    try:
-        return json.loads(m.group(0))
-    except json.JSONDecodeError:
-        return None
+    decoder = json.JSONDecoder()
+    for match in re.finditer(r"\{", text):
+        try:
+            obj, _ = decoder.raw_decode(text[match.start():])
+            if isinstance(obj, dict):
+                return obj
+        except json.JSONDecodeError:
+            continue
+    return None
 
 
 def elder_review(packet: str, profile: str = "balanced", providers: list[str] | None = None,

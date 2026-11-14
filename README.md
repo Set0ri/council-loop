@@ -40,7 +40,7 @@ flowchart LR
 
 | You use | Do this |
 | --- | --- |
-| **Claude Code (plugin)** | `/plugin marketplace add <your-org>/council-loop`, then `/plugin install council-loop@sylvan-labs`. This installs the skill, 3 read-only subagents, the locked-files hook and the MCP server |
+| **Claude Code (plugin)** | `/plugin marketplace add Set0ri/council-loop`, then `/plugin install council-loop@sylvan-labs`. This installs the skill, 3 read-only subagents, the locked-files hook and the MCP server |
 | **Claude Code (skill only)** | Copy `skills/council-loop/` to `.claude/skills/` (one project) or `~/.claude/skills/` (all projects), then add `docs/CLAUDE.md-snippet.md` to your CLAUDE.md |
 | **Any MCP client** (Claude Desktop, Cursor, Codex, Gemini CLI…) | Add a server: `uv run --with "mcp[cli]" --with pyyaml python /path/to/council-loop/mcp/server.py` (stdio) |
 | **Codex / Gemini CLI / Cursor without MCP** | Copy `AGENTS.md` and `skills/` into your repo. Gemini CLI: set `contextFileName` to `AGENTS.md` |

@@ -23,7 +23,7 @@ def main() -> int:
     lock = project / ".council" / "locks.json"
     if not lock.exists():
         return 0
-    locked = {p.replace("\\", "/") for p in json.loads(lock.read_text(encoding="utf-8"))}
+    locked = {p.replace("\\", "/") for p in json.loads(lock.read_text(encoding="utf-8-sig"))}
     tool = event.get("tool_name", "")
     inp = event.get("tool_input") or {}
     hit = None

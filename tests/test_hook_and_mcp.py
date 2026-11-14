@@ -51,3 +51,36 @@ def test_mcp_server_lists_tools_resources_prompts():
             "council_verify_locks", "council_elder_review"} <= tools
     assert "skill://council-loop/SKILL.md" in res and "council_loop" in prompts
     assert "name: council-loop" in skill.contents[0].text
+
+
+def test_hooks_json_cross_platform_and_bom_locks(tmp_path):
+    hooks_cfg = json.loads((ROOT / "hooks" / "hooks.json").read_text(encoding="utf-8"))
+    handler = hooks_cfg["hooks"]["PreToolUse"][0]["hooks"][0]
+    assert handler["type"] == "command"
+    assert "args" not in handler
+    assert '"${CLAUDE_PLUGIN_ROOT}/hooks/protect_locked_files.py"' in handler["command"]
+    assert "python " in handler["command"] and "python3 " in handler["command"]
+
+    (tmp_path / ".council").mkdir()
+    (tmp_path / ".council" / "locks.json").write_text(
+        json.dumps({"tests/test_x.py": "abc"}), encoding="utf-8-sig"
+    )
+    out = run_hook(tmp_path, {"tool_name": "Edit", "tool_input": {"file_path": str(tmp_path / "tests/test_x.py")}})
+    assert out["hookSpecificOutput"]["permissionDecision"] == "deny"
+
+
+def test_providers_parse_json_handles_fences_and_trailing_braces():
+    import providers
+
+    fenced = (
+        "```json\n"
+        '{"preferred": "A", "key_fix": "escape {x}", "confidence": 0.9}\n'
+        "```\n"
+        "Note: runner-up {B} trailed on cost."
+    )
+    assert providers.parse_json(fenced) == {"preferred": "A", "key_fix": "escape {x}", "confidence": 0.9}
+
+    preamble = 'Draft {v1} summary:\n{"preferred": "C", "verdict": {"C": "ship"}}'
+    assert providers.parse_json(preamble) == {"preferred": "C", "verdict": {"C": "ship"}}
+    assert providers.parse_json("plain text without json") is None
+    assert providers.parse_json("[1, 2, 3]") is None
