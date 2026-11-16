@@ -1,0 +1,280 @@
+{
+ "name": "direct",
+ "about": "The Direct tier: no council, tests first, locks proved at the end.",
+ "needs": [],
+ "steps": [
+  {
+   "put": "<ROOT>/tests/test_a.py",
+   "text": "def test_a():\n    assert True\n"
+  },
+  {
+   "cmd": [
+    "init",
+    "Tidy the helper that formats dates",
+    "--stakes",
+    "low",
+    "--reversible",
+    "yes"
+   ],
+   "clock": 1,
+   "rc": 0,
+   "out": "GATE tier=direct mode=fanout:claude profile=efficient loops<=0 calls~1 tokens~n/a rel_cost=0.66 (chair: stakes=low, reversible)\nrun: <ROOT>/.council/runs/261113-120001-tidy-helper-formats\nnote: only one lab reachable: elders come from the same family (no cross-lab check). Install the codex / gemini CLIs or set OPENROUTER_API_KEY to get one\n\n[261113-120001-tidy-helper-formats] tier=direct phase=direct\nDirect tier: one writer, tests first.\n  1. Have a different agent write the acceptance tests (or mutation-check yours) BEFORE the code.\n  2. Lock them:      council lock-tests <test paths>\n  3. Implement, then loop: run the checks, fix, repeat. 5 iterations at most.\n     Still failing after 5, or a real design fork appeared: raise the tier (council init ... --tier lite).\n  4. Prove the locks:  council verify-locks\nTHEN  council ingest        # closes the run\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "status"
+   ],
+   "clock": 2,
+   "rc": 0,
+   "out": "GATE tier=direct mode=fanout:claude profile=efficient loops<=0 calls~1 tokens~n/a rel_cost=0.66 (chair: stakes=low, reversible)\nrun 261113-120001-tidy-helper-formats · phase direct\nask: Tidy the helper that formats dates\ncalls so far: 0 (estimate 1)\nthis step is yours (direct).\nnext: council next        # prints the exact commands for this step; safe to run again\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "next"
+   ],
+   "clock": 3,
+   "rc": 0,
+   "out": "[261113-120001-tidy-helper-formats] tier=direct phase=direct\nDirect tier: one writer, tests first.\n  1. Have a different agent write the acceptance tests (or mutation-check yours) BEFORE the code.\n  2. Lock them:      council lock-tests <test paths>\n  3. Implement, then loop: run the checks, fix, repeat. 5 iterations at most.\n     Still failing after 5, or a real design fork appeared: raise the tier (council init ... --tier lite).\n  4. Prove the locks:  council verify-locks\nTHEN  council ingest        # closes the run\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "note",
+    "a note for nobody at all"
+   ],
+   "clock": 4,
+   "rc": 2,
+   "out": "",
+   "err": "error: notes belong to a council run that has a brief: ingest the brief first\n"
+  },
+  {
+   "cmd": [
+    "cut",
+    "--eli5",
+    "there is nothing to cut here"
+   ],
+   "clock": 5,
+   "rc": 2,
+   "out": "",
+   "err": "error: not at the cut yet (phase direct). Run `council next`.\n"
+  },
+  {
+   "cmd": [
+    "ingest",
+    "--drop",
+    "L1",
+    "--reason",
+    "there are no seats"
+   ],
+   "clock": 6,
+   "rc": 2,
+   "out": "",
+   "err": "error: --drop names a seat to go on without; the direct step is yours, not a seat's\n"
+  },
+  {
+   "cmd": [
+    "ingest"
+   ],
+   "clock": 7,
+   "rc": 0,
+   "out": "direct run closed (note: no files were locked)\n\n[261113-120001-tidy-helper-formats] tier=direct phase=done\nRun complete. Final: <ROOT>/.council/runs/261113-120001-tidy-helper-formats/final.md\nOpen a PR that appends the proposed lessons to docs/lessons.md and adds a row to docs/outcomes.md (success metric, kill criterion, control-arm result). Check the outcome again at 30 and 90 days.\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "status"
+   ],
+   "clock": 8,
+   "rc": 0,
+   "out": "GATE tier=direct mode=fanout:claude profile=efficient loops<=0 calls~1 tokens~n/a rel_cost=0.66 (chair: stakes=low, reversible)\nrun 261113-120001-tidy-helper-formats · phase done\nask: Tidy the helper that formats dates\ncalls so far: 0 (estimate 1)\nnext: nothing, the run is finished. The decision: final.md in the run folder · re-count the votes: council audit\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "init",
+    "Tidy the helper that formats times",
+    "--tier",
+    "direct"
+   ],
+   "clock": 9,
+   "rc": 0,
+   "out": "GATE tier=direct mode=fanout:claude profile=efficient loops<=0 calls~1 tokens~n/a rel_cost=0.66 (explicit)\nrun: <ROOT>/.council/runs/261113-120009-tidy-helper-formats\nnote: only one lab reachable: elders come from the same family (no cross-lab check). Install the codex / gemini CLIs or set OPENROUTER_API_KEY to get one\n\n[261113-120009-tidy-helper-formats] tier=direct phase=direct\nDirect tier: one writer, tests first.\n  1. Have a different agent write the acceptance tests (or mutation-check yours) BEFORE the code.\n  2. Lock them:      council lock-tests <test paths>\n  3. Implement, then loop: run the checks, fix, repeat. 5 iterations at most.\n     Still failing after 5, or a real design fork appeared: raise the tier (council init ... --tier lite).\n  4. Prove the locks:  council verify-locks\nTHEN  council ingest        # closes the run\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "lock-tests",
+    "tests"
+   ],
+   "clock": 10,
+   "rc": 0,
+   "out": "{\"locked\": 1, \"file\": \"<ROOT>/.council/locks.json\"}\n",
+   "err": ""
+  },
+  {
+   "put": "<ROOT>/tests/test_a.py",
+   "text": "def test_a():\n    assert 1\n"
+  },
+  {
+   "cmd": [
+    "ingest"
+   ],
+   "clock": 11,
+   "rc": 2,
+   "out": "",
+   "err": "error: locked files changed: ['tests/test_a.py']. Fix the code, not the tests (or ask the requester to unlock).\n"
+  },
+  {
+   "cmd": [
+    "deviation",
+    "the test was wrong, so the requester unlocked it"
+   ],
+   "clock": 12,
+   "rc": 0,
+   "out": "recorded deviation 1: direct: the test was wrong, so the requester unlocked it\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "lock-tests",
+    "tests"
+   ],
+   "clock": 13,
+   "rc": 0,
+   "out": "{\"locked\": 1, \"file\": \"<ROOT>/.council/locks.json\"}\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "ingest"
+   ],
+   "clock": 14,
+   "rc": 0,
+   "out": "direct run closed\n\n[261113-120009-tidy-helper-formats] tier=direct phase=done\nRun complete. Final: <ROOT>/.council/runs/261113-120009-tidy-helper-formats/final.md\nOpen a PR that appends the proposed lessons to docs/lessons.md and adds a row to docs/outcomes.md (success metric, kill criterion, control-arm result). Check the outcome again at 30 and 90 days.\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "status"
+   ],
+   "clock": 15,
+   "rc": 0,
+   "out": "GATE tier=direct mode=fanout:claude profile=efficient loops<=0 calls~1 tokens~n/a rel_cost=0.66 (explicit)\nrun 261113-120009-tidy-helper-formats · phase done\nask: Tidy the helper that formats times\ndeviations (1): direct: the test was wrong, so the requester unlocked it\ncalls so far: 0 (estimate 1)\nnext: nothing, the run is finished. The decision: final.md in the run folder · re-count the votes: council audit\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "audit"
+   ],
+   "clock": 16,
+   "rc": 0,
+   "out": "seat outputs: 0 of 0 match what was ingested (this run was recorded before outputs were hashed)\naudit: ok\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "check"
+   ],
+   "clock": 17,
+   "rc": 0,
+   "out": "{\n \"ok\": true,\n \"errors\": [],\n \"warnings\": []\n}\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "next",
+    "--run",
+    "no-such-run"
+   ],
+   "clock": 18,
+   "rc": 2,
+   "out": "",
+   "err": "error: run not found: no-such-run\n"
+  },
+  {
+   "cmd": [
+    "status",
+    "--run",
+    "261113-120009-tidy-helper-formats"
+   ],
+   "clock": 19,
+   "rc": 0,
+   "out": "GATE tier=direct mode=fanout:claude profile=efficient loops<=0 calls~1 tokens~n/a rel_cost=0.66 (explicit)\nrun 261113-120009-tidy-helper-formats · phase done\nask: Tidy the helper that formats times\ndeviations (1): direct: the test was wrong, so the requester unlocked it\ncalls so far: 0 (estimate 1)\nnext: nothing, the run is finished. The decision: final.md in the run folder · re-count the votes: council audit\n",
+   "err": ""
+  }
+ ],
+ "final": {
+  "<ROOT>/.council/locks.json": {
+   "json": {
+    "tests/test_a.py": "68d6ba86535085c3f68a736d28bc107d2756ffab6d668c07f8944af1b7d276e0"
+   }
+  },
+  "<ROOT>/.council/runs/261113-120001-tidy-helper-formats/events.jsonl": {
+   "text": "{\"t\": \"2026-11-13T12:00:01\", \"event\": \"verb\", \"verb\": \"init\", \"ok\": true, \"code\": 0, \"ms\": 0, \"phase\": [null, \"direct\"], \"loop\": [null, 0], \"error\": null}\n{\"t\": \"2026-11-13T12:00:03\", \"event\": \"verb\", \"verb\": \"next\", \"ok\": true, \"code\": 0, \"ms\": 0, \"phase\": [\"direct\", \"direct\"], \"loop\": [0, 0], \"error\": null}\n{\"t\": \"2026-11-13T12:00:04\", \"event\": \"verb\", \"verb\": \"note\", \"ok\": false, \"code\": 2, \"ms\": 0, \"phase\": [\"direct\", \"direct\"], \"loop\": [0, 0], \"error\": \"notes belong to a council run that has a brief: ingest the brief first\"}\n{\"t\": \"2026-11-13T12:00:05\", \"event\": \"verb\", \"verb\": \"cut\", \"ok\": false, \"code\": 2, \"ms\": 0, \"phase\": [\"direct\", \"direct\"], \"loop\": [0, 0], \"error\": \"not at the cut yet (phase direct). Run `council next`.\"}\n{\"t\": \"2026-11-13T12:00:06\", \"event\": \"verb\", \"verb\": \"ingest\", \"ok\": false, \"code\": 2, \"ms\": 0, \"phase\": [\"direct\", \"direct\"], \"loop\": [0, 0], \"error\": \"--drop names a seat to go on without; the direct step is yours, not a seat's\"}\n{\"t\": \"2026-11-13T12:00:07\", \"event\": \"verb\", \"verb\": \"ingest\", \"ok\": true, \"code\": 0, \"ms\": 0, \"phase\": [\"direct\", \"done\"], \"loop\": [0, 0], \"error\": null}\n"
+  },
+  "<ROOT>/.council/runs/261113-120001-tidy-helper-formats/run.json": {
+   "json": {
+    "id": "261113-120001-tidy-helper-formats",
+    "created": "2026-11-13T12:00:01",
+    "ask": "Tidy the helper that formats dates",
+    "paths": [],
+    "gate": "GATE tier=direct mode=fanout:claude profile=efficient loops<=0 calls~1 tokens~n/a rel_cost=0.66 (chair: stakes=low, reversible)",
+    "tier": "direct",
+    "mode": "fanout:claude",
+    "profile": "efficient",
+    "tripwires": [],
+    "gate_reason": "chair: stakes=low, reversible",
+    "calls_estimate": 1,
+    "deviations": [],
+    "friction": [],
+    "calls": {},
+    "loops": [],
+    "phase": "done",
+    "updated": "2026-11-13T12:00:07",
+    "locks": {
+     "ok": true,
+     "changed": [],
+     "note": "no locks"
+    }
+   }
+  },
+  "<ROOT>/.council/runs/261113-120009-tidy-helper-formats/events.jsonl": {
+   "text": "{\"t\": \"2026-11-13T12:00:09\", \"event\": \"verb\", \"verb\": \"init\", \"ok\": true, \"code\": 0, \"ms\": 0, \"phase\": [null, \"direct\"], \"loop\": [null, 0], \"error\": null}\n{\"t\": \"2026-11-13T12:00:11\", \"event\": \"verb\", \"verb\": \"ingest\", \"ok\": false, \"code\": 2, \"ms\": 0, \"phase\": [\"direct\", \"direct\"], \"loop\": [0, 0], \"error\": \"locked files changed: ['tests/test_a.py']. Fix the code, not the tests (or ask the requester to unlock).\"}\n{\"t\": \"2026-11-13T12:00:12\", \"event\": \"verb\", \"verb\": \"deviation\", \"ok\": true, \"code\": 0, \"ms\": 0, \"phase\": [\"direct\", \"direct\"], \"loop\": [0, 0], \"error\": null}\n{\"t\": \"2026-11-13T12:00:14\", \"event\": \"verb\", \"verb\": \"ingest\", \"ok\": true, \"code\": 0, \"ms\": 0, \"phase\": [\"direct\", \"done\"], \"loop\": [0, 0], \"error\": null}\n"
+  },
+  "<ROOT>/.council/runs/261113-120009-tidy-helper-formats/run.json": {
+   "json": {
+    "id": "261113-120009-tidy-helper-formats",
+    "created": "2026-11-13T12:00:09",
+    "ask": "Tidy the helper that formats times",
+    "paths": [],
+    "gate": "GATE tier=direct mode=fanout:claude profile=efficient loops<=0 calls~1 tokens~n/a rel_cost=0.66 (explicit)",
+    "tier": "direct",
+    "mode": "fanout:claude",
+    "profile": "efficient",
+    "tripwires": [],
+    "gate_reason": "explicit",
+    "calls_estimate": 1,
+    "deviations": [
+     "direct: the test was wrong, so the requester unlocked it"
+    ],
+    "friction": [],
+    "calls": {},
+    "loops": [],
+    "phase": "done",
+    "updated": "2026-11-13T12:00:14",
+    "locks": {
+     "ok": true,
+     "changed": []
+    }
+   }
+  },
+  "<ROOT>/.council/runs/CURRENT": {
+   "text": "261113-120009-tidy-helper-formats\n"
+  },
+  "<ROOT>/tests/test_a.py": {
+   "as_put": true
+  }
+ }
+}

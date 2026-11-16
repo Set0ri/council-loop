@@ -13,7 +13,7 @@ polish. If you are unsure, say so in your confidence.
 | R1 | Fewer wrong, stalled or drifting runs by the executing model | 35 | judgment |
 | R2 | Integrity: bias controls hold and the record stays honest | 25 | machine |
 | R3 | Lower cost: seat calls, tokens, wall-clock | 15 | source |
-| R4 | Keeps Logan's process whole (7 x 13, up to 3 loops, cross-lab elders, 7-5-3-1, ELI5s) | 15 | judgment |
+| R4 | Keeps the requester's process whole (7 x 13, up to 3 loops, cross-lab elders, 7-5-3-1, ELI5s) | 15 | judgment |
 | R5 | Small and testable: can ship today with a unit test | 10 | machine |
 
 ## Facts

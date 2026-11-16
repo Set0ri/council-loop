@@ -1,8 +1,8 @@
 {
   "name": "council-loop",
   "displayName": "Council Loop",
-  "version": "0.4.0",
-  "description": "Research-backed looped engineering: gate -> researchers and a codebase mapper -> 7-expert council with blind votes, red team and cross-lab elders (7->5->3->1) -> verified build loop -> lessons. A shared memory of sourced facts (project files or Obsidian). A resumable run loop (next / ingest) does the bookkeeping. Model picks per role from Artificial Analysis data.",
+  "version": "0.5.0",
+  "description": "Research-backed looped engineering: gate -> researchers and a codebase mapper -> 7-expert council with blind votes, red team and cross-lab elders (7->5->3->1) -> verified build loop -> lessons. A shared memory of sourced facts (project files or Obsidian). One program, `council`, does the bookkeeping and must be on your PATH: a resumable run loop (next / ingest), an MCP server, and a hook that guards locked tests. Model picks per role from Artificial Analysis data; a run starts with the cheapest that works.",
   "author": {
     "name": "Sylvan Labs"
   },

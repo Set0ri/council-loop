@@ -190,7 +190,7 @@ fn load_live(policy: &Value, models_dir: &Path) -> Result<Option<Loaded>> {
 
 /// A snapshot file, or `None` after saying on standard error what is wrong with it.
 fn load_offline(path: &Path) -> Option<Loaded> {
-    let text = match core::read_text(path) {
+    let text = match core::read_named(path) {
         Ok(text) => text,
         Err(err) => {
             complain!("cannot read the snapshot {}: {err}", path.display());
@@ -745,6 +745,9 @@ pub fn run(
     out: Option<&str>,
 ) -> Result<i32> {
     let models_dir = crate::assets::models_dir();
+    // where model data is kept comes from where the tool is installed or from your settings
+    // folder, never from the project: this tool may write there
+    crate::safe::allow_root(&models_dir);
     let out_path: PathBuf = out
         .map(PathBuf::from)
         .unwrap_or_else(|| models_dir.join("lock.yaml"));
@@ -816,10 +819,12 @@ pub fn run(
             )
         })
         .collect();
-    core::write_text(
-        &out_path,
-        &format!("{HEADER}{}", crate::yaml::dump_width(&lock, 120)),
-    )?;
+    let text = format!("{HEADER}{}", crate::yaml::dump_width(&lock, 120));
+    if out.is_some() {
+        crate::safe::write_named(&out_path, &text)?; // a path the person named
+    } else {
+        core::write_text(&out_path, &text)?;
+    }
     say!(
         "wrote {} ({} picks, {} changed)",
         out_path.display(),

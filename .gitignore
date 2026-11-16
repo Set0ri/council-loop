@@ -1,9 +1,5 @@
-__pycache__/
-*.pyc
+/target/
 .council/runs/
 .council/elders/
-.venv/
-.pytest_cache/
 .council/map/skeleton.md
 .council/map/MAP.*
-/target/

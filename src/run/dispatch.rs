@@ -2,11 +2,14 @@
 
 use super::*;
 
-/// What a seat may do while it works: researchers read files and open web pages, the mapper and
-/// the seats that propose or attack read files, judges read only their packet.
-fn tools_for(seat: &Value, phase: &str) -> &'static str {
+/// What a seat may do while it works. A researcher gets the web, or the project's files when its
+/// beat is the project's own record: never both in one seat, so a web page cannot talk it into
+/// sending a file out. The mapper and the seats that propose or attack read files. Judges read
+/// only their packet.
+pub(crate) fn tools_for(seat: &Value, phase: &str) -> &'static str {
     match seat.s("role") {
-        "researcher" => "research",
+        "researcher" if seat.s("beat") == core::BEATS[3].0 => "read",
+        "researcher" => "web",
         "mapper" => "read",
         _ if matches!(phase, "ideate" | "redteam") => "read",
         _ => "none",
@@ -56,7 +59,10 @@ pub fn cmd_dispatch(run_id: Option<&str>, seat: Option<&str>, dry_run: bool) -> 
             continue;
         }
         let retry = retry_file(&f.prompt);
-        let prompt = core::read_text(if retry.exists() { &retry } else { &f.prompt })?;
+        let prompt = crate::safe::read_capped(
+            if retry.exists() { &retry } else { &f.prompt },
+            crate::safe::MAX_OUTPUT * 4,
+        )?;
         todo.push(Job {
             seat: f.seat,
             how: v.clone(),
@@ -73,9 +79,10 @@ pub fn cmd_dispatch(run_id: Option<&str>, seat: Option<&str>, dry_run: bool) -> 
         say!("nothing to dispatch: no CLI/API seat of this step is missing an output");
         return Ok(0);
     }
-    let results: Vec<Value> = providers::in_parallel(&todo, 8, |job| {
+    let timed: Vec<(Value, u64)> = providers::in_parallel(&todo, 8, |job| {
         let v = &job.how;
         let (model, effort) = (v.at("native_id").as_str(), v.at("effort").as_str());
+        let started = std::time::Instant::now();
         let mut res = providers::ask(
             v.s("provider"),
             &job.prompt,
@@ -91,8 +98,38 @@ pub fn cmd_dispatch(run_id: Option<&str>, seat: Option<&str>, dry_run: bool) -> 
                 res["error"] = json!(format!("the answer could not be saved: {err:#}"));
             }
         }
-        res
+        if res.truthy("error") {
+            // what a vendor's tool prints on failure can hold a key: it goes no further
+            res["error"] = json!(crate::log::redact(&res.show("error")));
+        }
+        let ms = crate::log::took(started);
+        if !dry_run {
+            crate::log::progress(&format!(
+                "seat {}: {}",
+                job.seat,
+                if res.truthy("ok") {
+                    "answered"
+                } else {
+                    "failed"
+                }
+            ));
+        }
+        (res, ms)
     });
+    if !dry_run {
+        // the diary is written here, in seat order, not from the worker threads
+        for (job, (res, ms)) in todo.iter().zip(&timed) {
+            crate::log::record(
+                &d,
+                json!({"event": "seat_call", "seat": job.seat, "step": phase, "provider": job.how.at("provider"),
+                       "model": res.at("model"), "via": job.how.at("via"), "tools": tools_for(&job.how, &phase),
+                       "ok": res.truthy("ok"), "ms": ms, "prompt_chars": py::len(&job.prompt),
+                       "reply_chars": py::len(res.s("text")),
+                       "error": if res.truthy("ok") { Value::Null } else { json!(py::head(py::strip(&res.show("error")), 300)) }}),
+            );
+        }
+    }
+    let results: Vec<Value> = timed.into_iter().map(|(res, _)| res).collect();
     let mut failed = 0;
     for (s, res) in todo.iter().map(|job| &job.seat).zip(&results) {
         if dry_run {

@@ -1,6 +1,6 @@
 [package]
 name = "council-loop"
-version = "0.4.0"
+version = "0.5.0"
 edition = "2021"
 rust-version = "1.85"
 resolver = "3"            # pick dependency versions that build with rust-version
@@ -11,7 +11,7 @@ readme = "README.md"
 keywords = ["ai", "agents", "llm", "mcp", "cli"]
 categories = ["command-line-utilities", "development-tools"]
 build = "build.rs"
-exclude = ["docs/runs/*", ".council/*", "tests/*.py", "target/*", "**/__pycache__/*", "*.pyc", ".pytest_cache/*", ".github/*"]
+exclude = ["docs/runs/*", ".council/*", "target/*", ".github/*"]
 
 [[bin]]
 name = "council"
@@ -21,6 +21,13 @@ path = "src/main.rs"
 name = "council_loop"
 path = "src/lib.rs"
 
+# Whole scenarios through the real binary. It has its own main: it is also the stand-in for the
+# vendors' command-line tools that those scenarios call.
+[[test]]
+name = "scenarios"
+path = "tests/scenarios.rs"
+harness = false
+
 [dependencies]
 anyhow = "1"
 chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
@@ -29,6 +36,7 @@ dunce = "1.0.5"
 fancy-regex = "0.20"
 indexmap = { version = "2", features = ["serde"] }
 regex = "1"
+regex-syntax = "0.8"
 saphyr = "0.3.4"
 saphyr-parser = "0.3"
 serde = { version = "1", features = ["derive"] }
@@ -39,6 +47,9 @@ tree-sitter = "0.26"
 tree-sitter-python = "0.25"
 ureq = "3"
 which = "8"
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
 
 [profile.release]
 opt-level = 3

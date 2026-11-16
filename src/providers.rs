@@ -36,6 +36,10 @@ pub const EFFORTS: [&str; 5] = ["low", "medium", "high", "xhigh", "max"];
 const GEMINI_NUDGE: &str =
     "Follow the instructions above exactly. Reply with only the JSON they ask for.";
 const OPENROUTER_URL: &str = "https://openrouter.ai/api/v1/chat/completions";
+/// Bytes of a tool's reply that are kept.
+const REPLY_CAP: u64 = 32_000_000;
+/// Bytes `parse_json` will look at before it gives up on a reply.
+const PARSE_BUDGET: usize = 4_000_000;
 
 const ELDER_INSTRUCTIONS: &str = r#"You are an independent Elder Council reviewer. Review the blinded packet below.
 Rules: judge only against the rubric; ignore length and style; no nitpicks; flag blockers as S1.
@@ -107,14 +111,27 @@ pub fn native_id(
     (Value::Null, "cli default")
 }
 
+/// The command line that sends one prompt to a provider's tool, or why there is none.
+///
+/// `tools` is what the seat may do while it works: `none` (judges read only their packet), `read`
+/// (the project's files), `web` (search and open pages) or `research` (both). A seat that can open
+/// web pages and read private files can be talked into sending one to the other, so the run loop
+/// never asks for `research`: a researcher gets the web or the files, never both.
 fn command(
     provider: &str,
     model: Option<&str>,
     effort: Option<&str>,
     tools: &str,
     out_file: &Path,
-) -> Option<Vec<String>> {
+) -> Result<Vec<String>, String> {
     let model = model.filter(|m| !m.is_empty());
+    if let Some(odd) = model.filter(|m| !crate::safe::plain_arg(m)) {
+        // it becomes the value of an option of another program: it must not read as an option itself
+        return Err(format!(
+            "{} is not a model id",
+            py::str_repr(&crate::safe::shown(py::head(odd, 60)))
+        ));
+    }
     let mut cmd: Vec<String> = Vec::new();
     let mut add = |parts: &[&str]| cmd.extend(parts.iter().map(|p| (*p).to_string()));
     match provider {
@@ -134,6 +151,7 @@ fn command(
             }
             match tools {
                 "read" => add(&["--allowedTools", "Read,Grep,Glob"]),
+                "web" => add(&["--allowedTools", "WebSearch,WebFetch"]),
                 "research" => add(&["--allowedTools", "Read,Grep,Glob,WebSearch,WebFetch"]),
                 _ => add(&["--tools", ""]),
             }
@@ -153,9 +171,9 @@ fn command(
             }
             add(&["-o", "json", "-p", GEMINI_NUDGE]);
         }
-        _ => return None,
+        _ => return Err(format!("unknown provider: {provider}")),
     }
-    Some(cmd)
+    Ok(cmd)
 }
 
 fn openrouter(prompt: &str, model: &str, timeout: u64) -> Result<String, String> {
@@ -175,6 +193,8 @@ fn openrouter(prompt: &str, model: &str, timeout: u64) -> Result<String, String>
         .map_err(|e| e.to_string())?;
     let text = response
         .body_mut()
+        .with_config()
+        .limit(REPLY_CAP)
         .read_to_string()
         .map_err(|e| e.to_string())?;
     let reply: Value =
@@ -194,23 +214,35 @@ fn openrouter(prompt: &str, model: &str, timeout: u64) -> Result<String, String>
 }
 
 /// A folder of our own under the system's temporary folder, removed when it goes out of scope.
+/// Its name cannot be guessed, it is created (never adopted: a folder or link someone put there
+/// first is not used) and only its owner may enter it.
 struct Scratch(PathBuf);
 
 impl Scratch {
     fn new() -> std::io::Result<Scratch> {
+        use std::hash::{BuildHasher as _, Hasher as _};
         static NEXT: AtomicUsize = AtomicUsize::new(0);
-        let nanos = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .map(|d| d.subsec_nanos())
-            .unwrap_or(0);
-        let name = format!(
-            "council-{}-{}-{nanos:09}",
-            std::process::id(),
-            NEXT.fetch_add(1, Ordering::Relaxed)
-        );
-        let dir = std::env::temp_dir().join(name);
-        std::fs::create_dir_all(&dir)?;
-        Ok(Scratch(dir))
+        let mut last = None;
+        for _ in 0..8 {
+            // the standard library seeds this hasher from the system's random source
+            let mut hasher = std::collections::hash_map::RandomState::new().build_hasher();
+            hasher.write_usize(NEXT.fetch_add(1, Ordering::Relaxed));
+            hasher.write_u32(std::process::id());
+            let dir = std::env::temp_dir().join(format!("council-{:016x}", hasher.finish()));
+            // only Unix has a mode to set, so only there is the builder changed
+            #[cfg_attr(not(unix), allow(unused_mut))]
+            let mut builder = std::fs::DirBuilder::new();
+            #[cfg(unix)]
+            {
+                use std::os::unix::fs::DirBuilderExt as _;
+                builder.mode(0o700);
+            }
+            match builder.create(&dir) {
+                Ok(()) => return Ok(Scratch(dir)),
+                Err(err) => last = Some(err),
+            }
+        }
+        Err(last.unwrap_or_else(|| std::io::Error::other("no temporary folder")))
     }
 }
 
@@ -260,9 +292,13 @@ fn run_tool(
         pipe: Option<impl std::io::Read + Send + 'static>,
     ) -> std::thread::JoinHandle<Vec<u8>> {
         std::thread::spawn(move || {
+            use std::io::Read as _;
             let mut buffer = Vec::new();
             if let Some(mut pipe) = pipe {
-                let _ = pipe.read_to_end(&mut buffer);
+                // keep the first 32 MB and let the rest run off, so a tool that never stops
+                // printing fills neither memory nor its pipe
+                let _ = pipe.by_ref().take(REPLY_CAP).read_to_end(&mut buffer);
+                let _ = std::io::copy(&mut pipe, &mut std::io::sink());
             }
             buffer
         })
@@ -327,14 +363,16 @@ pub fn ask(
         }
     };
     let out_file = scratch.0.join("last.txt");
-    let Some(cmd) = command(provider, model, effort, tools, &out_file) else {
-        return json!({"ok": false, "provider": provider, "error": format!("unknown provider: {provider}")});
+    let cmd = match command(provider, model, effort, tools, &out_file) {
+        Ok(cmd) => cmd,
+        Err(why) => return json!({"ok": false, "provider": provider, "error": why}),
     };
     let shown_model = model.unwrap_or("cli default");
     if dry_run {
         return json!({"ok": true, "provider": provider, "model": shown_model, "dry_run": true, "command": cmd,
                       "stdin": format!("<prompt, {} chars>", py::len(prompt))});
     }
+    crate::diag!(Debug, "seat", "running {}", cmd.join(" "); "prompt_chars" => py::len(prompt), "tools" => tools);
     let Ok(exe) = which::which(&cmd[0]) else {
         return json!({"ok": false, "provider": provider, "error": format!("CLI not found: {}", cmd[0]), "command": cmd});
     };
@@ -348,7 +386,7 @@ pub fn ask(
             return json!({"ok": false, "provider": provider, "error": format!("could not run {}: {err}", cmd[0]), "command": cmd})
         }
     };
-    let mut text = if out_file.exists() {
+    let mut text = if crate::safe::plain_file(&out_file, REPLY_CAP).is_some() {
         printed(&std::fs::read(&out_file).unwrap_or_default())
     } else {
         done.stdout.clone()
@@ -363,6 +401,8 @@ pub fn ask(
         }
     }
     let ok = done.code == Some(0) && !py::strip(&text).is_empty();
+    crate::diag!(Info, "seat", "{provider} ({shown_model}) {}", if ok { "answered" } else { "failed" };
+                 "exit" => done.code, "reply_chars" => py::len(&text));
     let mut out = json!({"ok": ok, "provider": provider, "model": shown_model, "text": text});
     if !ok {
         let why = if done.stderr.is_empty() {
@@ -375,7 +415,8 @@ pub fn ask(
     out
 }
 
-/// First JSON object in a reply, tolerant of code fences and prose around it.
+/// First JSON object in a reply, tolerant of code fences and prose around it. The search is
+/// bounded: a reply made of a million open braces is given up on, not scanned a million times.
 pub fn parse_json(text: &str) -> Option<Value> {
     match serde_json::from_str::<Value>(text) {
         Ok(obj @ Value::Object(_)) => return Some(obj),
@@ -384,9 +425,14 @@ pub fn parse_json(text: &str) -> Option<Value> {
     }
     let bytes = text.as_bytes();
     let mut start = text.find('{');
+    let mut budget = PARSE_BUDGET;
     while let Some(from) = start {
         let (mut depth, mut in_str, mut esc) = (0i64, false, false);
         for (i, &ch) in bytes.iter().enumerate().skip(from) {
+            if budget == 0 {
+                return None;
+            }
+            budget -= 1;
             if in_str {
                 esc = ch == b'\\' && !esc;
                 if ch == b'"' && !esc {
@@ -447,12 +493,14 @@ pub fn in_parallel<T: Sync, R: Send>(
 
 /// Stand-alone elder review: the same blinded packet to each lab in parallel, then a summary.
 /// Inside a run, use `council next` / `council dispatch` instead: they also blind, record and validate.
+/// `save`: also write each provider's answer as `<out_dir>/<provider>.json`.
 pub fn elder_review(
     packet: &str,
     profile: &str,
     providers: &[String],
     out_dir: Option<&Path>,
     dry_run: bool,
+    save: bool,
 ) -> Value {
     let timeout = 900;
     let default: Vec<String> = ["claude", "openai", "gemini"]
@@ -473,10 +521,18 @@ pub fn elder_review(
         }
     }
     let prompt = format!("{ELDER_INSTRUCTIONS}\n\n{packet}");
+    // a folder the person chose is theirs to choose; the default one is checked like any other write
+    let named = out_dir.is_some_and(|d| d != Path::new(".council/elders"));
     let out_dir = out_dir
         .map(Path::to_path_buf)
         .unwrap_or_else(|| PathBuf::from(".council/elders"));
-    let folder = std::fs::create_dir_all(&out_dir);
+    let folder = if !save {
+        Ok(())
+    } else if named {
+        std::fs::create_dir_all(&out_dir).map_err(anyhow::Error::from)
+    } else {
+        crate::safe::make_dir(&out_dir).map(|_| ())
+    };
     let results: Vec<Value> = in_parallel(providers, providers.len(), |p| {
         let name = by_provider.get(p.as_str()).and_then(Value::as_str);
         let (id, how) = native_id(p, name, &policy);
@@ -501,17 +557,24 @@ pub fn elder_review(
     let mut reviews: Vec<Value> = Vec::new();
     let mut unwritten: Vec<String> = folder
         .err()
-        .map(|e| format!("{}: {e}", out_dir.display()))
+        .map(|e| format!("{}: {e:#}", out_dir.display()))
         .into_iter()
         .collect();
     for (p, r) in &by_name {
-        if let Err(err) = core::write_text(&out_dir.join(format!("{p}.json")), &Json::ONE.dumps(r))
-        {
+        let file = out_dir.join(format!("{p}.json"));
+        let saved = if !save {
+            Ok(()) // the caller gets the answers back and keeps them where it likes
+        } else if named {
+            crate::safe::write_named(&file, &Json::ONE.dumps(r))
+        } else {
+            core::write_text(&file, &Json::ONE.dumps(r))
+        };
+        if let Err(err) = saved {
             unwritten.push(format!("{p}.json: {err:#}"));
         }
         if r.truthy("ok") && !r.truthy("dry_run") {
             if let Some(review) = parse_json(r.s("text")) {
-                reviews.push(review);
+                reviews.push(crate::safe::cleaned(review));
             }
         }
     }
@@ -630,7 +693,23 @@ mod tests {
             command("gemini", None, None, "read", out).unwrap()[..4].join(" "),
             "gemini -o json -p"
         );
-        assert!(command("other", None, None, "none", out).is_none());
+        assert!(command("other", None, None, "none", out).is_err());
+        assert_eq!(
+            command("claude", None, None, "web", out).unwrap()[5..],
+            [
+                "--allowedTools".to_string(),
+                "WebSearch,WebFetch".to_string()
+            ]
+        );
+        // a model id is an option's value for another program: it may not read as an option
+        for odd in ["--dangerously-skip-permissions", "-c", "a\nb"] {
+            for provider in ["claude", "openai", "gemini"] {
+                assert!(
+                    command(provider, Some(odd), None, "none", out).is_err(),
+                    "{provider} {odd}"
+                );
+            }
+        }
     }
 
     #[test]
@@ -651,6 +730,26 @@ mod tests {
         assert_eq!(parse_json("[{\"a\": 1}]"), None);
         assert_eq!(parse_json("no object here"), None);
         assert_eq!(parse_json(""), None);
+        // made to be slow: every brace opens an object that never closes
+        let started = Instant::now();
+        assert_eq!(parse_json(&"{".repeat(1_500_000)), None);
+        assert_eq!(parse_json(&"{\"a\":".repeat(200_000)), None);
+        assert!(started.elapsed() < Duration::from_secs(5));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn the_scratch_folder_is_private_and_never_adopted() {
+        use std::os::unix::fs::PermissionsExt as _;
+        let (a, b) = (Scratch::new().unwrap(), Scratch::new().unwrap());
+        assert_ne!(a.0, b.0);
+        assert_eq!(
+            std::fs::metadata(&a.0).unwrap().permissions().mode() & 0o777,
+            0o700
+        );
+        let kept = a.0.clone();
+        drop(a);
+        assert!(!kept.exists() && b.0.exists());
     }
 
     #[test]

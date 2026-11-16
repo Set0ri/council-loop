@@ -410,5 +410,5 @@ pub fn cmd_cut(
     save(&mut run, &d)?;
     say!();
     let id = run.s("id").to_string();
-    cmd_next(Some(&id), None)
+    steps::cmd_next(Some(&id), None)
 }

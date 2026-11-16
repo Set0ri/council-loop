@@ -1,0 +1,369 @@
+{
+ "name": "blocks",
+ "about": "",
+ "needs": [],
+ "steps": [
+  {
+   "put": "<ROOT>/cards.json",
+   "text": "[{\"id\": \"c0\", \"title\": \"Idea 0\", \"body\": \"word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\", \"eli5\": \"simple 0\", \"author\": \"L1\"}, {\"id\": \"c1\", \"title\": \"Idea 1\", \"body\": \"word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\", \"eli5\": \"simple 1\", \"author\": \"L2\"}, {\"id\": \"c2\", \"title\": \"Idea 2\", \"body\": \"word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\", \"eli5\": \"simple 2\", \"author\": \"L3\"}, {\"id\": \"c3\", \"title\": \"Idea 3\", \"body\": \"word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\", \"eli5\": \"simple 3\", \"author\": \"L4\"}, {\"id\": \"c4\", \"title\": \"Idea 4\", \"body\": \"word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\", \"eli5\": \"simple 4\", \"author\": \"L5\"}]"
+  },
+  {
+   "cmd": [
+    "blind",
+    "cards.json",
+    "--seed",
+    "0"
+   ],
+   "clock": 1,
+   "rc": 0,
+   "out": "{\n \"ok\": true,\n \"errors\": [],\n \"warnings\": [],\n \"seed\": 0,\n \"packet\": \"### Candidate A: Idea 2\\nword word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\\nELI5: simple 2\\n\\n### Candidate B: Idea 1\\nword word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\\nELI5: simple 1\\n\\n### Candidate C: Idea 0\\nword word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\\nELI5: simple 0\\n\\n### Candidate D: Idea 4\\nword word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\\nELI5: simple 4\\n\\n### Candidate E: Idea 3\\nword word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\\nELI5: simple 3\",\n \"cards\": [\n  {\n   \"label\": \"A\",\n   \"title\": \"Idea 2\",\n   \"body\": \"word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\",\n   \"eli5\": \"simple 2\"\n  },\n  {\n   \"label\": \"B\",\n   \"title\": \"Idea 1\",\n   \"body\": \"word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\",\n   \"eli5\": \"simple 1\"\n  },\n  {\n   \"label\": \"C\",\n   \"title\": \"Idea 0\",\n   \"body\": \"word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\",\n   \"eli5\": \"simple 0\"\n  },\n  {\n   \"label\": \"D\",\n   \"title\": \"Idea 4\",\n   \"body\": \"word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\",\n   \"eli5\": \"simple 4\"\n  },\n  {\n   \"label\": \"E\",\n   \"title\": \"Idea 3\",\n   \"body\": \"word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\",\n   \"eli5\": \"simple 3\"\n  }\n ],\n \"mapping\": {\n  \"A\": {\n   \"id\": \"c2\",\n   \"authors\": [\n    \"L3\"\n   ]\n  },\n  \"B\": {\n   \"id\": \"c1\",\n   \"authors\": [\n    \"L2\"\n   ]\n  },\n  \"C\": {\n   \"id\": \"c0\",\n   \"authors\": [\n    \"L1\"\n   ]\n  },\n  \"D\": {\n   \"id\": \"c4\",\n   \"authors\": [\n    \"L5\"\n   ]\n  },\n  \"E\": {\n   \"id\": \"c3\",\n   \"authors\": [\n    \"L4\"\n   ]\n  }\n }\n}\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "blind",
+    "cards.json",
+    "--seed",
+    "1"
+   ],
+   "clock": 2,
+   "rc": 0,
+   "out": "{\n \"ok\": true,\n \"errors\": [],\n \"warnings\": [],\n \"seed\": 1,\n \"packet\": \"### Candidate A: Idea 2\\nword word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\\nELI5: simple 2\\n\\n### Candidate B: Idea 3\\nword word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\\nELI5: simple 3\\n\\n### Candidate C: Idea 4\\nword word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\\nELI5: simple 4\\n\\n### Candidate D: Idea 0\\nword word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\\nELI5: simple 0\\n\\n### Candidate E: Idea 1\\nword word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\\nELI5: simple 1\",\n \"cards\": [\n  {\n   \"label\": \"A\",\n   \"title\": \"Idea 2\",\n   \"body\": \"word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\",\n   \"eli5\": \"simple 2\"\n  },\n  {\n   \"label\": \"B\",\n   \"title\": \"Idea 3\",\n   \"body\": \"word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\",\n   \"eli5\": \"simple 3\"\n  },\n  {\n   \"label\": \"C\",\n   \"title\": \"Idea 4\",\n   \"body\": \"word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\",\n   \"eli5\": \"simple 4\"\n  },\n  {\n   \"label\": \"D\",\n   \"title\": \"Idea 0\",\n   \"body\": \"word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\",\n   \"eli5\": \"simple 0\"\n  },\n  {\n   \"label\": \"E\",\n   \"title\": \"Idea 1\",\n   \"body\": \"word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\",\n   \"eli5\": \"simple 1\"\n  }\n ],\n \"mapping\": {\n  \"A\": {\n   \"id\": \"c2\",\n   \"authors\": [\n    \"L3\"\n   ]\n  },\n  \"B\": {\n   \"id\": \"c3\",\n   \"authors\": [\n    \"L4\"\n   ]\n  },\n  \"C\": {\n   \"id\": \"c4\",\n   \"authors\": [\n    \"L5\"\n   ]\n  },\n  \"D\": {\n   \"id\": \"c0\",\n   \"authors\": [\n    \"L1\"\n   ]\n  },\n  \"E\": {\n   \"id\": \"c1\",\n   \"authors\": [\n    \"L2\"\n   ]\n  }\n }\n}\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "blind",
+    "cards.json",
+    "--seed",
+    "42"
+   ],
+   "clock": 3,
+   "rc": 0,
+   "out": "{\n \"ok\": true,\n \"errors\": [],\n \"warnings\": [],\n \"seed\": 42,\n \"packet\": \"### Candidate A: Idea 3\\nword word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\\nELI5: simple 3\\n\\n### Candidate B: Idea 1\\nword word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\\nELI5: simple 1\\n\\n### Candidate C: Idea 2\\nword word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\\nELI5: simple 2\\n\\n### Candidate D: Idea 4\\nword word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\\nELI5: simple 4\\n\\n### Candidate E: Idea 0\\nword word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\\nELI5: simple 0\",\n \"cards\": [\n  {\n   \"label\": \"A\",\n   \"title\": \"Idea 3\",\n   \"body\": \"word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\",\n   \"eli5\": \"simple 3\"\n  },\n  {\n   \"label\": \"B\",\n   \"title\": \"Idea 1\",\n   \"body\": \"word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\",\n   \"eli5\": \"simple 1\"\n  },\n  {\n   \"label\": \"C\",\n   \"title\": \"Idea 2\",\n   \"body\": \"word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\",\n   \"eli5\": \"simple 2\"\n  },\n  {\n   \"label\": \"D\",\n   \"title\": \"Idea 4\",\n   \"body\": \"word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\",\n   \"eli5\": \"simple 4\"\n  },\n  {\n   \"label\": \"E\",\n   \"title\": \"Idea 0\",\n   \"body\": \"word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\",\n   \"eli5\": \"simple 0\"\n  }\n ],\n \"mapping\": {\n  \"A\": {\n   \"id\": \"c3\",\n   \"authors\": [\n    \"L4\"\n   ]\n  },\n  \"B\": {\n   \"id\": \"c1\",\n   \"authors\": [\n    \"L2\"\n   ]\n  },\n  \"C\": {\n   \"id\": \"c2\",\n   \"authors\": [\n    \"L3\"\n   ]\n  },\n  \"D\": {\n   \"id\": \"c4\",\n   \"authors\": [\n    \"L5\"\n   ]\n  },\n  \"E\": {\n   \"id\": \"c0\",\n   \"authors\": [\n    \"L1\"\n   ]\n  }\n }\n}\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "blind",
+    "cards.json",
+    "--seed",
+    "3735928559"
+   ],
+   "clock": 4,
+   "rc": 0,
+   "out": "{\n \"ok\": true,\n \"errors\": [],\n \"warnings\": [],\n \"seed\": 3735928559,\n \"packet\": \"### Candidate A: Idea 4\\nword word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\\nELI5: simple 4\\n\\n### Candidate B: Idea 2\\nword word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\\nELI5: simple 2\\n\\n### Candidate C: Idea 1\\nword word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\\nELI5: simple 1\\n\\n### Candidate D: Idea 3\\nword word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\\nELI5: simple 3\\n\\n### Candidate E: Idea 0\\nword word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\\nELI5: simple 0\",\n \"cards\": [\n  {\n   \"label\": \"A\",\n   \"title\": \"Idea 4\",\n   \"body\": \"word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\",\n   \"eli5\": \"simple 4\"\n  },\n  {\n   \"label\": \"B\",\n   \"title\": \"Idea 2\",\n   \"body\": \"word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\",\n   \"eli5\": \"simple 2\"\n  },\n  {\n   \"label\": \"C\",\n   \"title\": \"Idea 1\",\n   \"body\": \"word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\",\n   \"eli5\": \"simple 1\"\n  },\n  {\n   \"label\": \"D\",\n   \"title\": \"Idea 3\",\n   \"body\": \"word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\",\n   \"eli5\": \"simple 3\"\n  },\n  {\n   \"label\": \"E\",\n   \"title\": \"Idea 0\",\n   \"body\": \"word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\",\n   \"eli5\": \"simple 0\"\n  }\n ],\n \"mapping\": {\n  \"A\": {\n   \"id\": \"c4\",\n   \"authors\": [\n    \"L5\"\n   ]\n  },\n  \"B\": {\n   \"id\": \"c2\",\n   \"authors\": [\n    \"L3\"\n   ]\n  },\n  \"C\": {\n   \"id\": \"c1\",\n   \"authors\": [\n    \"L2\"\n   ]\n  },\n  \"D\": {\n   \"id\": \"c3\",\n   \"authors\": [\n    \"L4\"\n   ]\n  },\n  \"E\": {\n   \"id\": \"c0\",\n   \"authors\": [\n    \"L1\"\n   ]\n  }\n }\n}\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "blind",
+    "cards.json",
+    "--seed",
+    "7",
+    "--out",
+    "packet.md"
+   ],
+   "clock": 5,
+   "rc": 0,
+   "out": "packet -> packet.md; mapping (keep away from judges) -> packet.md.mapping.json\n",
+   "err": ""
+  },
+  {
+   "put": "<ROOT>/leaky.json",
+   "text": "[{\"id\": \"c0\", \"title\": \"Idea 0\", \"body\": \"As the cost expert I say my lens is right and seat L1 agrees with voter L3 w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w\", \"eli5\": \"simple 0\", \"author\": \"L1\"}, {\"id\": \"c1\", \"title\": \"Idea 1\", \"body\": \"word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\", \"eli5\": \"\", \"author\": \"L2\"}, {\"id\": \"c2\", \"title\": \"Idea 2\", \"body\": \"long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long\", \"eli5\": \"simple 2\", \"author\": \"L3\"}]"
+  },
+  {
+   "cmd": [
+    "blind",
+    "leaky.json",
+    "--seed",
+    "3"
+   ],
+   "clock": 6,
+   "rc": 2,
+   "out": "{\n \"ok\": false,\n \"errors\": [\n  \"c0: identity leak: the card names 'L1'. Reword it (\\\"one expert\\\", \\\"another card\\\"): cards are judged blind\",\n  \"c0: identity leak: 'As the cost expert'. Reword it without saying who wrote or holds what: cards are judged blind\",\n  \"c1: missing ELI5\",\n  \"c2: body 140 words > cap 120\"\n ],\n \"warnings\": [],\n \"seed\": 3,\n \"packet\": \"### Candidate A: Idea 1\\nword word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\\nELI5: \\n\\n### Candidate B: Idea 2\\nlong long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long\\nELI5: simple 2\\n\\n### Candidate C: Idea 0\\nAs the cost expert I say my lens is right and seat L1 agrees with voter L3 w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w\\nELI5: simple 0\",\n \"cards\": [\n  {\n   \"label\": \"A\",\n   \"title\": \"Idea 1\",\n   \"body\": \"word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\",\n   \"eli5\": \"\"\n  },\n  {\n   \"label\": \"B\",\n   \"title\": \"Idea 2\",\n   \"body\": \"long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long\",\n   \"eli5\": \"simple 2\"\n  },\n  {\n   \"label\": \"C\",\n   \"title\": \"Idea 0\",\n   \"body\": \"As the cost expert I say my lens is right and seat L1 agrees with voter L3 w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w\",\n   \"eli5\": \"simple 0\"\n  }\n ],\n \"mapping\": {\n  \"A\": {\n   \"id\": \"c1\",\n   \"authors\": [\n    \"L2\"\n   ]\n  },\n  \"B\": {\n   \"id\": \"c2\",\n   \"authors\": [\n    \"L3\"\n   ]\n  },\n  \"C\": {\n   \"id\": \"c0\",\n   \"authors\": [\n    \"L1\"\n   ]\n  }\n }\n}\n",
+   "err": "error: c0: identity leak: the card names 'L1'. Reword it (\"one expert\", \"another card\"): cards are judged blind\nerror: c0: identity leak: 'As the cost expert'. Reword it without saying who wrote or holds what: cards are judged blind\nerror: c1: missing ELI5\nerror: c2: body 140 words > cap 120\n"
+  },
+  {
+   "cmd": [
+    "blind",
+    "[{\"id\": \"c0\", \"title\": \"Idea 0\", \"body\": \"word word word word word word word word word word word word word word word word word word word word\", \"eli5\": \"simple 0\", \"author\": \"L1\"}, {\"id\": \"c1\", \"title\": \"Idea 1\", \"body\": \"word word word word word word word word word word word word word word word word word word word word word\", \"eli5\": \"simple 1\", \"author\": \"L2\"}]",
+    "--max-words",
+    "15"
+   ],
+   "clock": 7,
+   "rc": 2,
+   "out": "{\n \"ok\": false,\n \"errors\": [\n  \"c0: body 20 words > cap 15\",\n  \"c1: body 21 words > cap 15\"\n ],\n \"warnings\": [],\n \"seed\": 0,\n \"packet\": \"### Candidate A: Idea 0\\nword word word word word word word word word word word word word word word word word word word word\\nELI5: simple 0\\n\\n### Candidate B: Idea 1\\nword word word word word word word word word word word word word word word word word word word word word\\nELI5: simple 1\",\n \"cards\": [\n  {\n   \"label\": \"A\",\n   \"title\": \"Idea 0\",\n   \"body\": \"word word word word word word word word word word word word word word word word word word word word\",\n   \"eli5\": \"simple 0\"\n  },\n  {\n   \"label\": \"B\",\n   \"title\": \"Idea 1\",\n   \"body\": \"word word word word word word word word word word word word word word word word word word word word word\",\n   \"eli5\": \"simple 1\"\n  }\n ],\n \"mapping\": {\n  \"A\": {\n   \"id\": \"c0\",\n   \"authors\": [\n    \"L1\"\n   ]\n  },\n  \"B\": {\n   \"id\": \"c1\",\n   \"authors\": [\n    \"L2\"\n   ]\n  }\n }\n}\n",
+   "err": "error: c0: body 20 words > cap 15\nerror: c1: body 21 words > cap 15\n"
+  },
+  {
+   "put": "<ROOT>/mapping.json",
+   "text": "{\"A\": {\"id\": \"a\", \"authors\": [\"L1\"]}, \"B\": {\"id\": \"b\", \"authors\": [\"L2\", \"L3\"]}, \"C\": {\"id\": \"c\", \"authors\": [\"L3\"]}, \"D\": {\"id\": \"d\", \"authors\": []}, \"E\": {\"id\": \"e\", \"authors\": [\"L5\"]}}"
+  },
+  {
+   "put": "<ROOT>/votes.json",
+   "text": "[{\"voter\": \"L1\", \"ranking\": [\"A\", \"B\", \"C\", \"D\", \"E\"], \"best_on\": {\"R1\": \"D\", \"R2\": \"E\"}}, {\"voter\": \"L2\", \"ranking\": [\"Candidate B\", \"c.\", \"a\", \"(d)\", \"E\"], \"best_on\": {\"R1\": \"D\", \"R2\": \"E\"}}, {\"voter\": \"L3\", \"ranking\": [\"C\", \"A\", \"Z\", \"A\"], \"best_on\": {\"R1\": \"D\", \"R2\": \"C\"}}, {\"voter\": \"L4\", \"ranking\": [\"E\", \"D\", \"C\", \"B\", \"A\"], \"best_on\": {\"R2\": \"E\"}}, {\"voter\": \"L5\", \"ranking\": [\"D\", \"E\", \"A\", \"B\", \"C\"], \"best_on\": {\"R1\": \"A\"}}]"
+  },
+  {
+   "cmd": [
+    "tally",
+    "votes.json",
+    "mapping.json"
+   ],
+   "clock": 8,
+   "rc": 0,
+   "out": "{\n \"ranking\": [\n  {\n   \"label\": \"D\",\n   \"id\": \"d\",\n   \"score\": 0.613,\n   \"check\": \"n/a\"\n  },\n  {\n   \"label\": \"B\",\n   \"id\": \"b\",\n   \"score\": 0.537,\n   \"check\": \"n/a\"\n  },\n  {\n   \"label\": \"C\",\n   \"id\": \"c\",\n   \"score\": 0.491,\n   \"check\": \"n/a\"\n  },\n  {\n   \"label\": \"E\",\n   \"id\": \"e\",\n   \"score\": 0.461,\n   \"check\": \"n/a\"\n  },\n  {\n   \"label\": \"A\",\n   \"id\": \"a\",\n   \"score\": 0.399,\n   \"check\": \"n/a\"\n  }\n ],\n \"ballots\": 5,\n \"head_to_heads\": 28,\n \"recused\": 9,\n \"gaps\": 4,\n \"thin\": [],\n \"ties\": [],\n \"agreement\": -0.32,\n \"agreement_note\": \"weak: treat close ranks as ties\",\n \"best_on\": {\n  \"R1\": \"D\",\n  \"R2\": \"E\"\n },\n \"problems\": [\n  \"L2: unknown label '(d)'\",\n  \"L3: unknown label 'Z'\",\n  \"L3: A ranked twice\"\n ]\n}\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "tally",
+    "votes.json",
+    "mapping.json",
+    "--keep",
+    "3"
+   ],
+   "clock": 9,
+   "rc": 0,
+   "out": "{\n \"ranking\": [\n  {\n   \"label\": \"D\",\n   \"id\": \"d\",\n   \"score\": 0.613,\n   \"check\": \"n/a\"\n  },\n  {\n   \"label\": \"B\",\n   \"id\": \"b\",\n   \"score\": 0.537,\n   \"check\": \"n/a\"\n  },\n  {\n   \"label\": \"C\",\n   \"id\": \"c\",\n   \"score\": 0.491,\n   \"check\": \"n/a\"\n  },\n  {\n   \"label\": \"E\",\n   \"id\": \"e\",\n   \"score\": 0.461,\n   \"check\": \"n/a\"\n  },\n  {\n   \"label\": \"A\",\n   \"id\": \"a\",\n   \"score\": 0.399,\n   \"check\": \"n/a\"\n  }\n ],\n \"ballots\": 5,\n \"head_to_heads\": 28,\n \"recused\": 9,\n \"gaps\": 4,\n \"thin\": [],\n \"ties\": [],\n \"agreement\": -0.32,\n \"agreement_note\": \"weak: treat close ranks as ties\",\n \"best_on\": {\n  \"R1\": \"D\",\n  \"R2\": \"E\"\n },\n \"problems\": [\n  \"L2: unknown label '(d)'\",\n  \"L3: unknown label 'Z'\",\n  \"L3: A ranked twice\"\n ],\n \"survivors\": [\n  \"D\",\n  \"B\",\n  \"E\"\n ],\n \"eliminated\": [\n  \"A\",\n  \"C\"\n ],\n \"wildcard\": {\n  \"label\": \"E\",\n  \"criterion\": \"R2\",\n  \"replaces\": \"C\"\n }\n}\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "tally",
+    "votes.json",
+    "mapping.json",
+    "--keep",
+    "3",
+    "--checks",
+    "{\"A\": \"pass\", \"D\": \"FAIL\"}",
+    "--scores",
+    "{\"A\": {\"R1\": 9, \"R3\": 2}, \"E\": {\"R3\": 7.5}, \"C\": {\"R3\": 7.5}}"
+   ],
+   "clock": 10,
+   "rc": 0,
+   "out": "{\n \"ranking\": [\n  {\n   \"label\": \"B\",\n   \"id\": \"b\",\n   \"score\": 0.537,\n   \"check\": \"n/a\"\n  },\n  {\n   \"label\": \"C\",\n   \"id\": \"c\",\n   \"score\": 0.491,\n   \"check\": \"n/a\"\n  },\n  {\n   \"label\": \"E\",\n   \"id\": \"e\",\n   \"score\": 0.461,\n   \"check\": \"n/a\"\n  },\n  {\n   \"label\": \"A\",\n   \"id\": \"a\",\n   \"score\": 0.399,\n   \"check\": \"pass\"\n  },\n  {\n   \"label\": \"D\",\n   \"id\": \"d\",\n   \"score\": 0.613,\n   \"check\": \"FAIL\"\n  }\n ],\n \"ballots\": 5,\n \"head_to_heads\": 28,\n \"recused\": 9,\n \"gaps\": 4,\n \"thin\": [],\n \"ties\": [],\n \"agreement\": -0.32,\n \"agreement_note\": \"weak: treat close ranks as ties\",\n \"best_on\": {\n  \"R1\": \"D\",\n  \"R2\": \"E\"\n },\n \"problems\": [\n  \"L2: unknown label '(d)'\",\n  \"L3: unknown label 'Z'\",\n  \"L3: A ranked twice\"\n ],\n \"survivors\": [\n  \"B\",\n  \"C\",\n  \"E\"\n ],\n \"eliminated\": [\n  \"A\",\n  \"D\"\n ],\n \"wildcard\": null\n}\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "tally",
+    "votes.json",
+    "mapping.json",
+    "--keep",
+    "1"
+   ],
+   "clock": 11,
+   "rc": 0,
+   "out": "{\n \"ranking\": [\n  {\n   \"label\": \"D\",\n   \"id\": \"d\",\n   \"score\": 0.613,\n   \"check\": \"n/a\"\n  },\n  {\n   \"label\": \"B\",\n   \"id\": \"b\",\n   \"score\": 0.537,\n   \"check\": \"n/a\"\n  },\n  {\n   \"label\": \"C\",\n   \"id\": \"c\",\n   \"score\": 0.491,\n   \"check\": \"n/a\"\n  },\n  {\n   \"label\": \"E\",\n   \"id\": \"e\",\n   \"score\": 0.461,\n   \"check\": \"n/a\"\n  },\n  {\n   \"label\": \"A\",\n   \"id\": \"a\",\n   \"score\": 0.399,\n   \"check\": \"n/a\"\n  }\n ],\n \"ballots\": 5,\n \"head_to_heads\": 28,\n \"recused\": 9,\n \"gaps\": 4,\n \"thin\": [],\n \"ties\": [],\n \"agreement\": -0.32,\n \"agreement_note\": \"weak: treat close ranks as ties\",\n \"best_on\": {\n  \"R1\": \"D\",\n  \"R2\": \"E\"\n },\n \"problems\": [\n  \"L2: unknown label '(d)'\",\n  \"L3: unknown label 'Z'\",\n  \"L3: A ranked twice\"\n ],\n \"survivors\": [\n  \"D\"\n ],\n \"eliminated\": [\n  \"B\",\n  \"C\",\n  \"E\",\n  \"A\"\n ],\n \"wildcard\": null\n}\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "tally",
+    "[{\"voter\": \"L1\", \"ranking\": [\"A\", \"B\", \"C\", \"D\", \"E\"], \"best_on\": {\"R1\": \"D\", \"R2\": \"E\"}}]",
+    "{\"A\": {\"id\": \"a\", \"authors\": []}}",
+    "--keep",
+    "1"
+   ],
+   "clock": 12,
+   "rc": 0,
+   "out": "{\n \"ranking\": [\n  {\n   \"label\": \"A\",\n   \"id\": \"a\",\n   \"score\": 0.5,\n   \"check\": \"n/a\"\n  }\n ],\n \"ballots\": 1,\n \"head_to_heads\": 0,\n \"recused\": 0,\n \"gaps\": 0,\n \"thin\": [],\n \"ties\": [],\n \"agreement\": null,\n \"agreement_note\": \"not measurable: no two voters judged the same head-to-head\",\n \"best_on\": {},\n \"problems\": [\n  \"L1: unknown label 'B'\",\n  \"L1: unknown label 'C'\",\n  \"L1: unknown label 'D'\",\n  \"L1: unknown label 'E'\"\n ],\n \"survivors\": [\n  \"A\"\n ],\n \"eliminated\": [],\n \"wildcard\": null\n}\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "check",
+    "<SKILL>/templates/run.example.json"
+   ],
+   "clock": 13,
+   "rc": 0,
+   "out": "{\n \"ok\": true,\n \"errors\": [],\n \"warnings\": []\n}\n",
+   "err": ""
+  },
+  {
+   "put": "<ROOT>/bad.json",
+   "text": "{\"tier\": \"lite\", \"loops\": [{\"ideas\": {\"L1\": [\"one idea\", \"w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w\"]}, \"survivors\": [\"A\", \"B\"], \"candidates\": [{\"id\": \"c1\", \"body\": \"w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w\"}], \"red_team\": [{\"severity\": \"S1\"}], \"elder_reviews\": [{\"seat\": \"EA\", \"stand_in_for\": \"OpenAI\"}]}, {}], \"seats\": {\"RA\": {\"role\": \"researcher\"}}, \"deviations\": [\"one\"], \"phase\": \"done\", \"map\": {\"left_out\": \"MAP\"}}"
+  },
+  {
+   "cmd": [
+    "check",
+    "bad.json"
+   ],
+   "clock": 14,
+   "rc": 1,
+   "out": "{\n \"ok\": false,\n \"errors\": [\n  \"2 loops > max 1 (only the requester can raise the cap)\",\n  \"missing ask (elders must see the requester's words, not only the brief)\",\n  \"missing intent brief\",\n  \"missing rubric\",\n  \"loop 1: L1 has 2 ideas < 5\",\n  \"loop 1: candidate c1 missing ELI5\",\n  \"loop 1: candidate c1 over 120 words\",\n  \"loop 1: ledger missing ELI5\",\n  \"loop 1: 1 S1/S2 finding(s) without a response\"\n ],\n \"warnings\": [\n  \"loop 1: L1 has 1 ideas over 25 words\",\n  \"loop 1: 2 survivors, schedule expects 1\",\n  \"loop 1: stand-in elders ['EA'] (label them in the write-up)\",\n  \"loop 1: no researcher reported (the council worked from the brief's facts only)\",\n  \"the codebase map was due but the mapper was left out\",\n  \"no retro / lessons recorded\",\n  \"deviation: one\"\n ]\n}\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "check",
+    "{\"tier\": \"direct\"}"
+   ],
+   "clock": 15,
+   "rc": 0,
+   "out": "{\n \"ok\": true,\n \"errors\": [],\n \"warnings\": []\n}\n",
+   "err": ""
+  },
+  {
+   "put": "<ROOT>/.council/keep.txt",
+   "text": ""
+  },
+  {
+   "put": "<ROOT>/tests/sub/test_b.py",
+   "text": "def test_b():\r\n    assert True\r\n"
+  },
+  {
+   "put": "<ROOT>/tests/test_a.py",
+   "text": "def test_a():\n    assert True\n"
+  },
+  {
+   "cmd": [
+    "verify-locks"
+   ],
+   "clock": 16,
+   "rc": 0,
+   "out": "{\"ok\": true, \"changed\": [], \"note\": \"no locks\"}\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "lock-tests",
+    "tests"
+   ],
+   "clock": 17,
+   "rc": 0,
+   "out": "{\"locked\": 2, \"file\": \"<ROOT>/.council/locks.json\"}\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "verify-locks"
+   ],
+   "clock": 18,
+   "rc": 0,
+   "out": "{\"ok\": true, \"changed\": []}\n",
+   "err": ""
+  },
+  {
+   "put": "<ROOT>/tests/sub/test_b.py",
+   "text": "def test_b():\n    assert True\n"
+  },
+  {
+   "cmd": [
+    "verify-locks"
+   ],
+   "clock": 19,
+   "rc": 0,
+   "out": "{\"ok\": true, \"changed\": []}\n",
+   "err": ""
+  },
+  {
+   "rm": "<ROOT>/tests/sub/test_b.py"
+  },
+  {
+   "mkdir": "<ROOT>/tests/sub"
+  },
+  {
+   "put": "<ROOT>/tests/test_a.py",
+   "text": "def test_a():\n    assert 1\n"
+  },
+  {
+   "cmd": [
+    "verify-locks"
+   ],
+   "clock": 20,
+   "rc": 1,
+   "out": "{\"ok\": false, \"changed\": [\"tests/sub/test_b.py\", \"tests/test_a.py\"]}\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "lock-tests",
+    "tests/test_a.py"
+   ],
+   "clock": 21,
+   "rc": 0,
+   "out": "{\"locked\": 2, \"file\": \"<ROOT>/.council/locks.json\"}\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "lock-tests",
+    "test_a.py"
+   ],
+   "clock": 22,
+   "rc": 0,
+   "out": "{\"locked\": 2, \"file\": \"<ROOT>/.council/locks.json\"}\n",
+   "err": "",
+   "cwd": "<ROOT>/tests"
+  }
+ ],
+ "final": {
+  "<ROOT>/.council/keep.txt": {
+   "as_put": true
+  },
+  "<ROOT>/.council/locks.json": {
+   "json": {
+    "tests/sub/test_b.py": "e90b57d3996ea37bdc72f5ba451ae4c355675777d885d880e542a8d4a035a153",
+    "tests/test_a.py": "68d6ba86535085c3f68a736d28bc107d2756ffab6d668c07f8944af1b7d276e0"
+   }
+  },
+  "<ROOT>/bad.json": {
+   "as_put": true
+  },
+  "<ROOT>/cards.json": {
+   "as_put": true
+  },
+  "<ROOT>/leaky.json": {
+   "as_put": true
+  },
+  "<ROOT>/mapping.json": {
+   "as_put": true
+  },
+  "<ROOT>/packet.md": {
+   "text": "### Candidate A: Idea 4\nword word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\nELI5: simple 4\n\n### Candidate B: Idea 0\nword word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\nELI5: simple 0\n\n### Candidate C: Idea 3\nword word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\nELI5: simple 3\n\n### Candidate D: Idea 1\nword word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\nELI5: simple 1\n\n### Candidate E: Idea 2\nword word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\nELI5: simple 2"
+  },
+  "<ROOT>/packet.md.mapping.json": {
+   "json": {
+    "A": {
+     "id": "c4",
+     "authors": [
+      "L5"
+     ]
+    },
+    "B": {
+     "id": "c0",
+     "authors": [
+      "L1"
+     ]
+    },
+    "C": {
+     "id": "c3",
+     "authors": [
+      "L4"
+     ]
+    },
+    "D": {
+     "id": "c1",
+     "authors": [
+      "L2"
+     ]
+    },
+    "E": {
+     "id": "c2",
+     "authors": [
+      "L3"
+     ]
+    }
+   }
+  },
+  "<ROOT>/tests/test_a.py": {
+   "as_put": true
+  },
+  "<ROOT>/votes.json": {
+   "as_put": true
+  }
+ }
+}

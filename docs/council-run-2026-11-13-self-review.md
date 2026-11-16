@@ -103,7 +103,7 @@ The run logged three deviations, and they are repeated here as the protocol asks
    been worse.
 2. **The chair saw the control arm early.** It opened the elder packet to check it. No candidate
    was edited afterwards, because the run had one loop. The tool now warns against this.
-3. **A judgment point was settled without Logan.** An elder S1 was open at the cut and Logan could
+3. **A judgment point was settled without the requester.** An elder S1 was open at the cut and the requester could
    not be asked. The safer option was taken: build the winner with the elder's fix. Nothing was
    released.
 

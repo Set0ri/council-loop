@@ -1,0 +1,448 @@
+{
+ "name": "gate",
+ "about": "",
+ "needs": [],
+ "steps": [
+  {
+   "put": "<ROOT>/README.md",
+   "text": "# Shop\n\nA small shop.\n"
+  },
+  {
+   "put": "<ROOT>/config.yaml",
+   "text": "name: shop\n"
+  },
+  {
+   "put": "<ROOT>/db/schema.sql",
+   "text": "CREATE TABLE IF NOT EXISTS orders (\n  id INTEGER\n);\n"
+  },
+  {
+   "put": "<ROOT>/docs/notes.md",
+   "text": "Notes.\n"
+  },
+  {
+   "put": "<ROOT>/native/cart.c",
+   "text": "#include \"cart.h\"\n\nint total_items(struct cart *c)\n{\n    return 0;\n}\n\nint main(void) {\n    return total_items(0);\n}\n"
+  },
+  {
+   "put": "<ROOT>/native/cart.h",
+   "text": "struct cart {\n    int n;\n};\n"
+  },
+  {
+   "put": "<ROOT>/shop/__init__.py",
+   "text": "\"\"\"The shop package.\"\"\"\n"
+  },
+  {
+   "put": "<ROOT>/shop/cli.py",
+   "text": "import argparse\n\nfrom shop import core\n\n\ndef main():\n    ap = argparse.ArgumentParser()\n    sub = ap.add_subparsers()\n    sub.add_parser(\"bill\")\n    sub.add_parser(\"refund\")\n    core.bill(None)\n"
+  },
+  {
+   "put": "<ROOT>/shop/core.py",
+   "text": "\"\"\"Billing: charge an order.\"\"\"\nimport os\n\nfrom . import db\nfrom .queue import BillingQueue\n\n\ndef bill(order, retries: int = 2):\n    \"\"\"Charge it.\"\"\"\n    queue = BillingQueue(os.environ.get(\"QUEUE_URL\"))\n    queue.post_event(order)\n    return db.save(order)\n\n\ndef _private():\n    return 1\n\n\nif __name__ == \"__main__\":\n    bill(None)\n"
+  },
+  {
+   "put": "<ROOT>/shop/db.py",
+   "text": "\"\"\"Storage.\"\"\"\n\n\ndef save(order):\n    \"\"\"Write one order.\"\"\"\n    return order\n\n\nclass Ledger:\n    \"\"\"Every charge, once.\"\"\"\n\n    def post_entry(self, entry):\n        return entry\n\n    def _hidden(self):\n        return 0\n"
+  },
+  {
+   "put": "<ROOT>/shop/queue.py",
+   "text": "\"\"\"The queue of billing events.\"\"\"\n\n\nclass BillingQueue:\n    def __init__(self, url):\n        self.url = url\n\n    def post_event(self, event):\n        return event\n\n    def drain_events(self):\n        return []\n"
+  },
+  {
+   "put": "<ROOT>/svc/lib.rs",
+   "text": "use std::fs;\n\npub fn total_items(items: &[u32]) -> usize {\n    items.len()\n}\n\npub struct OrderBook;\n\n#[test]\nfn adds() {}\n"
+  },
+  {
+   "put": "<ROOT>/svc/server.go",
+   "text": "package main\n\nimport (\n\t\"fmt\"\n)\n\nfunc Total(items []int) int {\n\treturn len(items)\n}\n\ntype Order struct {\n}\n\nfunc main() {\n\tfmt.Println(Total(nil))\n}\n"
+  },
+  {
+   "put": "<ROOT>/tests/test_core.py",
+   "text": "from shop import core\n\n\ndef test_bill():\n    assert core.bill(1) == 1\n\n\ndef test_total():\n    assert True\n"
+  },
+  {
+   "put": "<ROOT>/web/cart.ts",
+   "text": "/** The cart. */\nimport { total } from './total';\nexport class Cart {}\nexport function addItem(cart: Cart) { return total([]); }\n"
+  },
+  {
+   "put": "<ROOT>/web/total.ts",
+   "text": "export function total(items: number[]) { return items.length; }\nexport const TAX_RATE = 0.2;\n"
+  },
+  {
+   "cmd": [
+    "plan",
+    "Pick the queue technology for the billing pipeline"
+   ],
+   "clock": 1,
+   "rc": 0,
+   "out": "GATE tier=lite mode=fanout:claude profile=efficient loops<=1 calls~12 tokens~1.8M rel_cost=0.66 (default: pass --stakes and --reversible to record your judgment)\nMEMBERS researchers=2 (papers and primary research; practice in the field; about 10 searches each) mapper=yes (no map yet at docs/ARCHITECTURE.md) memory=files:.council/memory\n{\n \"tier\": \"lite\",\n \"reason\": \"default: pass --stakes and --reversible to record your judgment\",\n \"tripwires\": [],\n \"mode\": \"fanout:claude\",\n \"profile\": \"efficient\",\n \"chosen_by\": {\n  \"mode\": \"default\",\n  \"profile\": \"default\"\n },\n \"shape\": {\n  \"experts\": 3,\n  \"ideas_min\": 5,\n  \"keep\": 2,\n  \"elders\": 1,\n  \"start\": 3,\n  \"loops\": 1,\n  \"rubric\": [\n   3,\n   7\n  ],\n  \"schedule\": [\n   3,\n   1\n  ]\n },\n \"calls_estimate\": 12,\n \"tokens_estimate\": 1822000,\n \"models\": {\n  \"mode\": \"fanout:claude\",\n  \"profile\": \"efficient\",\n  \"data_collected\": \"2026-11-13\",\n  \"attribution\": \"Model data: Artificial Analysis (https://artificialanalysis.ai)\",\n  \"warnings\": [\n   \"fanout:openrouter: OpenRouter availability unknown in this snapshot; using all usable models. Run a live refresh to filter by openrouter_api_id.\"\n  ],\n  \"chair\": {\n   \"model\": \"Claude Fable 5.2 (low)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 54,\n   \"cost_per_task\": 3.1\n  },\n  \"experts\": [\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Fable 5.2 (low)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 54,\n    \"cost_per_task\": 3.1\n   }\n  ],\n  \"red_team\": {\n   \"model\": \"Claude Opus 5.5 (xhigh)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 57,\n   \"cost_per_task\": 6.05\n  },\n  \"elders\": [\n   {\n    \"model\": \"Claude Fable 5.2 (medium)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 56,\n    \"cost_per_task\": 3.8\n   },\n   {\n    \"model\": \"Claude Opus 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 57,\n    \"cost_per_task\": 6.05\n   },\n   {\n    \"model\": \"Claude Sonnet 5.5 (max)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 55,\n    \"cost_per_task\": 10.02\n   }\n  ],\n  \"verifier\": {\n   \"model\": \"Claude Opus 5.5 (low)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 35,\n   \"cost_per_task\": 0.98\n  },\n  \"relative_cost\": 0.66\n },\n \"support\": {\n  \"research\": {\n   \"budget\": {\n    \"lite\": 10,\n    \"full\": 15\n   },\n   \"seats\": 2,\n   \"later_loops\": \"on_request\",\n   \"model\": \"auto\",\n   \"beats\": []\n  },\n  \"map\": {\n   \"when\": \"stale\",\n   \"model\": \"chair\",\n   \"focus_tokens\": 700,\n   \"skeleton_lines\": 420,\n   \"path\": \"\",\n   \"due\": true,\n   \"reason\": \"no map yet at docs/ARCHITECTURE.md\"\n  },\n  \"digest\": 14,\n  \"origin\": {\n   \"research.seats\": \"default\",\n   \"research.budget.lite\": \"default\",\n   \"research.budget.full\": \"default\",\n   \"research.later_loops\": \"default\",\n   \"research.model\": \"default\",\n   \"research.beats\": \"default\",\n   \"map.when\": \"default\",\n   \"map.model\": \"default\",\n   \"map.focus_tokens\": \"default\",\n   \"map.skeleton_lines\": \"default\",\n   \"map.path\": \"default\",\n   \"digest\": \"default\"\n  },\n  \"problems\": []\n },\n \"environment_notes\": [\n  \"only one lab reachable: elders come from the same family (no cross-lab check). Install the codex / gemini CLIs or set OPENROUTER_API_KEY to get one\",\n  \"mode=fanout:claude and profile=efficient are the cheapest that work here (the default). More rigour costs more: --profile balanced or max. Keep a choice: `defaults:` in your ~/.council/config.yaml\"\n ]\n}\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "plan",
+    "Pick the queue technology for the billing pipeline",
+    "--stakes",
+    "low",
+    "--reversible",
+    "yes"
+   ],
+   "clock": 2,
+   "rc": 0,
+   "out": "GATE tier=direct mode=fanout:claude profile=efficient loops<=0 calls~1 tokens~n/a rel_cost=0.66 (chair: stakes=low, reversible)\nMEMBERS none (direct tier: no council)\n{\n \"tier\": \"direct\",\n \"reason\": \"chair: stakes=low, reversible\",\n \"tripwires\": [],\n \"mode\": \"fanout:claude\",\n \"profile\": \"efficient\",\n \"chosen_by\": {\n  \"mode\": \"default\",\n  \"profile\": \"default\"\n },\n \"shape\": {},\n \"calls_estimate\": 1,\n \"tokens_estimate\": null,\n \"models\": {\n  \"mode\": \"fanout:claude\",\n  \"profile\": \"efficient\",\n  \"data_collected\": \"2026-11-13\",\n  \"attribution\": \"Model data: Artificial Analysis (https://artificialanalysis.ai)\",\n  \"warnings\": [\n   \"fanout:openrouter: OpenRouter availability unknown in this snapshot; using all usable models. Run a live refresh to filter by openrouter_api_id.\"\n  ],\n  \"chair\": {\n   \"model\": \"Claude Fable 5.2 (low)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 54,\n   \"cost_per_task\": 3.1\n  },\n  \"experts\": [\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Fable 5.2 (low)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 54,\n    \"cost_per_task\": 3.1\n   }\n  ],\n  \"red_team\": {\n   \"model\": \"Claude Opus 5.5 (xhigh)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 57,\n   \"cost_per_task\": 6.05\n  },\n  \"elders\": [\n   {\n    \"model\": \"Claude Fable 5.2 (medium)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 56,\n    \"cost_per_task\": 3.8\n   },\n   {\n    \"model\": \"Claude Opus 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 57,\n    \"cost_per_task\": 6.05\n   },\n   {\n    \"model\": \"Claude Sonnet 5.5 (max)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 55,\n    \"cost_per_task\": 10.02\n   }\n  ],\n  \"verifier\": {\n   \"model\": \"Claude Opus 5.5 (low)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 35,\n   \"cost_per_task\": 0.98\n  },\n  \"relative_cost\": 0.66\n },\n \"support\": {\n  \"research\": {\n   \"budget\": {\n    \"lite\": 10,\n    \"full\": 15\n   },\n   \"seats\": 0,\n   \"later_loops\": \"on_request\",\n   \"model\": \"auto\",\n   \"beats\": []\n  },\n  \"map\": {\n   \"when\": \"never\",\n   \"model\": \"chair\",\n   \"focus_tokens\": 700,\n   \"skeleton_lines\": 420,\n   \"path\": \"\",\n   \"due\": false,\n   \"reason\": \"switched off\"\n  },\n  \"digest\": 14,\n  \"origin\": {\n   \"research.seats\": \"default\",\n   \"research.budget.lite\": \"default\",\n   \"research.budget.full\": \"default\",\n   \"research.later_loops\": \"default\",\n   \"research.model\": \"default\",\n   \"research.beats\": \"default\",\n   \"map.when\": \"default\",\n   \"map.model\": \"default\",\n   \"map.focus_tokens\": \"default\",\n   \"map.skeleton_lines\": \"default\",\n   \"map.path\": \"default\",\n   \"digest\": \"default\"\n  },\n  \"problems\": []\n },\n \"environment_notes\": [\n  \"only one lab reachable: elders come from the same family (no cross-lab check). Install the codex / gemini CLIs or set OPENROUTER_API_KEY to get one\"\n ]\n}\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "plan",
+    "Pick the queue technology for the billing pipeline",
+    "--stakes",
+    "medium"
+   ],
+   "clock": 3,
+   "rc": 0,
+   "out": "GATE tier=lite mode=fanout:claude profile=efficient loops<=1 calls~12 tokens~1.8M rel_cost=0.66 (chair: stakes=medium)\nMEMBERS researchers=2 (papers and primary research; practice in the field; about 10 searches each) mapper=yes (no map yet at docs/ARCHITECTURE.md) memory=files:.council/memory\n{\n \"tier\": \"lite\",\n \"reason\": \"chair: stakes=medium\",\n \"tripwires\": [],\n \"mode\": \"fanout:claude\",\n \"profile\": \"efficient\",\n \"chosen_by\": {\n  \"mode\": \"default\",\n  \"profile\": \"default\"\n },\n \"shape\": {\n  \"experts\": 3,\n  \"ideas_min\": 5,\n  \"keep\": 2,\n  \"elders\": 1,\n  \"start\": 3,\n  \"loops\": 1,\n  \"rubric\": [\n   3,\n   7\n  ],\n  \"schedule\": [\n   3,\n   1\n  ]\n },\n \"calls_estimate\": 12,\n \"tokens_estimate\": 1822000,\n \"models\": {\n  \"mode\": \"fanout:claude\",\n  \"profile\": \"efficient\",\n  \"data_collected\": \"2026-11-13\",\n  \"attribution\": \"Model data: Artificial Analysis (https://artificialanalysis.ai)\",\n  \"warnings\": [\n   \"fanout:openrouter: OpenRouter availability unknown in this snapshot; using all usable models. Run a live refresh to filter by openrouter_api_id.\"\n  ],\n  \"chair\": {\n   \"model\": \"Claude Fable 5.2 (low)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 54,\n   \"cost_per_task\": 3.1\n  },\n  \"experts\": [\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Fable 5.2 (low)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 54,\n    \"cost_per_task\": 3.1\n   }\n  ],\n  \"red_team\": {\n   \"model\": \"Claude Opus 5.5 (xhigh)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 57,\n   \"cost_per_task\": 6.05\n  },\n  \"elders\": [\n   {\n    \"model\": \"Claude Fable 5.2 (medium)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 56,\n    \"cost_per_task\": 3.8\n   },\n   {\n    \"model\": \"Claude Opus 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 57,\n    \"cost_per_task\": 6.05\n   },\n   {\n    \"model\": \"Claude Sonnet 5.5 (max)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 55,\n    \"cost_per_task\": 10.02\n   }\n  ],\n  \"verifier\": {\n   \"model\": \"Claude Opus 5.5 (low)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 35,\n   \"cost_per_task\": 0.98\n  },\n  \"relative_cost\": 0.66\n },\n \"support\": {\n  \"research\": {\n   \"budget\": {\n    \"lite\": 10,\n    \"full\": 15\n   },\n   \"seats\": 2,\n   \"later_loops\": \"on_request\",\n   \"model\": \"auto\",\n   \"beats\": []\n  },\n  \"map\": {\n   \"when\": \"stale\",\n   \"model\": \"chair\",\n   \"focus_tokens\": 700,\n   \"skeleton_lines\": 420,\n   \"path\": \"\",\n   \"due\": true,\n   \"reason\": \"no map yet at docs/ARCHITECTURE.md\"\n  },\n  \"digest\": 14,\n  \"origin\": {\n   \"research.seats\": \"default\",\n   \"research.budget.lite\": \"default\",\n   \"research.budget.full\": \"default\",\n   \"research.later_loops\": \"default\",\n   \"research.model\": \"default\",\n   \"research.beats\": \"default\",\n   \"map.when\": \"default\",\n   \"map.model\": \"default\",\n   \"map.focus_tokens\": \"default\",\n   \"map.skeleton_lines\": \"default\",\n   \"map.path\": \"default\",\n   \"digest\": \"default\"\n  },\n  \"problems\": []\n },\n \"environment_notes\": [\n  \"only one lab reachable: elders come from the same family (no cross-lab check). Install the codex / gemini CLIs or set OPENROUTER_API_KEY to get one\",\n  \"mode=fanout:claude and profile=efficient are the cheapest that work here (the default). More rigour costs more: --profile balanced or max. Keep a choice: `defaults:` in your ~/.council/config.yaml\"\n ]\n}\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "plan",
+    "Pick the queue technology for the billing pipeline",
+    "--reversible",
+    "no"
+   ],
+   "clock": 4,
+   "rc": 0,
+   "out": "GATE tier=full mode=fanout:claude profile=efficient loops<=3 calls~79 tokens~7.8M rel_cost=0.66 (chair: not reversible)\nMEMBERS researchers=2 (papers and primary research; practice in the field; about 15 searches each) mapper=yes (no map yet at docs/ARCHITECTURE.md) memory=files:.council/memory\n{\n \"tier\": \"full\",\n \"reason\": \"chair: not reversible\",\n \"tripwires\": [],\n \"mode\": \"fanout:claude\",\n \"profile\": \"efficient\",\n \"chosen_by\": {\n  \"mode\": \"default\",\n  \"profile\": \"default\"\n },\n \"shape\": {\n  \"experts\": 7,\n  \"ideas_min\": 13,\n  \"keep\": 3,\n  \"elders\": 3,\n  \"start\": 7,\n  \"loops\": 3,\n  \"rubric\": [\n   5,\n   7\n  ],\n  \"schedule\": [\n   7,\n   5,\n   3,\n   1\n  ]\n },\n \"calls_estimate\": 79,\n \"tokens_estimate\": 7834000,\n \"models\": {\n  \"mode\": \"fanout:claude\",\n  \"profile\": \"efficient\",\n  \"data_collected\": \"2026-11-13\",\n  \"attribution\": \"Model data: Artificial Analysis (https://artificialanalysis.ai)\",\n  \"warnings\": [\n   \"fanout:openrouter: OpenRouter availability unknown in this snapshot; using all usable models. Run a live refresh to filter by openrouter_api_id.\"\n  ],\n  \"chair\": {\n   \"model\": \"Claude Fable 5.2 (low)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 54,\n   \"cost_per_task\": 3.1\n  },\n  \"experts\": [\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Fable 5.2 (low)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 54,\n    \"cost_per_task\": 3.1\n   }\n  ],\n  \"red_team\": {\n   \"model\": \"Claude Opus 5.5 (xhigh)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 57,\n   \"cost_per_task\": 6.05\n  },\n  \"elders\": [\n   {\n    \"model\": \"Claude Fable 5.2 (medium)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 56,\n    \"cost_per_task\": 3.8\n   },\n   {\n    \"model\": \"Claude Opus 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 57,\n    \"cost_per_task\": 6.05\n   },\n   {\n    \"model\": \"Claude Sonnet 5.5 (max)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 55,\n    \"cost_per_task\": 10.02\n   }\n  ],\n  \"verifier\": {\n   \"model\": \"Claude Opus 5.5 (low)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 35,\n   \"cost_per_task\": 0.98\n  },\n  \"relative_cost\": 0.66\n },\n \"support\": {\n  \"research\": {\n   \"budget\": {\n    \"lite\": 10,\n    \"full\": 15\n   },\n   \"seats\": 2,\n   \"later_loops\": \"on_request\",\n   \"model\": \"auto\",\n   \"beats\": []\n  },\n  \"map\": {\n   \"when\": \"stale\",\n   \"model\": \"chair\",\n   \"focus_tokens\": 700,\n   \"skeleton_lines\": 420,\n   \"path\": \"\",\n   \"due\": true,\n   \"reason\": \"no map yet at docs/ARCHITECTURE.md\"\n  },\n  \"digest\": 14,\n  \"origin\": {\n   \"research.seats\": \"default\",\n   \"research.budget.lite\": \"default\",\n   \"research.budget.full\": \"default\",\n   \"research.later_loops\": \"default\",\n   \"research.model\": \"default\",\n   \"research.beats\": \"default\",\n   \"map.when\": \"default\",\n   \"map.model\": \"default\",\n   \"map.focus_tokens\": \"default\",\n   \"map.skeleton_lines\": \"default\",\n   \"map.path\": \"default\",\n   \"digest\": \"default\"\n  },\n  \"problems\": []\n },\n \"environment_notes\": [\n  \"only one lab reachable: elders come from the same family (no cross-lab check). Install the codex / gemini CLIs or set OPENROUTER_API_KEY to get one\",\n  \"mode=fanout:claude and profile=efficient are the cheapest that work here (the default). More rigour costs more: --profile balanced or max. Keep a choice: `defaults:` in your ~/.council/config.yaml\"\n ]\n}\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "plan",
+    "Write an RFC for our new auth architecture",
+    "--stakes",
+    "low"
+   ],
+   "clock": 5,
+   "rc": 0,
+   "out": "GATE tier=full mode=fanout:claude profile=efficient loops<=3 calls~79 tokens~7.8M rel_cost=0.66 (raised by tripwire(s): auth/security, architecture/strategy)\nMEMBERS researchers=2 (papers and primary research; practice in the field; about 15 searches each) mapper=yes (no map yet at docs/ARCHITECTURE.md) memory=files:.council/memory\n{\n \"tier\": \"full\",\n \"reason\": \"raised by tripwire(s): auth/security, architecture/strategy\",\n \"tripwires\": [\n  \"auth/security\",\n  \"architecture/strategy\"\n ],\n \"mode\": \"fanout:claude\",\n \"profile\": \"efficient\",\n \"chosen_by\": {\n  \"mode\": \"default\",\n  \"profile\": \"default\"\n },\n \"shape\": {\n  \"experts\": 7,\n  \"ideas_min\": 13,\n  \"keep\": 3,\n  \"elders\": 3,\n  \"start\": 7,\n  \"loops\": 3,\n  \"rubric\": [\n   5,\n   7\n  ],\n  \"schedule\": [\n   7,\n   5,\n   3,\n   1\n  ]\n },\n \"calls_estimate\": 79,\n \"tokens_estimate\": 7834000,\n \"models\": {\n  \"mode\": \"fanout:claude\",\n  \"profile\": \"efficient\",\n  \"data_collected\": \"2026-11-13\",\n  \"attribution\": \"Model data: Artificial Analysis (https://artificialanalysis.ai)\",\n  \"warnings\": [\n   \"fanout:openrouter: OpenRouter availability unknown in this snapshot; using all usable models. Run a live refresh to filter by openrouter_api_id.\"\n  ],\n  \"chair\": {\n   \"model\": \"Claude Fable 5.2 (low)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 54,\n   \"cost_per_task\": 3.1\n  },\n  \"experts\": [\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Fable 5.2 (low)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 54,\n    \"cost_per_task\": 3.1\n   }\n  ],\n  \"red_team\": {\n   \"model\": \"Claude Opus 5.5 (xhigh)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 57,\n   \"cost_per_task\": 6.05\n  },\n  \"elders\": [\n   {\n    \"model\": \"Claude Fable 5.2 (medium)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 56,\n    \"cost_per_task\": 3.8\n   },\n   {\n    \"model\": \"Claude Opus 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 57,\n    \"cost_per_task\": 6.05\n   },\n   {\n    \"model\": \"Claude Sonnet 5.5 (max)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 55,\n    \"cost_per_task\": 10.02\n   }\n  ],\n  \"verifier\": {\n   \"model\": \"Claude Opus 5.5 (low)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 35,\n   \"cost_per_task\": 0.98\n  },\n  \"relative_cost\": 0.66\n },\n \"support\": {\n  \"research\": {\n   \"budget\": {\n    \"lite\": 10,\n    \"full\": 15\n   },\n   \"seats\": 2,\n   \"later_loops\": \"on_request\",\n   \"model\": \"auto\",\n   \"beats\": []\n  },\n  \"map\": {\n   \"when\": \"stale\",\n   \"model\": \"chair\",\n   \"focus_tokens\": 700,\n   \"skeleton_lines\": 420,\n   \"path\": \"\",\n   \"due\": true,\n   \"reason\": \"no map yet at docs/ARCHITECTURE.md\"\n  },\n  \"digest\": 14,\n  \"origin\": {\n   \"research.seats\": \"default\",\n   \"research.budget.lite\": \"default\",\n   \"research.budget.full\": \"default\",\n   \"research.later_loops\": \"default\",\n   \"research.model\": \"default\",\n   \"research.beats\": \"default\",\n   \"map.when\": \"default\",\n   \"map.model\": \"default\",\n   \"map.focus_tokens\": \"default\",\n   \"map.skeleton_lines\": \"default\",\n   \"map.path\": \"default\",\n   \"digest\": \"default\"\n  },\n  \"problems\": []\n },\n \"environment_notes\": [\n  \"only one lab reachable: elders come from the same family (no cross-lab check). Install the codex / gemini CLIs or set OPENROUTER_API_KEY to get one\",\n  \"mode=fanout:claude and profile=efficient are the cheapest that work here (the default). More rigour costs more: --profile balanced or max. Keep a choice: `defaults:` in your ~/.council/config.yaml\"\n ]\n}\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "plan",
+    "Change the auth session cookie name",
+    "--tier",
+    "lite",
+    "--override",
+    "lite is fine"
+   ],
+   "clock": 6,
+   "rc": 0,
+   "out": "GATE tier=lite mode=fanout:claude profile=efficient loops<=1 calls~12 tokens~1.8M rel_cost=0.66 (tripwire(s) auth/security waived by the requester: \"lite is fine\")\nMEMBERS researchers=2 (papers and primary research; practice in the field; about 10 searches each) mapper=yes (no map yet at docs/ARCHITECTURE.md) memory=files:.council/memory\n{\n \"tier\": \"lite\",\n \"reason\": \"tripwire(s) auth/security waived by the requester: \\\"lite is fine\\\"\",\n \"tripwires\": [\n  \"auth/security\"\n ],\n \"mode\": \"fanout:claude\",\n \"profile\": \"efficient\",\n \"chosen_by\": {\n  \"mode\": \"default\",\n  \"profile\": \"default\"\n },\n \"shape\": {\n  \"experts\": 3,\n  \"ideas_min\": 5,\n  \"keep\": 2,\n  \"elders\": 1,\n  \"start\": 3,\n  \"loops\": 1,\n  \"rubric\": [\n   3,\n   7\n  ],\n  \"schedule\": [\n   3,\n   1\n  ]\n },\n \"calls_estimate\": 12,\n \"tokens_estimate\": 1822000,\n \"models\": {\n  \"mode\": \"fanout:claude\",\n  \"profile\": \"efficient\",\n  \"data_collected\": \"2026-11-13\",\n  \"attribution\": \"Model data: Artificial Analysis (https://artificialanalysis.ai)\",\n  \"warnings\": [\n   \"fanout:openrouter: OpenRouter availability unknown in this snapshot; using all usable models. Run a live refresh to filter by openrouter_api_id.\"\n  ],\n  \"chair\": {\n   \"model\": \"Claude Fable 5.2 (low)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 54,\n   \"cost_per_task\": 3.1\n  },\n  \"experts\": [\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Fable 5.2 (low)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 54,\n    \"cost_per_task\": 3.1\n   }\n  ],\n  \"red_team\": {\n   \"model\": \"Claude Opus 5.5 (xhigh)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 57,\n   \"cost_per_task\": 6.05\n  },\n  \"elders\": [\n   {\n    \"model\": \"Claude Fable 5.2 (medium)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 56,\n    \"cost_per_task\": 3.8\n   },\n   {\n    \"model\": \"Claude Opus 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 57,\n    \"cost_per_task\": 6.05\n   },\n   {\n    \"model\": \"Claude Sonnet 5.5 (max)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 55,\n    \"cost_per_task\": 10.02\n   }\n  ],\n  \"verifier\": {\n   \"model\": \"Claude Opus 5.5 (low)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 35,\n   \"cost_per_task\": 0.98\n  },\n  \"relative_cost\": 0.66\n },\n \"support\": {\n  \"research\": {\n   \"budget\": {\n    \"lite\": 10,\n    \"full\": 15\n   },\n   \"seats\": 2,\n   \"later_loops\": \"on_request\",\n   \"model\": \"auto\",\n   \"beats\": []\n  },\n  \"map\": {\n   \"when\": \"stale\",\n   \"model\": \"chair\",\n   \"focus_tokens\": 700,\n   \"skeleton_lines\": 420,\n   \"path\": \"\",\n   \"due\": true,\n   \"reason\": \"no map yet at docs/ARCHITECTURE.md\"\n  },\n  \"digest\": 14,\n  \"origin\": {\n   \"research.seats\": \"default\",\n   \"research.budget.lite\": \"default\",\n   \"research.budget.full\": \"default\",\n   \"research.later_loops\": \"default\",\n   \"research.model\": \"default\",\n   \"research.beats\": \"default\",\n   \"map.when\": \"default\",\n   \"map.model\": \"default\",\n   \"map.focus_tokens\": \"default\",\n   \"map.skeleton_lines\": \"default\",\n   \"map.path\": \"default\",\n   \"digest\": \"default\"\n  },\n  \"problems\": []\n },\n \"environment_notes\": [\n  \"only one lab reachable: elders come from the same family (no cross-lab check). Install the codex / gemini CLIs or set OPENROUTER_API_KEY to get one\",\n  \"mode=fanout:claude and profile=efficient are the cheapest that work here (the default). More rigour costs more: --profile balanced or max. Keep a choice: `defaults:` in your ~/.council/config.yaml\"\n ]\n}\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "plan",
+    "Tidy a helper",
+    "--tier",
+    "lite",
+    "--override",
+    "lite please"
+   ],
+   "clock": 7,
+   "rc": 0,
+   "out": "GATE tier=lite mode=fanout:claude profile=efficient loops<=1 calls~12 tokens~1.8M rel_cost=0.66 (the requester: \"lite please\")\nMEMBERS researchers=2 (papers and primary research; practice in the field; about 10 searches each) mapper=yes (no map yet at docs/ARCHITECTURE.md) memory=files:.council/memory\n{\n \"tier\": \"lite\",\n \"reason\": \"the requester: \\\"lite please\\\"\",\n \"tripwires\": [],\n \"mode\": \"fanout:claude\",\n \"profile\": \"efficient\",\n \"chosen_by\": {\n  \"mode\": \"default\",\n  \"profile\": \"default\"\n },\n \"shape\": {\n  \"experts\": 3,\n  \"ideas_min\": 5,\n  \"keep\": 2,\n  \"elders\": 1,\n  \"start\": 3,\n  \"loops\": 1,\n  \"rubric\": [\n   3,\n   7\n  ],\n  \"schedule\": [\n   3,\n   1\n  ]\n },\n \"calls_estimate\": 12,\n \"tokens_estimate\": 1822000,\n \"models\": {\n  \"mode\": \"fanout:claude\",\n  \"profile\": \"efficient\",\n  \"data_collected\": \"2026-11-13\",\n  \"attribution\": \"Model data: Artificial Analysis (https://artificialanalysis.ai)\",\n  \"warnings\": [\n   \"fanout:openrouter: OpenRouter availability unknown in this snapshot; using all usable models. Run a live refresh to filter by openrouter_api_id.\"\n  ],\n  \"chair\": {\n   \"model\": \"Claude Fable 5.2 (low)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 54,\n   \"cost_per_task\": 3.1\n  },\n  \"experts\": [\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Fable 5.2 (low)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 54,\n    \"cost_per_task\": 3.1\n   }\n  ],\n  \"red_team\": {\n   \"model\": \"Claude Opus 5.5 (xhigh)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 57,\n   \"cost_per_task\": 6.05\n  },\n  \"elders\": [\n   {\n    \"model\": \"Claude Fable 5.2 (medium)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 56,\n    \"cost_per_task\": 3.8\n   },\n   {\n    \"model\": \"Claude Opus 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 57,\n    \"cost_per_task\": 6.05\n   },\n   {\n    \"model\": \"Claude Sonnet 5.5 (max)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 55,\n    \"cost_per_task\": 10.02\n   }\n  ],\n  \"verifier\": {\n   \"model\": \"Claude Opus 5.5 (low)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 35,\n   \"cost_per_task\": 0.98\n  },\n  \"relative_cost\": 0.66\n },\n \"support\": {\n  \"research\": {\n   \"budget\": {\n    \"lite\": 10,\n    \"full\": 15\n   },\n   \"seats\": 2,\n   \"later_loops\": \"on_request\",\n   \"model\": \"auto\",\n   \"beats\": []\n  },\n  \"map\": {\n   \"when\": \"stale\",\n   \"model\": \"chair\",\n   \"focus_tokens\": 700,\n   \"skeleton_lines\": 420,\n   \"path\": \"\",\n   \"due\": true,\n   \"reason\": \"no map yet at docs/ARCHITECTURE.md\"\n  },\n  \"digest\": 14,\n  \"origin\": {\n   \"research.seats\": \"default\",\n   \"research.budget.lite\": \"default\",\n   \"research.budget.full\": \"default\",\n   \"research.later_loops\": \"default\",\n   \"research.model\": \"default\",\n   \"research.beats\": \"default\",\n   \"map.when\": \"default\",\n   \"map.model\": \"default\",\n   \"map.focus_tokens\": \"default\",\n   \"map.skeleton_lines\": \"default\",\n   \"map.path\": \"default\",\n   \"digest\": \"default\"\n  },\n  \"problems\": []\n },\n \"environment_notes\": [\n  \"only one lab reachable: elders come from the same family (no cross-lab check). Install the codex / gemini CLIs or set OPENROUTER_API_KEY to get one\",\n  \"mode=fanout:claude and profile=efficient are the cheapest that work here (the default). More rigour costs more: --profile balanced or max. Keep a choice: `defaults:` in your ~/.council/config.yaml\"\n ]\n}\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "plan",
+    "Drop the users table in prod",
+    "--tier",
+    "direct"
+   ],
+   "clock": 8,
+   "rc": 0,
+   "out": "GATE tier=full mode=fanout:claude profile=efficient loops<=3 calls~79 tokens~7.8M rel_cost=0.66 (raised by tripwire(s): data loss/irreversible)\nMEMBERS researchers=2 (papers and primary research; practice in the field; about 15 searches each) mapper=yes (no map yet at docs/ARCHITECTURE.md) memory=files:.council/memory\n{\n \"tier\": \"full\",\n \"reason\": \"raised by tripwire(s): data loss/irreversible\",\n \"tripwires\": [\n  \"data loss/irreversible\"\n ],\n \"mode\": \"fanout:claude\",\n \"profile\": \"efficient\",\n \"chosen_by\": {\n  \"mode\": \"default\",\n  \"profile\": \"default\"\n },\n \"shape\": {\n  \"experts\": 7,\n  \"ideas_min\": 13,\n  \"keep\": 3,\n  \"elders\": 3,\n  \"start\": 7,\n  \"loops\": 3,\n  \"rubric\": [\n   5,\n   7\n  ],\n  \"schedule\": [\n   7,\n   5,\n   3,\n   1\n  ]\n },\n \"calls_estimate\": 79,\n \"tokens_estimate\": 7834000,\n \"models\": {\n  \"mode\": \"fanout:claude\",\n  \"profile\": \"efficient\",\n  \"data_collected\": \"2026-11-13\",\n  \"attribution\": \"Model data: Artificial Analysis (https://artificialanalysis.ai)\",\n  \"warnings\": [\n   \"fanout:openrouter: OpenRouter availability unknown in this snapshot; using all usable models. Run a live refresh to filter by openrouter_api_id.\"\n  ],\n  \"chair\": {\n   \"model\": \"Claude Fable 5.2 (low)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 54,\n   \"cost_per_task\": 3.1\n  },\n  \"experts\": [\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Fable 5.2 (low)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 54,\n    \"cost_per_task\": 3.1\n   }\n  ],\n  \"red_team\": {\n   \"model\": \"Claude Opus 5.5 (xhigh)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 57,\n   \"cost_per_task\": 6.05\n  },\n  \"elders\": [\n   {\n    \"model\": \"Claude Fable 5.2 (medium)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 56,\n    \"cost_per_task\": 3.8\n   },\n   {\n    \"model\": \"Claude Opus 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 57,\n    \"cost_per_task\": 6.05\n   },\n   {\n    \"model\": \"Claude Sonnet 5.5 (max)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 55,\n    \"cost_per_task\": 10.02\n   }\n  ],\n  \"verifier\": {\n   \"model\": \"Claude Opus 5.5 (low)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 35,\n   \"cost_per_task\": 0.98\n  },\n  \"relative_cost\": 0.66\n },\n \"support\": {\n  \"research\": {\n   \"budget\": {\n    \"lite\": 10,\n    \"full\": 15\n   },\n   \"seats\": 2,\n   \"later_loops\": \"on_request\",\n   \"model\": \"auto\",\n   \"beats\": []\n  },\n  \"map\": {\n   \"when\": \"stale\",\n   \"model\": \"chair\",\n   \"focus_tokens\": 700,\n   \"skeleton_lines\": 420,\n   \"path\": \"\",\n   \"due\": true,\n   \"reason\": \"no map yet at docs/ARCHITECTURE.md\"\n  },\n  \"digest\": 14,\n  \"origin\": {\n   \"research.seats\": \"default\",\n   \"research.budget.lite\": \"default\",\n   \"research.budget.full\": \"default\",\n   \"research.later_loops\": \"default\",\n   \"research.model\": \"default\",\n   \"research.beats\": \"default\",\n   \"map.when\": \"default\",\n   \"map.model\": \"default\",\n   \"map.focus_tokens\": \"default\",\n   \"map.skeleton_lines\": \"default\",\n   \"map.path\": \"default\",\n   \"digest\": \"default\"\n  },\n  \"problems\": []\n },\n \"environment_notes\": [\n  \"only one lab reachable: elders come from the same family (no cross-lab check). Install the codex / gemini CLIs or set OPENROUTER_API_KEY to get one\",\n  \"mode=fanout:claude and profile=efficient are the cheapest that work here (the default). More rigour costs more: --profile balanced or max. Keep a choice: `defaults:` in your ~/.council/config.yaml\"\n ]\n}\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "plan",
+    "Tidy a helper",
+    "--stakes",
+    "low",
+    "--paths",
+    "db/migrations/001.sql",
+    "src/app.py"
+   ],
+   "clock": 9,
+   "rc": 0,
+   "out": "GATE tier=full mode=fanout:claude profile=efficient loops<=3 calls~79 tokens~7.8M rel_cost=0.66 (raised by tripwire(s): migration)\nMEMBERS researchers=2 (papers and primary research; practice in the field; about 15 searches each) mapper=yes (no map yet at docs/ARCHITECTURE.md) memory=files:.council/memory\n{\n \"tier\": \"full\",\n \"reason\": \"raised by tripwire(s): migration\",\n \"tripwires\": [\n  \"migration\"\n ],\n \"mode\": \"fanout:claude\",\n \"profile\": \"efficient\",\n \"chosen_by\": {\n  \"mode\": \"default\",\n  \"profile\": \"default\"\n },\n \"shape\": {\n  \"experts\": 7,\n  \"ideas_min\": 13,\n  \"keep\": 3,\n  \"elders\": 3,\n  \"start\": 7,\n  \"loops\": 3,\n  \"rubric\": [\n   5,\n   7\n  ],\n  \"schedule\": [\n   7,\n   5,\n   3,\n   1\n  ]\n },\n \"calls_estimate\": 79,\n \"tokens_estimate\": 7834000,\n \"models\": {\n  \"mode\": \"fanout:claude\",\n  \"profile\": \"efficient\",\n  \"data_collected\": \"2026-11-13\",\n  \"attribution\": \"Model data: Artificial Analysis (https://artificialanalysis.ai)\",\n  \"warnings\": [\n   \"fanout:openrouter: OpenRouter availability unknown in this snapshot; using all usable models. Run a live refresh to filter by openrouter_api_id.\"\n  ],\n  \"chair\": {\n   \"model\": \"Claude Fable 5.2 (low)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 54,\n   \"cost_per_task\": 3.1\n  },\n  \"experts\": [\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Fable 5.2 (low)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 54,\n    \"cost_per_task\": 3.1\n   }\n  ],\n  \"red_team\": {\n   \"model\": \"Claude Opus 5.5 (xhigh)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 57,\n   \"cost_per_task\": 6.05\n  },\n  \"elders\": [\n   {\n    \"model\": \"Claude Fable 5.2 (medium)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 56,\n    \"cost_per_task\": 3.8\n   },\n   {\n    \"model\": \"Claude Opus 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 57,\n    \"cost_per_task\": 6.05\n   },\n   {\n    \"model\": \"Claude Sonnet 5.5 (max)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 55,\n    \"cost_per_task\": 10.02\n   }\n  ],\n  \"verifier\": {\n   \"model\": \"Claude Opus 5.5 (low)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 35,\n   \"cost_per_task\": 0.98\n  },\n  \"relative_cost\": 0.66\n },\n \"support\": {\n  \"research\": {\n   \"budget\": {\n    \"lite\": 10,\n    \"full\": 15\n   },\n   \"seats\": 2,\n   \"later_loops\": \"on_request\",\n   \"model\": \"auto\",\n   \"beats\": []\n  },\n  \"map\": {\n   \"when\": \"stale\",\n   \"model\": \"chair\",\n   \"focus_tokens\": 700,\n   \"skeleton_lines\": 420,\n   \"path\": \"\",\n   \"due\": true,\n   \"reason\": \"no map yet at docs/ARCHITECTURE.md\"\n  },\n  \"digest\": 14,\n  \"origin\": {\n   \"research.seats\": \"default\",\n   \"research.budget.lite\": \"default\",\n   \"research.budget.full\": \"default\",\n   \"research.later_loops\": \"default\",\n   \"research.model\": \"default\",\n   \"research.beats\": \"default\",\n   \"map.when\": \"default\",\n   \"map.model\": \"default\",\n   \"map.focus_tokens\": \"default\",\n   \"map.skeleton_lines\": \"default\",\n   \"map.path\": \"default\",\n   \"digest\": \"default\"\n  },\n  \"problems\": []\n },\n \"environment_notes\": [\n  \"only one lab reachable: elders come from the same family (no cross-lab check). Install the codex / gemini CLIs or set OPENROUTER_API_KEY to get one\",\n  \"mode=fanout:claude and profile=efficient are the cheapest that work here (the default). More rigour costs more: --profile balanced or max. Keep a choice: `defaults:` in your ~/.council/config.yaml\"\n ]\n}\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "plan",
+    "Pick the queue technology for the billing pipeline",
+    "--tier",
+    "full",
+    "--loops",
+    "4",
+    "--profile",
+    "max",
+    "--mode",
+    "crosslab"
+   ],
+   "clock": 10,
+   "rc": 0,
+   "out": "GATE tier=full mode=crosslab profile=max loops<=4 calls~104 tokens~12.3M rel_cost=4.14 (explicit)\nMEMBERS researchers=2 (papers and primary research; practice in the field; about 15 searches each) mapper=yes (no map yet at docs/ARCHITECTURE.md) memory=files:.council/memory\n{\n \"tier\": \"full\",\n \"reason\": \"explicit\",\n \"tripwires\": [],\n \"mode\": \"crosslab\",\n \"profile\": \"max\",\n \"chosen_by\": {\n  \"mode\": \"flag\",\n  \"profile\": \"flag\"\n },\n \"shape\": {\n  \"experts\": 7,\n  \"ideas_min\": 13,\n  \"keep\": 3,\n  \"elders\": 3,\n  \"start\": 7,\n  \"loops\": 4,\n  \"rubric\": [\n   5,\n   7\n  ],\n  \"schedule\": [\n   7,\n   5,\n   3,\n   2,\n   1\n  ]\n },\n \"calls_estimate\": 104,\n \"tokens_estimate\": 12324000,\n \"models\": {\n  \"mode\": \"crosslab\",\n  \"profile\": \"max\",\n  \"data_collected\": \"2026-11-13\",\n  \"attribution\": \"Model data: Artificial Analysis (https://artificialanalysis.ai)\",\n  \"warnings\": [\n   \"fanout:openrouter: OpenRouter availability unknown in this snapshot; using all usable models. Run a live refresh to filter by openrouter_api_id.\"\n  ],\n  \"chair\": {\n   \"model\": \"Claude Fable 5.2 (max)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 65,\n   \"cost_per_task\": 26.54\n  },\n  \"experts\": [\n   {\n    \"model\": \"Claude Fable 5.2 (high)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 62,\n    \"cost_per_task\": 9.08\n   },\n   {\n    \"model\": \"Claude Fable 5.2 (high)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 62,\n    \"cost_per_task\": 9.08\n   },\n   {\n    \"model\": \"Claude Fable 5.2 (high)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 62,\n    \"cost_per_task\": 9.08\n   },\n   {\n    \"model\": \"Claude Fable 5.2 (high)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 62,\n    \"cost_per_task\": 9.08\n   },\n   {\n    \"model\": \"Claude Fable 5.2 (high)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 62,\n    \"cost_per_task\": 9.08\n   },\n   {\n    \"model\": \"Claude Fable 5.2 (high)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 62,\n    \"cost_per_task\": 9.08\n   },\n   {\n    \"model\": \"GPT-6 Astra (max)\",\n    \"creator\": \"OpenAI\",\n    \"quality\": 57,\n    \"cost_per_task\": 6.24\n   }\n  ],\n  \"red_team\": {\n   \"model\": \"GPT-6 Astra (max)\",\n   \"creator\": \"OpenAI\",\n   \"quality\": 57,\n   \"cost_per_task\": 6.24\n  },\n  \"elders\": [\n   {\n    \"model\": \"Claude Fable 5.2 (max)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 65,\n    \"cost_per_task\": 26.54\n   },\n   {\n    \"model\": \"GPT-6 Astra (max)\",\n    \"creator\": \"OpenAI\",\n    \"quality\": 57,\n    \"cost_per_task\": 6.24\n   },\n   {\n    \"model\": \"Gemini 4 Argon (high)\",\n    \"creator\": \"Google\",\n    \"quality\": 50,\n    \"cost_per_task\": 4.97\n   }\n  ],\n  \"verifier\": {\n   \"model\": \"GPT-6.1 Sol (medium)\",\n   \"creator\": \"OpenAI\",\n   \"quality\": 46,\n   \"cost_per_task\": 0.36\n  },\n  \"relative_cost\": 4.14\n },\n \"support\": {\n  \"research\": {\n   \"budget\": {\n    \"lite\": 10,\n    \"full\": 15\n   },\n   \"seats\": 2,\n   \"later_loops\": \"on_request\",\n   \"model\": \"auto\",\n   \"beats\": []\n  },\n  \"map\": {\n   \"when\": \"stale\",\n   \"model\": \"chair\",\n   \"focus_tokens\": 700,\n   \"skeleton_lines\": 420,\n   \"path\": \"\",\n   \"due\": true,\n   \"reason\": \"no map yet at docs/ARCHITECTURE.md\"\n  },\n  \"digest\": 14,\n  \"origin\": {\n   \"research.seats\": \"default\",\n   \"research.budget.lite\": \"default\",\n   \"research.budget.full\": \"default\",\n   \"research.later_loops\": \"default\",\n   \"research.model\": \"default\",\n   \"research.beats\": \"default\",\n   \"map.when\": \"default\",\n   \"map.model\": \"default\",\n   \"map.focus_tokens\": \"default\",\n   \"map.skeleton_lines\": \"default\",\n   \"map.path\": \"default\",\n   \"digest\": \"default\"\n  },\n  \"problems\": []\n },\n \"environment_notes\": [\n  \"only one lab reachable: elders come from the same family (no cross-lab check). Install the codex / gemini CLIs or set OPENROUTER_API_KEY to get one\"\n ]\n}\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "plan",
+    "Pick the queue technology for the billing pipeline",
+    "--tier",
+    "lite",
+    "--profile",
+    "efficient",
+    "--research",
+    "1",
+    "--research-budget",
+    "6",
+    "--map",
+    "never",
+    "--focus-tokens",
+    "0"
+   ],
+   "clock": 11,
+   "rc": 0,
+   "out": "GATE tier=lite mode=fanout:claude profile=efficient loops<=1 calls~10 tokens~1.5M rel_cost=0.66 (explicit)\nMEMBERS researchers=1 (papers and practice; about 6 searches each) mapper=off memory=files:.council/memory\n{\n \"tier\": \"lite\",\n \"reason\": \"explicit\",\n \"tripwires\": [],\n \"mode\": \"fanout:claude\",\n \"profile\": \"efficient\",\n \"chosen_by\": {\n  \"mode\": \"default\",\n  \"profile\": \"flag\"\n },\n \"shape\": {\n  \"experts\": 3,\n  \"ideas_min\": 5,\n  \"keep\": 2,\n  \"elders\": 1,\n  \"start\": 3,\n  \"loops\": 1,\n  \"rubric\": [\n   3,\n   7\n  ],\n  \"schedule\": [\n   3,\n   1\n  ]\n },\n \"calls_estimate\": 10,\n \"tokens_estimate\": 1472000,\n \"models\": {\n  \"mode\": \"fanout:claude\",\n  \"profile\": \"efficient\",\n  \"data_collected\": \"2026-11-13\",\n  \"attribution\": \"Model data: Artificial Analysis (https://artificialanalysis.ai)\",\n  \"warnings\": [\n   \"fanout:openrouter: OpenRouter availability unknown in this snapshot; using all usable models. Run a live refresh to filter by openrouter_api_id.\"\n  ],\n  \"chair\": {\n   \"model\": \"Claude Fable 5.2 (low)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 54,\n   \"cost_per_task\": 3.1\n  },\n  \"experts\": [\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Fable 5.2 (low)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 54,\n    \"cost_per_task\": 3.1\n   }\n  ],\n  \"red_team\": {\n   \"model\": \"Claude Opus 5.5 (xhigh)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 57,\n   \"cost_per_task\": 6.05\n  },\n  \"elders\": [\n   {\n    \"model\": \"Claude Fable 5.2 (medium)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 56,\n    \"cost_per_task\": 3.8\n   },\n   {\n    \"model\": \"Claude Opus 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 57,\n    \"cost_per_task\": 6.05\n   },\n   {\n    \"model\": \"Claude Sonnet 5.5 (max)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 55,\n    \"cost_per_task\": 10.02\n   }\n  ],\n  \"verifier\": {\n   \"model\": \"Claude Opus 5.5 (low)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 35,\n   \"cost_per_task\": 0.98\n  },\n  \"relative_cost\": 0.66\n },\n \"support\": {\n  \"research\": {\n   \"budget\": {\n    \"lite\": 6,\n    \"full\": 6\n   },\n   \"seats\": 1,\n   \"later_loops\": \"on_request\",\n   \"model\": \"auto\",\n   \"beats\": []\n  },\n  \"map\": {\n   \"when\": \"never\",\n   \"model\": \"chair\",\n   \"focus_tokens\": 0,\n   \"skeleton_lines\": 420,\n   \"path\": \"\",\n   \"due\": false,\n   \"reason\": \"switched off\"\n  },\n  \"digest\": 14,\n  \"origin\": {\n   \"research.seats\": \"flag\",\n   \"research.budget.lite\": \"flag\",\n   \"research.budget.full\": \"flag\",\n   \"research.later_loops\": \"default\",\n   \"research.model\": \"default\",\n   \"research.beats\": \"default\",\n   \"map.when\": \"flag\",\n   \"map.model\": \"default\",\n   \"map.focus_tokens\": \"flag\",\n   \"map.skeleton_lines\": \"default\",\n   \"map.path\": \"default\",\n   \"digest\": \"default\"\n  },\n  \"problems\": []\n },\n \"environment_notes\": [\n  \"only one lab reachable: elders come from the same family (no cross-lab check). Install the codex / gemini CLIs or set OPENROUTER_API_KEY to get one\",\n  \"mode=fanout:claude is the cheapest that works here for profile=efficient (the default). More rigour costs more: --profile balanced or max. Keep a choice: `defaults:` in your ~/.council/config.yaml\"\n ]\n}\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "plan",
+    "Pick the queue technology for the billing pipeline",
+    "--tier",
+    "lite",
+    "--research",
+    "4",
+    "--research-later",
+    "always",
+    "--map",
+    "always",
+    "--mode",
+    "solo"
+   ],
+   "clock": 12,
+   "rc": 0,
+   "out": "GATE tier=lite mode=solo profile=efficient loops<=1 calls~14 tokens~2.2M rel_cost=n/a (explicit)\nMEMBERS researchers=4 (papers and primary research; practice in the field; the case against; the project's own record; about 10 searches each) mapper=yes (no map yet at docs/ARCHITECTURE.md) memory=files:.council/memory\n{\n \"tier\": \"lite\",\n \"reason\": \"explicit\",\n \"tripwires\": [],\n \"mode\": \"solo\",\n \"profile\": \"efficient\",\n \"chosen_by\": {\n  \"mode\": \"flag\",\n  \"profile\": \"default\"\n },\n \"shape\": {\n  \"experts\": 3,\n  \"ideas_min\": 5,\n  \"keep\": 2,\n  \"elders\": 1,\n  \"start\": 3,\n  \"loops\": 1,\n  \"rubric\": [\n   3,\n   7\n  ],\n  \"schedule\": [\n   3,\n   1\n  ]\n },\n \"calls_estimate\": 14,\n \"tokens_estimate\": 2222000,\n \"models\": {\n  \"mode\": \"solo\",\n  \"profile\": \"efficient\",\n  \"data_collected\": \"2026-11-13\",\n  \"attribution\": \"Model data: Artificial Analysis (https://artificialanalysis.ai)\",\n  \"warnings\": [\n   \"fanout:openrouter: OpenRouter availability unknown in this snapshot; using all usable models. Run a live refresh to filter by openrouter_api_id.\"\n  ],\n  \"chair\": \"current model @ medium\",\n  \"experts\": \"current model @ low\",\n  \"red_team\": \"current model @ medium\",\n  \"elders\": \"current model @ medium\",\n  \"verifier\": \"current model @ low\"\n },\n \"support\": {\n  \"research\": {\n   \"budget\": {\n    \"lite\": 10,\n    \"full\": 15\n   },\n   \"seats\": 4,\n   \"later_loops\": \"always\",\n   \"model\": \"auto\",\n   \"beats\": []\n  },\n  \"map\": {\n   \"when\": \"always\",\n   \"model\": \"chair\",\n   \"focus_tokens\": 700,\n   \"skeleton_lines\": 420,\n   \"path\": \"\",\n   \"due\": true,\n   \"reason\": \"no map yet at docs/ARCHITECTURE.md\"\n  },\n  \"digest\": 14,\n  \"origin\": {\n   \"research.seats\": \"flag\",\n   \"research.budget.lite\": \"default\",\n   \"research.budget.full\": \"default\",\n   \"research.later_loops\": \"flag\",\n   \"research.model\": \"default\",\n   \"research.beats\": \"default\",\n   \"map.when\": \"flag\",\n   \"map.model\": \"default\",\n   \"map.focus_tokens\": \"default\",\n   \"map.skeleton_lines\": \"default\",\n   \"map.path\": \"default\",\n   \"digest\": \"default\"\n  },\n  \"problems\": []\n },\n \"environment_notes\": [\n  \"only one lab reachable: elders come from the same family (no cross-lab check). Install the codex / gemini CLIs or set OPENROUTER_API_KEY to get one\",\n  \"profile=efficient is the cheapest (the default). More rigour costs more: --profile balanced or max. Keep a choice: `defaults:` in your ~/.council/config.yaml\"\n ]\n}\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "plan",
+    "Pick the queue technology for the billing pipeline",
+    "--tier",
+    "lite",
+    "--no-research",
+    "--no-map",
+    "--mode",
+    "fanout:gemini"
+   ],
+   "clock": 13,
+   "rc": 0,
+   "out": "GATE tier=lite mode=fanout:gemini profile=efficient loops<=1 calls~9 tokens~1.3M rel_cost=1.96 (explicit)\nMEMBERS researchers=0 (off) mapper=off memory=files:.council/memory\n{\n \"tier\": \"lite\",\n \"reason\": \"explicit\",\n \"tripwires\": [],\n \"mode\": \"fanout:gemini\",\n \"profile\": \"efficient\",\n \"chosen_by\": {\n  \"mode\": \"flag\",\n  \"profile\": \"default\"\n },\n \"shape\": {\n  \"experts\": 3,\n  \"ideas_min\": 5,\n  \"keep\": 2,\n  \"elders\": 1,\n  \"start\": 3,\n  \"loops\": 1,\n  \"rubric\": [\n   3,\n   7\n  ],\n  \"schedule\": [\n   3,\n   1\n  ]\n },\n \"calls_estimate\": 9,\n \"tokens_estimate\": 1272000,\n \"models\": {\n  \"mode\": \"fanout:gemini\",\n  \"profile\": \"efficient\",\n  \"data_collected\": \"2026-11-13\",\n  \"attribution\": \"Model data: Artificial Analysis (https://artificialanalysis.ai)\",\n  \"warnings\": [\n   \"fanout:openrouter: OpenRouter availability unknown in this snapshot; using all usable models. Run a live refresh to filter by openrouter_api_id.\"\n  ],\n  \"chair\": {\n   \"model\": \"Gemini 4 Argon (high)\",\n   \"creator\": \"Google\",\n   \"quality\": 50,\n   \"cost_per_task\": 4.97\n  },\n  \"experts\": [\n   {\n    \"model\": \"Gemini 4 Argon (high)\",\n    \"creator\": \"Google\",\n    \"quality\": 50,\n    \"cost_per_task\": 4.97\n   },\n   {\n    \"model\": \"Gemini 4 Argon (high)\",\n    \"creator\": \"Google\",\n    \"quality\": 50,\n    \"cost_per_task\": 4.97\n   },\n   {\n    \"model\": \"Gemini 4 Argon (high)\",\n    \"creator\": \"Google\",\n    \"quality\": 50,\n    \"cost_per_task\": 4.97\n   },\n   {\n    \"model\": \"Gemini 4 Argon (high)\",\n    \"creator\": \"Google\",\n    \"quality\": 50,\n    \"cost_per_task\": 4.97\n   },\n   {\n    \"model\": \"Gemini 4 Argon (high)\",\n    \"creator\": \"Google\",\n    \"quality\": 50,\n    \"cost_per_task\": 4.97\n   },\n   {\n    \"model\": \"Gemini 4 Argon (high)\",\n    \"creator\": \"Google\",\n    \"quality\": 50,\n    \"cost_per_task\": 4.97\n   },\n   {\n    \"model\": \"Gemini 4 Argon (high)\",\n    \"creator\": \"Google\",\n    \"quality\": 50,\n    \"cost_per_task\": 4.97\n   }\n  ],\n  \"red_team\": {\n   \"model\": \"Gemini 4 Argon (high)\",\n   \"creator\": \"Google\",\n   \"quality\": 50,\n   \"cost_per_task\": 4.97\n  },\n  \"elders\": [\n   {\n    \"model\": \"Gemini 4 Argon (high)\",\n    \"creator\": \"Google\",\n    \"quality\": 50,\n    \"cost_per_task\": 4.97\n   },\n   {\n    \"model\": \"Gemini 4 Argon (high)\",\n    \"creator\": \"Google\",\n    \"quality\": 50,\n    \"cost_per_task\": 4.97\n   },\n   {\n    \"model\": \"Gemini 4 Argon (high)\",\n    \"creator\": \"Google\",\n    \"quality\": 50,\n    \"cost_per_task\": 4.97\n   }\n  ],\n  \"verifier\": {\n   \"model\": \"Gemini 4 Argon (high)\",\n   \"creator\": \"Google\",\n   \"quality\": 50,\n   \"cost_per_task\": 4.97\n  },\n  \"relative_cost\": 1.96\n },\n \"support\": {\n  \"research\": {\n   \"budget\": {\n    \"lite\": 10,\n    \"full\": 15\n   },\n   \"seats\": 0,\n   \"later_loops\": \"on_request\",\n   \"model\": \"auto\",\n   \"beats\": []\n  },\n  \"map\": {\n   \"when\": \"never\",\n   \"model\": \"chair\",\n   \"focus_tokens\": 700,\n   \"skeleton_lines\": 420,\n   \"path\": \"\",\n   \"due\": false,\n   \"reason\": \"switched off\"\n  },\n  \"digest\": 14,\n  \"origin\": {\n   \"research.seats\": \"flag\",\n   \"research.budget.lite\": \"default\",\n   \"research.budget.full\": \"default\",\n   \"research.later_loops\": \"default\",\n   \"research.model\": \"default\",\n   \"research.beats\": \"default\",\n   \"map.when\": \"flag\",\n   \"map.model\": \"default\",\n   \"map.focus_tokens\": \"default\",\n   \"map.skeleton_lines\": \"default\",\n   \"map.path\": \"default\",\n   \"digest\": \"default\"\n  },\n  \"problems\": []\n },\n \"environment_notes\": [\n  \"only one lab reachable: elders come from the same family (no cross-lab check). Install the codex / gemini CLIs or set OPENROUTER_API_KEY to get one\",\n  \"profile=efficient is the cheapest (the default). More rigour costs more: --profile balanced or max. Keep a choice: `defaults:` in your ~/.council/config.yaml\"\n ]\n}\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "plan",
+    "Pick the queue technology for the billing pipeline",
+    "--tier",
+    "lite",
+    "--research",
+    "9",
+    "--mode",
+    "openai"
+   ],
+   "clock": 14,
+   "rc": 0,
+   "out": "GATE tier=lite mode=fanout:openai profile=efficient loops<=1 calls~12 tokens~1.8M rel_cost=0.11 (explicit)\nMEMBERS researchers=2 (papers and primary research; practice in the field; about 10 searches each) mapper=yes (no map yet at docs/ARCHITECTURE.md) memory=files:.council/memory\n{\n \"tier\": \"lite\",\n \"reason\": \"explicit\",\n \"tripwires\": [],\n \"mode\": \"fanout:openai\",\n \"profile\": \"efficient\",\n \"chosen_by\": {\n  \"mode\": \"flag\",\n  \"profile\": \"default\"\n },\n \"shape\": {\n  \"experts\": 3,\n  \"ideas_min\": 5,\n  \"keep\": 2,\n  \"elders\": 1,\n  \"start\": 3,\n  \"loops\": 1,\n  \"rubric\": [\n   3,\n   7\n  ],\n  \"schedule\": [\n   3,\n   1\n  ]\n },\n \"calls_estimate\": 12,\n \"tokens_estimate\": 1822000,\n \"models\": {\n  \"mode\": \"fanout:openai\",\n  \"profile\": \"efficient\",\n  \"data_collected\": \"2026-11-13\",\n  \"attribution\": \"Model data: Artificial Analysis (https://artificialanalysis.ai)\",\n  \"warnings\": [\n   \"fanout:openrouter: OpenRouter availability unknown in this snapshot; using all usable models. Run a live refresh to filter by openrouter_api_id.\"\n  ],\n  \"chair\": {\n   \"model\": \"GPT-6.1 Sol (medium)\",\n   \"creator\": \"OpenAI\",\n   \"quality\": 46,\n   \"cost_per_task\": 0.36\n  },\n  \"experts\": [\n   {\n    \"model\": \"GPT-6.1 Terra (low)\",\n    \"creator\": \"OpenAI\",\n    \"quality\": 29,\n    \"cost_per_task\": 0.0713\n   },\n   {\n    \"model\": \"GPT-6.1 Terra (low)\",\n    \"creator\": \"OpenAI\",\n    \"quality\": 29,\n    \"cost_per_task\": 0.0713\n   },\n   {\n    \"model\": \"GPT-6.1 Terra (low)\",\n    \"creator\": \"OpenAI\",\n    \"quality\": 29,\n    \"cost_per_task\": 0.0713\n   },\n   {\n    \"model\": \"GPT-6.1 Terra (low)\",\n    \"creator\": \"OpenAI\",\n    \"quality\": 29,\n    \"cost_per_task\": 0.0713\n   },\n   {\n    \"model\": \"GPT-6.1 Terra (low)\",\n    \"creator\": \"OpenAI\",\n    \"quality\": 29,\n    \"cost_per_task\": 0.0713\n   },\n   {\n    \"model\": \"GPT-6.1 Sol (medium)\",\n    \"creator\": \"OpenAI\",\n    \"quality\": 46,\n    \"cost_per_task\": 0.36\n   },\n   {\n    \"model\": \"GPT-6 Luna (max)\",\n    \"creator\": \"OpenAI\",\n    \"quality\": 28,\n    \"cost_per_task\": 0.15\n   }\n  ],\n  \"red_team\": {\n   \"model\": \"GPT-6.1 Terra (high)\",\n   \"creator\": \"OpenAI\",\n   \"quality\": 42,\n   \"cost_per_task\": 0.26\n  },\n  \"elders\": [\n   {\n    \"model\": \"GPT-6.1 Sol (medium)\",\n    \"creator\": \"OpenAI\",\n    \"quality\": 46,\n    \"cost_per_task\": 0.36\n   },\n   {\n    \"model\": \"GPT-6.1 Terra (max)\",\n    \"creator\": \"OpenAI\",\n    \"quality\": 51,\n    \"cost_per_task\": 0.96\n   },\n   {\n    \"model\": \"GPT-6 Astra (high)\",\n    \"creator\": \"OpenAI\",\n    \"quality\": 55,\n    \"cost_per_task\": 3.24\n   }\n  ],\n  \"verifier\": {\n   \"model\": \"GPT-6.1 Terra (medium)\",\n   \"creator\": \"OpenAI\",\n   \"quality\": 38,\n   \"cost_per_task\": 0.17\n  },\n  \"relative_cost\": 0.11\n },\n \"support\": {\n  \"research\": {\n   \"budget\": {\n    \"lite\": 10,\n    \"full\": 15\n   },\n   \"seats\": 2,\n   \"later_loops\": \"on_request\",\n   \"model\": \"auto\",\n   \"beats\": []\n  },\n  \"map\": {\n   \"when\": \"stale\",\n   \"model\": \"chair\",\n   \"focus_tokens\": 700,\n   \"skeleton_lines\": 420,\n   \"path\": \"\",\n   \"due\": true,\n   \"reason\": \"no map yet at docs/ARCHITECTURE.md\"\n  },\n  \"digest\": 14,\n  \"origin\": {\n   \"research.seats\": \"default\",\n   \"research.budget.lite\": \"default\",\n   \"research.budget.full\": \"default\",\n   \"research.later_loops\": \"default\",\n   \"research.model\": \"default\",\n   \"research.beats\": \"default\",\n   \"map.when\": \"default\",\n   \"map.model\": \"default\",\n   \"map.focus_tokens\": \"default\",\n   \"map.skeleton_lines\": \"default\",\n   \"map.path\": \"default\",\n   \"digest\": \"default\"\n  },\n  \"problems\": [\n   \"members.research.seats = 9 (flag) was refused (allowed: (0, 4)); using 2\"\n  ]\n },\n \"environment_notes\": [\n  \"only one lab reachable: elders come from the same family (no cross-lab check). Install the codex / gemini CLIs or set OPENROUTER_API_KEY to get one\",\n  \"profile=efficient is the cheapest (the default). More rigour costs more: --profile balanced or max. Keep a choice: `defaults:` in your ~/.council/config.yaml\"\n ]\n}\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "plan",
+    "Pick the queue technology for the billing pipeline",
+    "--tier",
+    "bogus"
+   ],
+   "clock": 15,
+   "rc": 2,
+   "out": "",
+   "err": "",
+   "loose": true
+  },
+  {
+   "cmd": [
+    "doctor"
+   ],
+   "clock": 16,
+   "rc": 0,
+   "out": "recommended mode: fanout:claude · fresh contexts via: subagents\nnote: only one lab reachable: elders come from the same family (no cross-lab check). Install the codex / gemini CLIs or set OPENROUTER_API_KEY to get one\n{\n \"claude_code\": true,\n \"cli\": {\n  \"claude\": true,\n  \"codex\": false,\n  \"gemini\": false\n },\n \"git\": true,\n \"openrouter_key\": false,\n \"aa_key\": false,\n \"labs_reachable\": {\n  \"Anthropic\": true,\n  \"OpenAI\": false,\n  \"Google\": false\n },\n \"fresh_contexts\": \"subagents\",\n \"lock\": {\n  \"exists\": true,\n  \"age_days\": 0,\n  \"stale\": false,\n  \"collected\": \"2026-11-13\"\n },\n \"recommended_mode\": \"fanout:claude\",\n \"strongest_mode\": \"fanout:claude\",\n \"mode_costs\": {\n  \"fanout:claude\": 0.66\n },\n \"notes\": [\n  \"only one lab reachable: elders come from the same family (no cross-lab check). Install the codex / gemini CLIs or set OPENROUTER_API_KEY to get one\"\n ],\n \"memory\": {\n  \"backend\": \"files\",\n  \"dir\": \"<ROOT>/.council/memory\",\n  \"source\": \"default\",\n  \"ok\": true\n }\n}\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "doctor"
+   ],
+   "clock": 17,
+   "rc": 0,
+   "out": "recommended mode: fanout:openai · fresh contexts via: cli:codex\nnote: the default mode is the cheapest that can be reached: fanout:openai (rel. cost 0.11). For another lab's check of the finalists: --mode crosslab (rel. cost 0.46)\n{\n \"claude_code\": false,\n \"cli\": {\n  \"claude\": true,\n  \"codex\": false,\n  \"gemini\": false\n },\n \"git\": true,\n \"openrouter_key\": true,\n \"aa_key\": false,\n \"labs_reachable\": {\n  \"Anthropic\": true,\n  \"OpenAI\": true,\n  \"Google\": true\n },\n \"fresh_contexts\": \"cli:codex\",\n \"lock\": {\n  \"exists\": true,\n  \"age_days\": 0,\n  \"stale\": false,\n  \"collected\": \"2026-11-13\"\n },\n \"recommended_mode\": \"fanout:openai\",\n \"strongest_mode\": \"crosslab\",\n \"mode_costs\": {\n  \"fanout:openai\": 0.11,\n  \"fanout:openrouter\": 0.25,\n  \"fanout:mix\": 0.25,\n  \"crosslab\": 0.46,\n  \"fanout:open\": 0.58,\n  \"fanout:claude\": 0.66,\n  \"fanout:gemini\": 1.96\n },\n \"notes\": [\n  \"the default mode is the cheapest that can be reached: fanout:openai (rel. cost 0.11). For another lab's check of the finalists: --mode crosslab (rel. cost 0.46)\"\n ],\n \"memory\": {\n  \"backend\": \"files\",\n  \"dir\": \"<ROOT>/.council/memory\",\n  \"source\": \"default\",\n  \"ok\": true\n }\n}\n",
+   "err": "",
+   "env": {
+    "OPENROUTER_API_KEY": "x",
+    "COUNCIL_SEATS_VIA": "cli:codex",
+    "CLAUDECODE": "0"
+   }
+  },
+  {
+   "cmd": [
+    "config"
+   ],
+   "clock": 18,
+   "rc": 0,
+   "out": "# Support members (flags beat the project's .council/config.yaml, which beats your ~/.council/config.yaml)\nmembers.research.seats = 2    (default)\nmembers.research.budget.lite = 10    (default)\nmembers.research.budget.full = 15    (default)\nmembers.research.later_loops = on_request    (default)\nmembers.research.model = auto    (default)\nmembers.research.beats = built in    (default)\nmembers.map.when = stale    (default)\nmembers.map.model = chair    (default)\nmembers.map.focus_tokens = 700    (default)\nmembers.map.skeleton_lines = 420    (default)\nmembers.map.path = docs/ARCHITECTURE.md    (default)\nmembers.digest = 14    (default)\nbeats this would seat: Papers and primary research; Practice in the field\n\n# Shared memory (your own settings beat the project's here: a vault path is personal)\nmemory.backend = files    (default)\nmemory.dir = <ROOT>/.council/memory    (default)\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "config",
+    "--example"
+   ],
+   "clock": 19,
+   "rc": 0,
+   "out": "# Council Loop settings. Every key is optional: delete what you do not need.\n#\n# Two files, same shape:\n#   <project>/.council/config.yaml    for one project (commit it)\n#   ~/.council/config.yaml            your own defaults on this machine\n# Who wins: a command-line flag, then the project's file, then your own file, then the defaults\n# shown here. One exception: for `memory:` your own file wins, because a vault path is personal, and\n# a project's file may only name a folder inside the project. Two sections at the end belong to one\n# file only.\n# See what is in force, and who set it:  council config\n\nmembers:\n  research:                  # shorthand: `research: 3` (how many) or `research: false` (none)\n    seats: 2                 # 0 to 4 researchers. Flag: --research N, --no-research\n    budget:                  # searches or page reads per researcher. Flag: --research-budget N\n      lite: 10\n      full: 15\n    later_loops: on_request  # research again before loops 2 and 3: on_request (a member asked) | always | never\n    model: auto              # auto: models that can search the web, from different labs | chair: the strongest model\n    # beats:                 # replace the built-in beats (papers; practice; the case against; the project's own record)\n    #   - name: Regulation\n    #     text: Laws, regulator guidance and enforcement actions that apply to this decision, by jurisdiction.\n\n  map:                       # shorthand: `map: always` | `map: never`\n    when: stale              # stale: only when the map is missing or behind the code | always | never. Flag: --map, --no-map\n    path: docs/ARCHITECTURE.md   # where the map lives (default: docs/ARCHITECTURE.md if docs/ exists, else ARCHITECTURE.md)\n    model: chair             # chair: the strongest model writes the map | expert: an expert-seat model (cheaper)\n    skeleton_lines: 420      # length of the script-made skeleton the mapper reads\n    focus_tokens: 700        # size of the ranked code list packets carry when the ask names code; 0 = none. Flag: --focus-tokens N\n\n  digest: 14                 # how many facts from the shared memory each packet carries (0 to 40)\n\nmemory:                      # set with: council memory setup --obsidian --vault \"<path>\"   (or --files)\n  backend: files             # files | obsidian\n  # dir: .council/memory     # for files\n  # vault: /path/to/your/vault         # for obsidian (put this in YOUR file, not the project's)\n  # folder: Council Loop/<project>     # folder inside the vault\n\n# --- the project's file only -------------------------------------------------------------------\n# tripwires:                 # a name and a pattern: an ask that matches is raised to the Full tier\n#   billing: \"\\\\bbilling\\\\b|\\\\binvoices?\\\\b\"       # letter case is ignored; no look-around, no back-references, 200 characters at most\n# tripwire_paths:            # a name and globs: touching such a file (--paths) raises the tier too\n#   billing: [\"billing/*\", \"*/ledger/*\"]\n\n# --- your own file only (~/.council/config.yaml) ------------------------------------------------\n# A project's file cannot set these: what a run costs and what a server offers are yours to decide.\n# defaults:\n#   profile: efficient       # efficient (the default, cheapest) | balanced | max\n#   mode: fanout:claude      # default: the cheapest mode this machine can reach (council doctor shows it)\n# mcp:                       # the MCP server (council mcp); a flag or a COUNCIL_MCP_* variable beats these\n#   project: /path/to/project   # serve this one project and refuse others\n#   read_only: false         # true: offer only the operations that change nothing\n#   dispatch: true           # false: never offer an operation that sends prompts to model vendors\n#   toolsets: [run, memory, map]   # groups of tools: run, memory, map, blocks, or all\n#   deny_tools: []           # operations never to offer, e.g. [memory_setup]\n#   output_schemas: false    # true: list every tool's output schema too (a larger tool list)\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "models",
+    "--mode",
+    "crosslab",
+    "--profile",
+    "balanced"
+   ],
+   "clock": 20,
+   "rc": 0,
+   "out": "{\n \"mode\": \"crosslab\",\n \"profile\": \"balanced\",\n \"data_collected\": \"2026-11-13\",\n \"attribution\": \"Model data: Artificial Analysis (https://artificialanalysis.ai)\",\n \"warnings\": [\n  \"fanout:openrouter: OpenRouter availability unknown in this snapshot; using all usable models. Run a live refresh to filter by openrouter_api_id.\"\n ],\n \"chair\": {\n  \"model\": \"Claude Fable 5.2 (high)\",\n  \"creator\": \"Anthropic\",\n  \"quality\": 62,\n  \"cost_per_task\": 9.08\n },\n \"experts\": [\n  {\n   \"model\": \"GPT-6.1 Sol (high)\",\n   \"creator\": \"OpenAI\",\n   \"quality\": 50,\n   \"cost_per_task\": 0.59\n  },\n  {\n   \"model\": \"GPT-6.1 Sol (high)\",\n   \"creator\": \"OpenAI\",\n   \"quality\": 50,\n   \"cost_per_task\": 0.59\n  },\n  {\n   \"model\": \"GPT-6.1 Sol (high)\",\n   \"creator\": \"OpenAI\",\n   \"quality\": 50,\n   \"cost_per_task\": 0.59\n  },\n  {\n   \"model\": \"GPT-6.1 Sol (high)\",\n   \"creator\": \"OpenAI\",\n   \"quality\": 50,\n   \"cost_per_task\": 0.59\n  },\n  {\n   \"model\": \"GPT-6.1 Sol (high)\",\n   \"creator\": \"OpenAI\",\n   \"quality\": 50,\n   \"cost_per_task\": 0.59\n  },\n  {\n   \"model\": \"Claude Fable 5.2 (low)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 54,\n   \"cost_per_task\": 3.1\n  },\n  {\n   \"model\": \"Gemini 4 Argon (high)\",\n   \"creator\": \"Google\",\n   \"quality\": 50,\n   \"cost_per_task\": 4.97\n  }\n ],\n \"red_team\": {\n  \"model\": \"GPT-6.1 Sol (max)\",\n  \"creator\": \"OpenAI\",\n  \"quality\": 55,\n  \"cost_per_task\": 1.27\n },\n \"elders\": [\n  {\n   \"model\": \"Claude Fable 5.2 (high)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 62,\n   \"cost_per_task\": 9.08\n  },\n  {\n   \"model\": \"GPT-6.1 Sol (max)\",\n   \"creator\": \"OpenAI\",\n   \"quality\": 55,\n   \"cost_per_task\": 1.27\n  },\n  {\n   \"model\": \"Gemini 4 Argon (high)\",\n   \"creator\": \"Google\",\n   \"quality\": 50,\n   \"cost_per_task\": 4.97\n  }\n ],\n \"verifier\": {\n  \"model\": \"GPT-6.1 Sol (medium)\",\n  \"creator\": \"OpenAI\",\n  \"quality\": 46,\n  \"cost_per_task\": 0.36\n },\n \"relative_cost\": 1.0\n}\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "models",
+    "--mode",
+    "solo",
+    "--profile",
+    "max"
+   ],
+   "clock": 21,
+   "rc": 0,
+   "out": "{\n \"mode\": \"solo\",\n \"profile\": \"max\",\n \"data_collected\": \"2026-11-13\",\n \"attribution\": \"Model data: Artificial Analysis (https://artificialanalysis.ai)\",\n \"warnings\": [\n  \"fanout:openrouter: OpenRouter availability unknown in this snapshot; using all usable models. Run a live refresh to filter by openrouter_api_id.\"\n ],\n \"chair\": \"current model @ max\",\n \"experts\": \"current model @ high\",\n \"red_team\": \"current model @ high\",\n \"elders\": \"current model @ max\",\n \"verifier\": \"current model @ medium\"\n}\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "models",
+    "--mode",
+    "claude",
+    "--profile",
+    "efficient"
+   ],
+   "clock": 22,
+   "rc": 0,
+   "out": "{\n \"mode\": \"fanout:claude\",\n \"profile\": \"efficient\",\n \"data_collected\": \"2026-11-13\",\n \"attribution\": \"Model data: Artificial Analysis (https://artificialanalysis.ai)\",\n \"warnings\": [\n  \"fanout:openrouter: OpenRouter availability unknown in this snapshot; using all usable models. Run a live refresh to filter by openrouter_api_id.\"\n ],\n \"chair\": {\n  \"model\": \"Claude Fable 5.2 (low)\",\n  \"creator\": \"Anthropic\",\n  \"quality\": 54,\n  \"cost_per_task\": 3.1\n },\n \"experts\": [\n  {\n   \"model\": \"Claude Haiku 5.5 (xhigh)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 35,\n   \"cost_per_task\": 0.25\n  },\n  {\n   \"model\": \"Claude Haiku 5.5 (xhigh)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 35,\n   \"cost_per_task\": 0.25\n  },\n  {\n   \"model\": \"Claude Haiku 5.5 (xhigh)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 35,\n   \"cost_per_task\": 0.25\n  },\n  {\n   \"model\": \"Claude Haiku 5.5 (xhigh)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 35,\n   \"cost_per_task\": 0.25\n  },\n  {\n   \"model\": \"Claude Haiku 5.5 (xhigh)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 35,\n   \"cost_per_task\": 0.25\n  },\n  {\n   \"model\": \"Claude Haiku 5.5 (xhigh)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 35,\n   \"cost_per_task\": 0.25\n  },\n  {\n   \"model\": \"Claude Fable 5.2 (low)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 54,\n   \"cost_per_task\": 3.1\n  }\n ],\n \"red_team\": {\n  \"model\": \"Claude Opus 5.5 (xhigh)\",\n  \"creator\": \"Anthropic\",\n  \"quality\": 57,\n  \"cost_per_task\": 6.05\n },\n \"elders\": [\n  {\n   \"model\": \"Claude Fable 5.2 (medium)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 56,\n   \"cost_per_task\": 3.8\n  },\n  {\n   \"model\": \"Claude Opus 5.5 (xhigh)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 57,\n   \"cost_per_task\": 6.05\n  },\n  {\n   \"model\": \"Claude Sonnet 5.5 (max)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 55,\n   \"cost_per_task\": 10.02\n  }\n ],\n \"verifier\": {\n  \"model\": \"Claude Opus 5.5 (low)\",\n  \"creator\": \"Anthropic\",\n  \"quality\": 35,\n  \"cost_per_task\": 0.98\n },\n \"relative_cost\": 0.66\n}\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "models",
+    "--mode",
+    "fanout:mix",
+    "--profile",
+    "balanced"
+   ],
+   "clock": 23,
+   "rc": 0,
+   "out": "{\n \"mode\": \"fanout:mix\",\n \"profile\": \"balanced\",\n \"data_collected\": \"2026-11-13\",\n \"attribution\": \"Model data: Artificial Analysis (https://artificialanalysis.ai)\",\n \"warnings\": [\n  \"fanout:openrouter: OpenRouter availability unknown in this snapshot; using all usable models. Run a live refresh to filter by openrouter_api_id.\"\n ],\n \"chair\": {\n  \"model\": \"Claude Fable 5.2 (high)\",\n  \"creator\": \"Anthropic\",\n  \"quality\": 62,\n  \"cost_per_task\": 9.08\n },\n \"experts\": [\n  {\n   \"model\": \"GPT-6.1 Sol (high)\",\n   \"creator\": \"OpenAI\",\n   \"quality\": 50,\n   \"cost_per_task\": 0.59\n  },\n  {\n   \"model\": \"GPT-6.1 Sol (high)\",\n   \"creator\": \"OpenAI\",\n   \"quality\": 50,\n   \"cost_per_task\": 0.59\n  },\n  {\n   \"model\": \"GPT-6.1 Sol (high)\",\n   \"creator\": \"OpenAI\",\n   \"quality\": 50,\n   \"cost_per_task\": 0.59\n  },\n  {\n   \"model\": \"GPT-6.1 Sol (high)\",\n   \"creator\": \"OpenAI\",\n   \"quality\": 50,\n   \"cost_per_task\": 0.59\n  },\n  {\n   \"model\": \"GPT-6.1 Sol (high)\",\n   \"creator\": \"OpenAI\",\n   \"quality\": 50,\n   \"cost_per_task\": 0.59\n  },\n  {\n   \"model\": \"GPT-6.1 Sol (high)\",\n   \"creator\": \"OpenAI\",\n   \"quality\": 50,\n   \"cost_per_task\": 0.59\n  },\n  {\n   \"model\": \"Claude Fable 5.2 (low)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 54,\n   \"cost_per_task\": 3.1\n  }\n ],\n \"red_team\": {\n  \"model\": \"GPT-6.1 Sol (max)\",\n  \"creator\": \"OpenAI\",\n  \"quality\": 55,\n  \"cost_per_task\": 1.27\n },\n \"elders\": [\n  {\n   \"model\": \"Claude Fable 5.2 (high)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 62,\n   \"cost_per_task\": 9.08\n  },\n  {\n   \"model\": \"GPT-6.1 Sol (max)\",\n   \"creator\": \"OpenAI\",\n   \"quality\": 55,\n   \"cost_per_task\": 1.27\n  },\n  {\n   \"model\": \"Claude Opus 5.5 (max)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 59,\n   \"cost_per_task\": 10.04\n  }\n ],\n \"verifier\": {\n  \"model\": \"GPT-6.1 Sol (medium)\",\n  \"creator\": \"OpenAI\",\n  \"quality\": 46,\n  \"cost_per_task\": 0.36\n },\n \"relative_cost\": 0.86\n}\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "models",
+    "--mode",
+    "nope",
+    "--profile",
+    "balanced"
+   ],
+   "clock": 24,
+   "rc": 0,
+   "out": "{\n \"error\": \"no config for profile=balanced mode=fanout:nope\"\n}\n",
+   "err": ""
+  }
+ ],
+ "final": {
+  "<ROOT>/README.md": {
+   "as_put": true
+  },
+  "<ROOT>/config.yaml": {
+   "as_put": true
+  },
+  "<ROOT>/db/schema.sql": {
+   "as_put": true
+  },
+  "<ROOT>/docs/notes.md": {
+   "as_put": true
+  },
+  "<ROOT>/native/cart.c": {
+   "as_put": true
+  },
+  "<ROOT>/native/cart.h": {
+   "as_put": true
+  },
+  "<ROOT>/shop/__init__.py": {
+   "as_put": true
+  },
+  "<ROOT>/shop/cli.py": {
+   "as_put": true
+  },
+  "<ROOT>/shop/core.py": {
+   "as_put": true
+  },
+  "<ROOT>/shop/db.py": {
+   "as_put": true
+  },
+  "<ROOT>/shop/queue.py": {
+   "as_put": true
+  },
+  "<ROOT>/svc/lib.rs": {
+   "as_put": true
+  },
+  "<ROOT>/svc/server.go": {
+   "as_put": true
+  },
+  "<ROOT>/tests/test_core.py": {
+   "as_put": true
+  },
+  "<ROOT>/web/cart.ts": {
+   "as_put": true
+  },
+  "<ROOT>/web/total.ts": {
+   "as_put": true
+  }
+ }
+}

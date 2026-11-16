@@ -28,6 +28,11 @@ pub fn load(text: &str) -> Result<Value, String> {
     let mut loader: YamlLoader<Yaml> = YamlLoader::default();
     loader.early_parse(false);
     parser.load(&mut loader, true).map_err(|e| e.to_string())?;
+    // the loader keeps its own first error (a key given twice, or aliases that expand without end:
+    // it stops at 100,000 expanded nodes); a document it gave up on must not read as an empty one
+    if let Some(err) = loader.error() {
+        return Err(err.to_string());
+    }
     Ok(loader
         .into_documents()
         .first()
@@ -653,6 +658,24 @@ mod tests {
         );
         assert_eq!(load("").unwrap(), Value::Null);
         assert!(load("a: [1, 2").is_err());
+    }
+
+    #[test]
+    fn a_document_the_loader_gives_up_on_is_an_error_not_an_empty_document() {
+        // nested aliases that would expand to 9^12 nodes (the "billion laughs" file)
+        let mut lines = vec!["a0: &a0 [x,x,x,x,x,x,x,x,x]".to_string()];
+        for i in 1..12 {
+            lines.push(format!(
+                "a{i}: &a{i} [{}]",
+                vec![format!("*a{}", i - 1); 9].join(",")
+            ));
+        }
+        let started = std::time::Instant::now();
+        let refused = load(&lines.join("\n")).unwrap_err();
+        assert!(refused.contains("alias expansion"), "{refused}");
+        assert!(started.elapsed().as_secs() < 5);
+        assert!(load("a: 1\na: 2\n").is_err());
+        assert!(load("a: &x [1, 2]\nb: *x\n").is_ok());
     }
 
     #[test]

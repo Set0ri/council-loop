@@ -1,9 +1,8 @@
 name: release
-# Builds the `council` binary for each system when a tag like v0.4.0 is pushed, and attaches the
-# archives to the GitHub release. This workflow had not run when it was written: check the first
-# release it makes before pointing anyone at it.
-# To do before a public release: pack the licence notices of the crates the binary contains (all are
-# permissive; `cargo about generate` can collect them) next to LICENSE.
+# Builds the `council` binary for each system when a tag like v0.5.0 is pushed, and attaches the
+# archives to the GitHub release, each with LICENSE and the licence notices of the crates the binary
+# contains. This workflow had not run when it was written: check the first release it makes before
+# pointing anyone at it.
 on:
   push:
     tags: ["v*"]
@@ -31,7 +30,7 @@ jobs:
         run: |
           name="council-${GITHUB_REF_NAME}-${{ matrix.target }}"
           mkdir "$name"
-          cp "target/${{ matrix.target }}/release/${{ matrix.exe }}" LICENSE README.md "$name/"
+          cp "target/${{ matrix.target }}/release/${{ matrix.exe }}" LICENSE THIRD-PARTY-NOTICES.md README.md "$name/"
           if [ "${{ runner.os }}" = "Windows" ]; then 7z a "$name.zip" "$name" > /dev/null; else tar -czf "$name.tar.gz" "$name"; fi
       - uses: softprops/action-gh-release@v2
         with:

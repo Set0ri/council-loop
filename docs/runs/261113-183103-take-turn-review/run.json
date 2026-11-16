@@ -12,7 +12,7 @@
  "deviations": [
   "loop 1 fuse: the vote counter (tally) was replaced before any ballot was cast: red-team finding 1 (S1) showed the old one scored co-written cards 0.0 and treated a ballot gap as a last place; new head-to-head count has unit tests",
   "loop 1 elders: the chair opened the elder packet to check it and so saw the blinded control arm before the elder review; no candidate was edited afterwards (single loop), but the tool did not warn against it",
-  "loop 1 cut: elders split or an S1 was open and Logan could not be asked; safer option taken: build the winner with the elder's S1 fix grafted in (a vote must never cut a card it could not judge) and the control arm sealed; nothing is released yet, so every step can be undone"
+  "loop 1 cut: elders split or an S1 was open and the requester could not be asked; safer option taken: build the winner with the elder's S1 fix grafted in (a vote must never cut a card it could not judge) and the control arm sealed; nothing is released yet, so every step can be undone"
  ],
  "friction": [
   "L1 (ideate, loop 1): Packet lists scripts/providers.py; it is at skills/council-loop/scripts/providers.py.",
@@ -53,7 +53,7 @@
      "Make check_run errors block the retro-to-done transition instead of just printing them; a failing protocol check should not close a run.",
      "Record sha256 of every seat out.json at ingest; a new audit command re-tallies from raw ballots plus the private mapping and flags any mismatch.",
      "Contrarian: drop the shortlist vote in Full and send top pool cards by red-team triage instead; saves 7 seat calls per loop.",
-     "Contrarian: stop trusting approved_by: logan typed by the chair; require Logan's own words via --override-style flag, else record unattended.",
+     "Contrarian: stop trusting approved_by: <a name> typed by the chair; require the requester's own words via --override-style flag, else record unattended.",
      "Simpler: treat an empty red-team result after --force as a hard deviation in check_run, not a silently empty list.",
      "Simpler: add model names to blind() forbidden tokens so cards mentioning 'Gemini thinks' or a seat model cannot leak authorship."
     ],
@@ -586,7 +586,7 @@
    },
    {
     "id": "R4",
-    "name": "Keeps Logan's process whole (7 x 13, up to 3 loops, cross-lab elders, 7-5-3-1, ELI5s)",
+    "name": "Keeps the requester's process whole (7 x 13, up to 3 loops, cross-lab elders, 7-5-3-1, ELI5s)",
     "weight": 15,
     "check": "judgment"
    },
@@ -607,7 +607,7 @@
     "id": "L1",
     "name": "Executor ergonomics",
     "maximize": "The odds that an LLM chair with a finite context, possibly reset mid-run, finishes a Full council correctly",
-    "respect": "Add no new concept that Logan has to learn",
+    "respect": "Add no new concept that the requester has to learn",
     "method": "Walk the next / ingest loop step by step as the chair; find every point where a model would stall, guess or drift",
     "evidence": "skills/council-loop/SKILL.md; the next_* and ingest_* functions in scripts/run.py"
    },
@@ -623,7 +623,7 @@
     "id": "L3",
     "name": "Cost and simplicity",
     "maximize": "Decision quality per token and per minute",
-    "respect": "Logan's process stays whole: 7 lenses x 13 ideas, up to 3 loops, elders each loop, 7-5-3-1",
+    "respect": "the requester's process stays whole: 7 lenses x 13 ideas, up to 3 loops, elders each loop, 7-5-3-1",
     "method": "Delete, merge or cheapen steps; count calls and words in the packets",
     "evidence": "templates/packets/*.md; estimate_calls in scripts/council.py; reference/protocol.md"
    }

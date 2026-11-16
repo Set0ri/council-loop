@@ -4,7 +4,7 @@
 # smartest model we can afford" and let a script pick today's best models from
 # Artificial Analysis data. New model next week? Run the refresh, review the diff.
 #
-# Picks are resolved by scripts/refresh_models.py into models/lock.yaml.
+# Picks are resolved by `council refresh` into models/lock.yaml.
 # Review lock.yaml changes in a PR. Never edit lock.yaml by hand: use pins/bans below.
 
 version: 1

@@ -210,7 +210,11 @@ pub fn cmd_status(run_id: Option<&str>) -> Result<i32> {
     } else if CHAIR_STEPS.contains(&phase.as_str()) || phase == "cut" {
         say!("this step is yours ({phase}).");
     }
-    say!("next: council next        # prints the exact commands for this step; safe to run again");
+    if phase == "done" {
+        say!("next: nothing, the run is finished. The decision: final.md in the run folder · re-count the votes: council audit");
+    } else {
+        say!("next: council next        # prints the exact commands for this step; safe to run again");
+    }
     Ok(0)
 }
 
@@ -227,7 +231,7 @@ fn ballots_on_disk(dir: &Path) -> Result<Vec<Value>> {
     files.sort();
     let mut votes = Vec::new();
     for f in files {
-        let Some(obj) = providers::parse_json(&core::read_text(&f)?) else {
+        let Some(obj) = read_out(&f) else {
             continue;
         };
         let name = f
@@ -253,7 +257,7 @@ pub fn cmd_audit(run_id: Option<&str>) -> Result<i32> {
     let mut maps = private(&run, &d);
     let arch = d.join("unblinded.json");
     if arch.exists() {
-        let archived: Value = serde_json::from_str(&core::read_text(&arch)?)
+        let archived: Value = serde_json::from_str(&crate::safe::read_own(&arch)?)
             .map_err(|e| anyhow::anyhow!("{} is not valid JSON: {e}", arch.display()))?;
         maps = Value::Object(crate::val::merged(&archived, &maps));
     }
@@ -347,4 +351,79 @@ pub fn cmd_audit(run_id: Option<&str>) -> Result<i32> {
         say!("audit: {bad} problem(s)");
     }
     Ok(i32::from(bad > 0))
+}
+
+/// `council log`: the run's diary, one line per step taken and per seat called.
+pub fn cmd_log(run_id: Option<&str>, tail: Option<usize>, as_json: bool) -> Result<i32> {
+    let (run, d) = load(run_id)?;
+    let mut events = crate::log::events(&d);
+    if let Some(n) = tail {
+        let skip = events.len().saturating_sub(n);
+        events.drain(..skip);
+    }
+    if as_json {
+        for event in &events {
+            say!("{}", Json::LINE.dumps(event));
+        }
+        return Ok(0);
+    }
+    say!(
+        "run {} · {} event(s) · {}",
+        run.s("id"),
+        events.len(),
+        show(&d.join(crate::log::EVENTS))
+    );
+    for event in &events {
+        say!("{}", crate::log::event_line(event));
+    }
+    if events.is_empty() {
+        say!("(nothing recorded yet: steps are written here as they are taken)");
+    }
+    Ok(0)
+}
+
+/// Where a run stands, as data: its step, its loop, the seats of the step and whether each has
+/// written its output, and what to do now. For callers that would otherwise read the printed text.
+pub fn snapshot(run_id: Option<&str>) -> Option<Value> {
+    let (run, d) = load(run_id).ok()?;
+    let phase = run.s("phase");
+    let seated = matches!(
+        phase,
+        "research" | "ideate" | "vote" | "rank" | "redteam" | "elders"
+    );
+    // the loop's folder is made by the step that needs it: looking must not create it
+    let files = if seated && d.join(format!("loop-{}", run.show("loop"))).is_dir() {
+        seat_files(&run, &d).unwrap_or_default()
+    } else {
+        Vec::new()
+    };
+    let owed: Vec<Value> = files
+        .iter()
+        .map(|f| {
+            let seat = run.at("seats").at(&f.seat);
+            json!({"seat": f.seat, "role": seat.at("role"), "via": seat.at("via"), "agent": agent(seat),
+                   "prompt": show(&f.prompt), "output": show(&f.out),
+                   "state": if f.out.exists() { "written" } else { "missing" }})
+        })
+        .collect();
+    let missing = owed.iter().filter(|s| s.s("state") == "missing").count();
+    let at = run.show("loop");
+    let next = match phase {
+        "direct" => "do the work directly, then ingest to close the run".to_string(),
+        "brief" => "write brief.yaml in the run folder (next shows the template), then ingest".to_string(),
+        "merge" => format!("review loop-{at}/pool.json and set \"reviewed\": true, then ingest"),
+        "fuse" => format!("answer every finding in loop-{at}/candidates.json, then ingest"),
+        "cut" => "cut (pass eli5: one line on what happened in this loop)".to_string(),
+        "final" => "write final.md (replace every TODO), then ingest".to_string(),
+        "retro" => "write retro.md (replace every TODO), then ingest".to_string(),
+        "done" => "nothing: the run is finished".to_string(),
+        _ if owed.is_empty() => "next (it writes this step's packets and lists the seats)".to_string(),
+        _ if missing > 0 => format!("start the {missing} seat(s) still missing (dispatch runs the CLI and API ones), then ingest"),
+        _ => "ingest".to_string(),
+    };
+    Some(
+        json!({"id": run.at("id"), "tier": run.at("tier"), "phase": phase, "loop": run.int("loop").unwrap_or(0),
+                "max_loops": run.int("max_loops").unwrap_or(0), "mode": run.at("mode"), "profile": run.at("profile"),
+                "dir": show(&d), "done": phase == "done", "owed": owed, "next": next}),
+    )
 }

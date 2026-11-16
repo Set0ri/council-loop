@@ -8,13 +8,16 @@
 //! Claude Code hook that guards locked tests (`council hook`). They all call the functions in this
 //! crate, so the rules are enforced the same way everywhere.
 
+pub mod api;
 pub mod assets;
 pub mod cli;
 pub mod clock;
 pub mod codemap;
 pub mod core;
+pub mod demo;
 pub mod gate;
 pub mod hook;
+pub mod log;
 pub mod mcp;
 pub mod memory;
 pub mod out;
@@ -24,6 +27,8 @@ pub mod pyrand;
 pub mod pyread;
 pub mod refresh;
 pub mod run;
+pub mod safe;
 pub mod tpl;
 pub mod val;
+pub mod welcome;
 pub mod yaml;

@@ -28,7 +28,6 @@ use crate::py::{self, Json};
 use crate::say;
 use crate::val::Get;
 use anyhow::Result;
-use fancy_regex::Regex as FancyRegex;
 use indexmap::IndexMap;
 use regex::Regex;
 use serde_json::{json, Value};
@@ -151,6 +150,7 @@ fn parent(name: &str) -> &str {
 
 /// The first line of a text that is not blank, cut to `cap` characters.
 pub fn first_line(text: &str, cap: usize) -> String {
+    let text = &*crate::safe::shown(text);
     let line = py::lines(text)
         .into_iter()
         .map(py::strip)
@@ -195,14 +195,42 @@ pub struct Read {
     pub uses: IndexMap<String, usize>,
 }
 
-fn rx(pattern: &str) -> FancyRegex {
-    FancyRegex::new(pattern).expect("the built-in patterns are valid")
+/// A pattern of the code reader. Every one is matched in time proportional to the text (no
+/// look-around, no back-references), so no source file can be written to make the reader slow.
+fn rx(pattern: &str) -> Regex {
+    Regex::new(pattern).expect("the built-in patterns are valid")
 }
 
-fn by_regex(text: &str, symbols: &FancyRegex, imports: Option<&FancyRegex>) -> Read {
+fn by_regex(text: &str, symbols: &Regex, imports: Option<&Regex>) -> Read {
+    by_regex_unless(text, symbols, imports, None)
+}
+
+/// [`by_regex`], leaving out a definition whose line starts the way `unless` describes (a pattern
+/// anchored with `\A`). The search goes on from the next line, exactly as a look-ahead at the
+/// start of the line would make it.
+fn by_regex_unless(
+    text: &str,
+    symbols: &Regex,
+    imports: Option<&Regex>,
+    unless: Option<&Regex>,
+) -> Read {
     let mut out = Read::default();
-    for m in symbols.captures_iter(text).flatten() {
+    // matches come in order, so line numbers are counted once, forward (not from the top each time)
+    let (mut pos, mut line, mut counted) = (0usize, 1usize, 0usize);
+    while pos <= text.len() {
+        let Some(m) = symbols.captures_at(text, pos) else {
+            break;
+        };
         let whole = m.get(0).expect("group 0 is the match");
+        if unless.is_some_and(|u| u.is_match(&text[whole.start()..])) {
+            match text[whole.start()..].find('\n') {
+                Some(nl) => pos = whole.start() + nl + 1,
+                None => break,
+            }
+            continue;
+        }
+        line += text[counted..whole.start()].matches('\n').count();
+        counted = whole.start();
         let kind = m
             .get(1)
             .map(|k| k.as_str())
@@ -214,12 +242,17 @@ fn by_regex(text: &str, symbols: &FancyRegex, imports: Option<&FancyRegex>) -> R
             kind: py::split(kind).last().unwrap_or("def").to_string(),
             sig: py::head(&squashed, 120).to_string(),
             doc: String::new(),
-            line: text[..whole.start()].matches('\n').count() + 1,
+            line,
             methods: None,
         });
+        pos = if whole.end() > whole.start() {
+            whole.end()
+        } else {
+            whole.end() + text[whole.end()..].chars().next().map_or(1, char::len_utf8)
+        };
     }
     if let Some(imports) = imports {
-        for m in imports.captures_iter(text).flatten() {
+        for m in imports.captures_iter(text) {
             if let Some(found) = (1..m.len())
                 .filter_map(|i| m.get(i))
                 .map(|g| g.as_str())
@@ -233,9 +266,9 @@ fn by_regex(text: &str, symbols: &FancyRegex, imports: Option<&FancyRegex>) -> R
 }
 
 fn extract_python(text: &str) -> Read {
-    static SYMBOLS: LazyLock<FancyRegex> =
+    static SYMBOLS: LazyLock<Regex> =
         LazyLock::new(|| rx(r"(?m)^(class|def|async def)\s+([A-Za-z_]\w*)"));
-    static IMPORTS: LazyLock<FancyRegex> =
+    static IMPORTS: LazyLock<Regex> =
         LazyLock::new(|| rx(r"(?m)^\s*(?:from\s+([\w.]+)\s+import|import\s+([\w.]+))"));
     match crate::pyread::read(text) {
         Some(f) => Read {
@@ -250,12 +283,12 @@ fn extract_python(text: &str) -> Read {
 }
 
 fn extract_js(text: &str) -> Read {
-    static SYMBOLS: LazyLock<FancyRegex> = LazyLock::new(|| {
+    static SYMBOLS: LazyLock<Regex> = LazyLock::new(|| {
         rx(
             r"(?m)^\s*export\s+(?:default\s+)?(?:async\s+)?(function\*?|class|const|let|var|interface|type|enum)\s+([A-Za-z_$][\w$]*)",
         )
     });
-    static IMPORTS: LazyLock<FancyRegex> = LazyLock::new(|| {
+    static IMPORTS: LazyLock<Regex> = LazyLock::new(|| {
         rx(r#"(?m)(?:\bfrom\s*|\bimport\s*\(?\s*|\brequire\(\s*)['"]([^'"\n]+)['"]"#)
     });
     static HEAD: LazyLock<Regex> =
@@ -269,9 +302,9 @@ fn extract_js(text: &str) -> Read {
 }
 
 fn extract_go(text: &str) -> Read {
-    static FUNCS: LazyLock<FancyRegex> =
+    static FUNCS: LazyLock<Regex> =
         LazyLock::new(|| rx(r"(?m)^(func)\s+(?:\([^)]*\)\s*)?([A-Z]\w*)\s*\("));
-    static TYPES: LazyLock<FancyRegex> =
+    static TYPES: LazyLock<Regex> =
         LazyLock::new(|| rx(r"(?m)^(type)\s+([A-Z]\w*)\s+(?:struct|interface)"));
     static IMPORTS: LazyLock<Regex> =
         LazyLock::new(|| Regex::new(r#"(?m)^\s*(?:[\w.]+\s+)?"([\w./-]+)"\s*$"#).expect("valid"));
@@ -288,12 +321,12 @@ fn extract_go(text: &str) -> Read {
 }
 
 fn extract_rust(text: &str) -> Read {
-    static SYMBOLS: LazyLock<FancyRegex> = LazyLock::new(|| {
+    static SYMBOLS: LazyLock<Regex> = LazyLock::new(|| {
         rx(
             r"(?m)^\s*pub(?:\([^)]*\))?\s+(?:async\s+)?(fn|struct|enum|trait|mod|type|const)\s+(\w+)",
         )
     });
-    static IMPORTS: LazyLock<FancyRegex> =
+    static IMPORTS: LazyLock<Regex> =
         LazyLock::new(|| rx(r"(?m)^\s*(?:pub\s+)?(?:mod|use)\s+([\w:]+)"));
     static MAIN: LazyLock<Regex> =
         LazyLock::new(|| Regex::new(r"(?m)^fn\s+main\s*\(").expect("valid"));
@@ -303,7 +336,7 @@ fn extract_rust(text: &str) -> Read {
 }
 
 fn extract_classes(text: &str) -> Read {
-    static SYMBOLS: LazyLock<FancyRegex> = LazyLock::new(|| {
+    static SYMBOLS: LazyLock<Regex> = LazyLock::new(|| {
         rx(
             r"(?m)^\s*(?:(?:public|internal|abstract|final|sealed|data|open|static)\s+)*(class|interface|enum|record|object|struct)\s+(\w+)",
         )
@@ -312,9 +345,9 @@ fn extract_classes(text: &str) -> Read {
 }
 
 fn extract_ruby(text: &str) -> Read {
-    static SYMBOLS: LazyLock<FancyRegex> =
+    static SYMBOLS: LazyLock<Regex> =
         LazyLock::new(|| rx(r"(?m)^\s*(class|module|def)\s+([\w.:?!]+)"));
-    static IMPORTS: LazyLock<FancyRegex> =
+    static IMPORTS: LazyLock<Regex> =
         LazyLock::new(|| rx(r#"(?m)^\s*require(?:_relative)?\s+['"]([^'"]+)['"]"#));
     by_regex(text, &SYMBOLS, Some(&IMPORTS))
 }
@@ -322,15 +355,18 @@ fn extract_ruby(text: &str) -> Read {
 /// Languages without a reader of their own (C, C++, shell, SQL): un-indented lines that look like
 /// a definition. Rough, but it is the same on every machine, which is what staleness needs.
 fn extract_generic(text: &str) -> Read {
-    static FUNCS: LazyLock<FancyRegex> = LazyLock::new(|| {
+    static FUNCS: LazyLock<Regex> = LazyLock::new(|| {
         rx(
-            r"(?m)^(?!(?:if|for|while|switch|return|else|do|case)\b)(?:[A-Za-z_][\w:<>,*&\s]*?\s+\**)?()([A-Za-z_]\w{2,})\s*\([^;{}]*\)\s*(?:const\s*)?\{?\s*$",
+            r"(?m)^(?:[A-Za-z_][\w:<>,*&\s]*?\s+\**)?()([A-Za-z_]\w{2,})\s*\([^;{}]*\)\s*(?:const\s*)?\{?\s*$",
         )
     });
-    static TYPES: LazyLock<FancyRegex> = LazyLock::new(|| {
+    // a statement is not a definition: `while (x) {` starts with a keyword
+    static KEYWORD: LazyLock<Regex> =
+        LazyLock::new(|| rx(r"\A(?:if|for|while|switch|return|else|do|case)\b"));
+    static TYPES: LazyLock<Regex> = LazyLock::new(|| {
         rx(r"(?m)^(?:typedef\s+)?(struct|class|enum|union|namespace)\s+([A-Za-z_]\w*)")
     });
-    static SQL: LazyLock<FancyRegex> = LazyLock::new(|| {
+    static SQL: LazyLock<Regex> = LazyLock::new(|| {
         rx(
             r#"(?im)^\s*create\s+(?:or\s+replace\s+)?(table|view|function|procedure|index)\s+(?:if\s+not\s+exists\s+)?[`"\[]?([\w.]+)"#,
         )
@@ -339,7 +375,7 @@ fn extract_generic(text: &str) -> Read {
         LazyLock::new(|| Regex::new(r#"(?m)^\s*#\s*include\s+"([^"]+)""#).expect("valid"));
     static MAIN: LazyLock<Regex> =
         LazyLock::new(|| Regex::new(r"(?m)^\s*(?:int|void)\s+main\s*\(").expect("valid"));
-    let mut out = by_regex(text, &FUNCS, None);
+    let mut out = by_regex_unless(text, &FUNCS, None, Some(&KEYWORD));
     out.symbols.extend(by_regex(text, &TYPES, None).symbols);
     out.symbols.extend(by_regex(text, &SQL, None).symbols);
     out.imports = INCLUDES
@@ -423,9 +459,7 @@ pub fn list_files(root: &Path) -> (Vec<String>, bool) {
     let mut names: Option<Vec<String>> = None;
     if root.join(".git").exists() {
         // -z: names as they are, never quoted or escaped
-        let out = std::process::Command::new("git")
-            .arg("-C")
-            .arg(root)
+        let out = crate::safe::git(root)
             .args(["ls-files", "-co", "--exclude-standard", "-z"])
             .output();
         if let Ok(out) = out {
@@ -456,11 +490,15 @@ pub fn list_files(root: &Path) -> (Vec<String>, bool) {
                     .file_name()
                     .map(|n| n.to_string_lossy().into_owned())
                     .unwrap_or_default();
-                if p.is_dir() {
-                    if !IGNORE_DIRS.contains(&name.as_str()) && !p.is_symlink() {
+                // links are not followed: one may point out of the project, or back up into it
+                let Ok(kind) = std::fs::symlink_metadata(&p).map(|m| m.file_type()) else {
+                    continue;
+                };
+                if kind.is_dir() {
+                    if !IGNORE_DIRS.contains(&name.as_str()) {
                         stack.push(p);
                     }
-                } else if p.is_file() {
+                } else if kind.is_file() {
                     if let Ok(rel) = p.strip_prefix(root) {
                         names.push(py::posix(rel));
                     }
@@ -471,6 +509,8 @@ pub fn list_files(root: &Path) -> (Vec<String>, bool) {
     });
     let unique: BTreeSet<String> = names.into_iter().collect();
     let mut keep = Vec::new();
+    // folder -> does it, with links followed, lie inside the project? (asked once per folder)
+    let mut inside: HashMap<PathBuf, bool> = HashMap::new();
     for n in unique {
         let parts: Vec<&str> = n.split('/').collect();
         let suf = suffix(&n);
@@ -482,7 +522,17 @@ pub fn list_files(root: &Path) -> (Vec<String>, bool) {
             continue;
         }
         let p = root.join(&n);
-        if p.is_file() && p.metadata().map(|m| m.len() <= MAX_BYTES).unwrap_or(false) {
+        // a plain file only: a link may point out of the project (its target's names would land in
+        // the skeleton, and the skeleton goes to a model), a device never ends, and a name with
+        // control characters would be printed
+        if crate::safe::plain_file(&p, MAX_BYTES).is_none() || crate::safe::odd_name(&n) {
+            continue;
+        }
+        let folder = p.parent().unwrap_or(root).to_path_buf();
+        let ok = *inside
+            .entry(folder)
+            .or_insert_with_key(|dir| crate::safe::within(dir, root));
+        if ok {
             keep.push(n);
         }
     }
@@ -531,60 +581,91 @@ pub struct Scan {
     pub capped: bool,
 }
 
+/// What one file holds. `None` when it cannot be read.
+fn read_file(root: &Path, n: &str) -> Option<FileInfo> {
+    // line ends and byte-order marks must not change what is read: a CRLF checkout and an LF one are the same code
+    let raw = std::fs::read(root.join(n)).ok()?;
+    let raw = core::normalise_line_ends(&raw);
+    let text =
+        String::from_utf8_lossy(raw.strip_prefix(&[0xef, 0xbb, 0xbf]).unwrap_or(&raw)).into_owned();
+    let suf = suffix(n);
+    let code = code_lang(&suf).is_some();
+    let mut info = FileInfo {
+        lang: code_lang(&suf).or(other_lang(&suf)).unwrap_or(""),
+        code,
+        lines: text.matches('\n').count() + usize::from(!text.is_empty() && !text.ends_with('\n')),
+        ..Default::default()
+    };
+    if let Some(read) = extractor(&suf) {
+        let found = read(&text);
+        info.doc = found.doc;
+        info.symbols = found.symbols;
+        info.imports = found.imports;
+        info.main = found.main;
+        info.uses = found.uses;
+    }
+    if code {
+        if info.uses.is_empty() {
+            info.uses = code_words(&text, &suf);
+        }
+        let env: BTreeSet<String> = ENV_RX
+            .captures_iter(&text)
+            .filter_map(|m| m.get(1).or(m.get(2)).map(|g| g.as_str().to_string()))
+            .collect();
+        info.env = env.into_iter().collect();
+        info.cli = CLI_RX
+            .captures_iter(&text)
+            .filter_map(|m| m.get(1).or(m.get(2)).map(|g| g.as_str().to_string()))
+            .collect();
+        info.routes = ROUTE_RX
+            .captures_iter(&text)
+            .map(|m| format!("{} {}", m[1].to_uppercase(), &m[2]))
+            .collect();
+        info.tools = TOOL_RX
+            .captures_iter(&text)
+            .map(|m| format!("{} {}", &m[1], &m[3]))
+            .collect();
+        info.tests = TEST_RX.find_iter(&text).count();
+    }
+    Some(info)
+}
+
 /// Read every file once.
 pub fn scan(root: &Path) -> Scan {
+    let started = std::time::Instant::now();
     let (names, capped) = list_files(root);
+    crate::diag!(
+        Debug,
+        "map",
+        "{} file(s) listed in {} ms{}",
+        names.len(),
+        started.elapsed().as_millis(),
+        if capped { " (the list was cut)" } else { "" }
+    );
+    // every file is read on its own, so the reading is spread over the processor's cores; the
+    // results are put together in the order of the list, so the outcome is the same on any machine
+    let threads = if names.len() < 64 {
+        1
+    } else {
+        std::thread::available_parallelism()
+            .map_or(1, |n| n.get())
+            .min(16)
+    };
+    let read: Vec<Option<FileInfo>> =
+        crate::providers::in_parallel(&names, threads, |n| read_file(root, n));
     let mut files: IndexMap<String, FileInfo> = IndexMap::new();
-    for n in names {
-        // line ends and byte-order marks must not change what is read: a CRLF checkout and an LF one are the same code
-        let Ok(raw) = std::fs::read(root.join(&n)) else {
-            continue;
-        };
-        let raw = core::normalise_line_ends(&raw);
-        let text = String::from_utf8_lossy(raw.strip_prefix(&[0xef, 0xbb, 0xbf]).unwrap_or(&raw))
-            .into_owned();
-        let suf = suffix(&n);
-        let code = code_lang(&suf).is_some();
-        let mut info = FileInfo {
-            lang: code_lang(&suf).or(other_lang(&suf)).unwrap_or(""),
-            code,
-            lines: text.matches('\n').count()
-                + usize::from(!text.is_empty() && !text.ends_with('\n')),
-            ..Default::default()
-        };
-        if let Some(read) = extractor(&suf) {
-            let found = read(&text);
-            info.doc = found.doc;
-            info.symbols = found.symbols;
-            info.imports = found.imports;
-            info.main = found.main;
-            info.uses = found.uses;
+    for (n, info) in names.into_iter().zip(read) {
+        if let Some(info) = info {
+            files.insert(n, info);
         }
-        if code {
-            if info.uses.is_empty() {
-                info.uses = code_words(&text, &suf);
-            }
-            let env: BTreeSet<String> = ENV_RX
-                .captures_iter(&text)
-                .filter_map(|m| m.get(1).or(m.get(2)).map(|g| g.as_str().to_string()))
-                .collect();
-            info.env = env.into_iter().collect();
-            info.cli = CLI_RX
-                .captures_iter(&text)
-                .filter_map(|m| m.get(1).or(m.get(2)).map(|g| g.as_str().to_string()))
-                .collect();
-            info.routes = ROUTE_RX
-                .captures_iter(&text)
-                .map(|m| format!("{} {}", m[1].to_uppercase(), &m[2]))
-                .collect();
-            info.tools = TOOL_RX
-                .captures_iter(&text)
-                .map(|m| format!("{} {}", &m[1], &m[3]))
-                .collect();
-            info.tests = TEST_RX.find_iter(&text).count();
-        }
-        files.insert(n, info);
     }
+    crate::diag!(
+        Debug,
+        "map",
+        "{} file(s) read in {} ms on {threads} thread(s)",
+        files.len(),
+        started.elapsed().as_millis()
+    );
     let defined: HashSet<String> = files.values().flat_map(def_names).collect();
     for info in files.values_mut() {
         // keep only uses of names this repository defines
@@ -1153,8 +1234,16 @@ fn symbol_line(
 pub fn skeleton(root: &Path, budget: usize, scanned: Scan) -> Skeleton {
     let files = &scanned.files;
     let code: IndexMap<&String, &FileInfo> = files.iter().filter(|(_, i)| i.code).collect();
+    let started = std::time::Instant::now();
     let edges = resolve_imports(files);
+    let linked = started.elapsed().as_millis();
     let ranked_ = ranking(files, &edges, &HashSet::new(), &HashSet::new());
+    crate::diag!(
+        Debug,
+        "map",
+        "imports resolved in {linked} ms, files ranked in {} ms",
+        started.elapsed().as_millis() - linked
+    );
     let mut imported_by: HashMap<&str, usize> = HashMap::new();
     for outs in edges.values() {
         for t in outs {
@@ -1183,7 +1272,14 @@ pub fn skeleton(root: &Path, budget: usize, scanned: Scan) -> Skeleton {
         entry.1 += i.lines;
         entry.2.insert(i.lang);
     }
+    let started = std::time::Instant::now();
     let st = stale(root, &scanned);
+    crate::diag!(
+        Debug,
+        "map",
+        "compared with the map's record in {} ms",
+        started.elapsed().as_millis()
+    );
     let total_lines: usize = files.values().map(|i| i.lines).sum();
     let root_name = root
         .file_name()
@@ -1744,9 +1840,11 @@ pub fn validate_map(text: &str, root: &Path) -> (Vec<String>, Vec<String>) {
         if !q.contains('/') {
             return names.contains(q) || known.contains(q);
         }
-        known.contains(q)
-            || known.iter().any(|k| k.ends_with(&format!("/{q}")))
-            || root.join(q).exists()
+        if known.contains(q) {
+            return true;
+        }
+        let tail = format!("/{q}");
+        known.iter().any(|k| k.ends_with(&tail)) || root.join(q).exists()
     };
     let dead: Vec<String> = named_paths(text)
         .into_iter()
@@ -1834,17 +1932,6 @@ pub struct MapArgs {
     pub focus: Option<String>,
 }
 
-/// Strip one outer code fence, when a model wrapped the whole document in it.
-pub fn unfence(text: &str) -> String {
-    static FENCE_RX: LazyLock<Regex> = LazyLock::new(|| {
-        Regex::new(r"(?s)\A\s*```(?:markdown|md)?\s*\n(.*?)\n```\s*\z").expect("valid")
-    });
-    match FENCE_RX.captures(text) {
-        Some(m) => m[1].to_string(),
-        None => text.to_string(),
-    }
-}
-
 /// `council map`.
 pub fn cmd_map(args: &MapArgs) -> Result<i32> {
     let root = core::project_root();
@@ -1886,11 +1973,16 @@ pub fn cmd_map(args: &MapArgs) -> Result<i32> {
     };
     if let Some(install) = &args.install {
         let src = Path::new(install);
-        if !src.exists() {
+        if !src.exists() && !crate::safe::is_link(src) {
             say!("no file at {install}");
             return Ok(1);
         }
-        let text = unfence(&core::read_text(src)?);
+        if crate::safe::plain_file(src, crate::safe::MAX_OUTPUT).is_none() {
+            say!("{install} is not a plain file of a map's size");
+            return Ok(1);
+        }
+        let text = crate::safe::unfence(&core::read_text(src)?);
+        let text = crate::safe::shown(&text).into_owned();
         let (errs, warns) = validate_map(&text, &root);
         print_findings(&errs, &warns);
         if !errs.is_empty() {
@@ -1910,7 +2002,11 @@ pub fn cmd_map(args: &MapArgs) -> Result<i32> {
             note.map(|n| format!(" ({n})")).unwrap_or_default()
         );
         let conf = crate::memory::settings(Some(&root));
-        match crate::memory::publish_map(&core::read_text(&placed)?, &rel(&placed, &root), &conf) {
+        match crate::memory::publish_map(
+            &crate::safe::read_own(&placed)?,
+            &rel(&placed, &root),
+            &conf,
+        ) {
             Ok(Some(copy)) => say!("a copy for Obsidian: {}", copy.display()),
             Ok(None) => {}
             Err(err) => say!(
@@ -1925,7 +2021,10 @@ pub fn cmd_map(args: &MapArgs) -> Result<i32> {
             say!("no map at {}", rel(&path, &root));
             return Ok(1);
         }
-        let (errs, warns) = validate_map(&core::read_text(&path)?, &root);
+        let (errs, warns) = validate_map(
+            &crate::safe::read_capped(&path, crate::safe::MAX_OUTPUT)?,
+            &root,
+        );
         print_findings(&errs, &warns);
         if errs.is_empty() {
             say!("map: ok");
@@ -1947,10 +2046,18 @@ pub fn cmd_map(args: &MapArgs) -> Result<i32> {
         return Ok(0);
     }
     let target = match &args.out {
-        Some(out) => py::plain(out),
-        None => root.join(".council").join("map").join("skeleton.md"),
+        Some(out) => {
+            // a path the person named is theirs to choose
+            let target = py::plain(out);
+            crate::safe::write_named(&target, &sk.markdown)?;
+            target
+        }
+        None => {
+            let target = root.join(".council").join("map").join("skeleton.md");
+            core::write_text(&target, &sk.markdown)?;
+            target
+        }
     };
-    core::write_text(&target, &sk.markdown)?;
     let s = sk.stats;
     say!(
         "skeleton: {}  ({} files, {} lines, {} source files, {} internal imports, {} commands, {} MCP entries)",

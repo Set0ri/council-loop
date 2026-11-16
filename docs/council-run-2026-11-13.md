@@ -17,12 +17,12 @@ The winner is what this repo ships.
 **Ask (verbatim, condensed):**
 - Research the best looped engineering processes for AI. Propose an update to our CLAUDE.md and
   other AI systems.
-- Keep Logan's loop: leader → 7 orthogonal experts × ≥13 approaches → self-critique → vote →
+- Keep the requester's loop: leader → 7 orthogonal experts × ≥13 approaches → self-critique → vote →
   adversarial critique → refine → recombine to the best 7 → rank, ≤3 OODA loops.
 - Elders from Gemini, OpenAI and Fable review the top 2 (top 1 in the last loop). Eliminate 7→5→3→1.
 - ELI5 everywhere; compressed during iteration, plain language with pictures at the end.
 
-**Added mid-run by Logan:**
+**Added mid-run by the requester:**
 - Model modes (solo / fan-out per family incl. OpenRouter, open-source and best mix / cross-lab) ×
   profiles (max, balanced, efficient), chosen from Artificial Analysis data.
 - Extensible, because models change constantly.
@@ -36,7 +36,7 @@ each time, and can swap in newer AI brains easily.
 | Rubric | Weight |
 | --- | --- |
 | R1 Quality lift (evidence it improves outcomes) | 25 |
-| R2 Fidelity to Logan's spec | 20 |
+| R2 Fidelity to the requester's spec | 20 |
 | R3 Verifiability (real checks, not vibes) | 15 |
 | R4 Cost and latency proportionality | 10 |
 | R5 Robustness to bias and multi-agent failure modes | 15 |
@@ -67,7 +67,7 @@ liked the careful one but wanted a "small jobs" fast lane.
 - **E2:**
   rubric before ideas · verifier ladder · evidence-gated critique · chain-of-verification · execute
   spikes · per-stage checklists · held-out golden set · pass^k checks · tests first · confidence +
-  "unknown" · position-swapped A/B · calibrate judges vs Logan · ship gate
+  "unknown" · position-swapped A/B · calibrate judges vs the requester · ship gate
 - **E3:**
   independent ideation · Delphi rounds · Borda voting · Elo tournament · confidence-weighted votes ·
   unique-info-first · minority report · evidence-only vote changes · cross-lab jury · dedicated red
@@ -106,7 +106,7 @@ liked the careful one but wanted a "small jobs" fast lane.
 
 | Id | Candidate | Score |
 | --- | --- | --- |
-| C2 | Verified Council Loop (Logan's loop + verification, fair judgment, wildcard, registry) | 8.35 |
+| C2 | Verified Council Loop (the requester's loop + verification, fair judgment, wildcard, registry) | 8.35 |
 | C7 | Adaptive Router (triage to verify loop / tournament / council) | 7.50 |
 | C4 | Lean Verify Loop (tests + Ralph loop; council on demand) | 6.85 |
 | C6 | Plan-gated compound engineering | 6.80 |
@@ -128,7 +128,7 @@ liked the careful one but wanted a "small jobs" fast lane.
 | Elder | K | Q | Preferred | Key fix | Own idea |
 | --- | --- | --- | --- | --- | --- |
 | Fable (real) | 7.65 revise | 6.10 revise | merge | K as engine, Q as a thin front gate; pinned registry via PR | Golden set + single-model baseline arm |
-| Opus (stand-in, OpenAI) | 7.40 revise | 5.75 revise | merge | K behind triage; Logan approves the brief; enforce blinding in a script | Blind control arm in the final comparison |
+| Opus (stand-in, OpenAI) | 7.40 revise | 5.75 revise | merge | K behind triage; the requester approves the brief; enforce blinding in a script | Blind control arm in the final comparison |
 | Sonnet (stand-in, Gemini) | 8.00 ship | 6.55 revise | merge | K + calibrated triage; per-task budget | Held-out replay benchmark vs baseline |
 
 **Cut:**
@@ -144,7 +144,7 @@ said "lock the answer key and build it in stages".
 
 **Mutations (top grafts):**
 - Gate as a front door with tripwires.
-- Logan-approved brief, with the verbatim ask passed to the elders.
+- The requester-approved brief, with the verbatim ask passed to the elders.
 - Orchestrator script.
 - Control arm.
 - Golden set.
@@ -168,7 +168,7 @@ already merged into K2).
 | --- | --- | --- | --- | --- | --- |
 | Fable | 8.25 ship | 6.30 revise | K2 | Ship in stages; downgrades only by PR after ≥10 runs | Outcome ledger (2–4 week follow-up) |
 | Opus (stand-in) | 7.80 revise | 6.55 kill | K2 | Tests written first and hash-locked; tripwires only escalate | Prediction ledger with falsifiable metrics |
-| Sonnet (stand-in) | 8.25 ship | 6.75 revise | merge | Independent test author or mutation checks; staged build | Disagreement → ask Logan one question |
+| Sonnet (stand-in) | 8.25 ship | 6.75 revise | merge | Independent test author or mutation checks; staged build | Disagreement → ask the requester one question |
 
 **Cut:**
 - Q2 eliminated (absorbed as K2's gate).
@@ -195,14 +195,14 @@ thing to be made safer or simpler first.
 **How the final answered them:**
 - **One path.** `council.py` is the single source of truth. The MCP server, the hook and CI are thin
   wrappers over it. ✔
-- **MCP kept.** Logan explicitly asked for it. Since it is a thin wrapper, keeping it costs little;
+- **MCP kept.** the requester explicitly asked for it. Since it is a thin wrapper, keeping it costs little;
   this dissent is recorded.
 - **Enforced below the agent.** CI runs `verify-locks`, with a `council-unlock` label for exceptions,
   and agents get no publishing credentials. ✔
 - **Staged rollout.** Stage 1 first, with a pre-registered go/no-go. ✔
 - **Dry run.** `council.py plan` and the "dry run" phrase. ✔
 - **Fire drill and process-off canary:** in the rollout. ✔
-- **Fan-out variants kept** (Logan asked for them). They are computed rows in `lock.yaml`, with no
+- **Fan-out variants kept** (the requester asked for them). They are computed rows in `lock.yaml`, with no
   extra code.
 
 **Winner:** Council Loop v2. Elder average 8.27/10, three of three "ship".

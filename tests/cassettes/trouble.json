@@ -1,0 +1,1371 @@
+{
+ "name": "trouble",
+ "about": "What goes wrong in a run: a brief that is not ready, seats that answer badly or not at all,",
+ "needs": [],
+ "steps": [
+  {
+   "mkdir": "<ROOT>"
+  },
+  {
+   "cmd": [
+    "init",
+    "Pick the queue technology for the billing pipeline",
+    "--tier",
+    "lite",
+    "--no-research",
+    "--no-map"
+   ],
+   "clock": 1,
+   "rc": 0,
+   "out": "GATE tier=lite mode=fanout:claude profile=efficient loops<=1 calls~9 tokens~1.3M rel_cost=0.66 (explicit)\nMEMBERS researchers=0 (off) mapper=off memory=files:.council/memory\nrun: <ROOT>/.council/runs/261113-120001-pick-queue-technology\nnote: only one lab reachable: elders come from the same family (no cross-lab check). Install the codex / gemini CLIs or set OPENROUTER_API_KEY to get one\nnote: mode=fanout:claude and profile=efficient are the cheapest that work here (the default). More rigour costs more: --profile balanced or max. Keep a choice: `defaults:` in your ~/.council/config.yaml\n\n[261113-120001-pick-queue-technology] tier=lite phase=brief\nWrite the intent brief: <ROOT>/.council/runs/261113-120001-pick-queue-technology/brief.yaml\n  Rubric first, before any ideas. Lenses by objective + constraint + method, not job titles.\n  If the requester is here, show them the brief (one screen) and set approved_by to their name (or \"requester\"). Otherwise: unattended.\nTHEN  council ingest\n",
+   "err": ""
+  },
+  {
+   "put": "<ROOT>/.council/runs/261113-120001-pick-queue-technology/brief.yaml",
+   "text": "restated: ' '\neli5: w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w\nrubric:\n- id: R1\n  name: ''\n  weight: 50\n- id: R1\n  name: cost\n  weight: 30\n- id: X\n  name: speed\n  weight: 0.5\nevidence_plan:\n- load test\nlenses:\n- id: L1\n  name: Same\n  maximize: a\n  respect: b\n  method: c\n- id: L2\n  name: 'same '\n  maximize: ''\n  respect: b\n  method: c\nfacts: fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact\n  fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact\n  fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact\n  fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact\n  fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact\n  fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact\n  fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact\n  fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact\n  fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact\n  fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact\n  fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact\n  fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact\n  fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact\n  fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact\n  fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact\n  fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact\n  fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact\n  fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact\n  fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact\n  fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact\n  fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact\n  fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact\n  fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact\n  fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact\n  fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact\n  fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact\n  fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact\n  fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact\n  fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact\n  fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact\n  fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact fact\n  fact fact fact fact fact fact\nlessons_applied: none\napproved_by: The Chair\nresearch_questions: what?\n"
+  },
+  {
+   "cmd": [
+    "ingest"
+   ],
+   "clock": 2,
+   "rc": 2,
+   "out": "",
+   "err": "error: brief.yaml is not ready:\n  restated is empty\n  eli5 must be 1 to 25 words\n  every criterion needs an id like R1 and a name\n  rubric ids must be unique\n  rubric weights must sum to 100 (they sum to 80.5)\n  lenses must have exactly the ids ['L1', 'L2', 'L3']\n  lens L2: name, maximize, respect and method are all required\n  two lenses share a name: make them orthogonal\n  approved_by must name the person who approved this brief (or say \"requester\"), or be \"unattended\". The chair cannot approve its own brief\n  lessons_applied must be a list (it may be empty)\n  facts is over 400 words: move the detail to facts.md\n  research_questions must be a list of at most 8 questions (it may be empty)\n"
+  },
+  {
+   "put": "<ROOT>/.council/runs/261113-120001-pick-queue-technology/brief.yaml",
+   "text": "restated: [unclosed\n"
+  },
+  {
+   "cmd": [
+    "ingest"
+   ],
+   "clock": 3,
+   "rc": 2,
+   "out": "",
+   "err": "",
+   "loose": true
+  },
+  {
+   "rm": "<ROOT>/.council/runs/261113-120001-pick-queue-technology/brief.yaml"
+  },
+  {
+   "cmd": [
+    "ingest"
+   ],
+   "clock": 4,
+   "rc": 2,
+   "out": "",
+   "err": "error: brief.yaml is missing. Run `council next`.\n"
+  },
+  {
+   "cmd": [
+    "next"
+   ],
+   "clock": 5,
+   "rc": 0,
+   "out": "[261113-120001-pick-queue-technology] tier=lite phase=brief\nWrite the intent brief: <ROOT>/.council/runs/261113-120001-pick-queue-technology/brief.yaml\n  Rubric first, before any ideas. Lenses by objective + constraint + method, not job titles.\n  If the requester is here, show them the brief (one screen) and set approved_by to their name (or \"requester\"). Otherwise: unattended.\nTHEN  council ingest\n",
+   "err": ""
+  },
+  {
+   "put": "<ROOT>/.council/runs/261113-120001-pick-queue-technology/brief.yaml",
+   "text": "restated: Pick the queue technology for the billing pipeline.\neli5: choose the safest mail system\nrubric:\n- id: R1\n  name: reliability\n  weight: 40\n  check: judgment\n- id: R2\n  name: cost\n  weight: 20\n  check: judgment\n- id: R3\n  name: simplicity\n  weight: 20\n  check: judgment\n- id: R4\n  name: speed to ship\n  weight: 10\n  check: judgment\n- id: R5\n  name: operability\n  weight: 10\n  check: judgment\nevidence_plan:\n- load test\nlenses:\n- id: L1\n  name: lens 1\n  maximize: one thing\n  respect: a limit\n  method: first principles\n  evidence: facts\n- id: L2\n  name: lens 2\n  maximize: one thing\n  respect: a limit\n  method: first principles\n  evidence: facts\n- id: L3\n  name: lens 3\n  maximize: one thing\n  respect: a limit\n  method: first principles\n  evidence: facts\nfacts: Peak is 4,000 events per second.\nlessons_applied:\n- L-20261113-1\napproved_by: '  Unattended '\nresearch_questions: []\n"
+  },
+  {
+   "cmd": [
+    "ingest"
+   ],
+   "clock": 6,
+   "rc": 0,
+   "out": "brief accepted: rubric frozen for this run\n\n[261113-120001-pick-queue-technology] tier=lite phase=ideate loop=1/1 calls=0/~9\nIdeate: 3 experts, each alone, at least 5 ideas, keep 2.\nSeat CTRL is the control arm: one fresh one-shot answer. Do not read its output; the tool blinds it for the elders.\nSPAWN 4 fresh-context agent(s) in ONE message (parallel). Each prompt is one line:\n  L1    agent=council-expert  model=haiku  effort=xhigh\n        prompt: Read and follow <ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/ideate/L1.prompt.md\n  L2    agent=council-expert  model=fable  effort=low\n        prompt: Read and follow <ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/ideate/L2.prompt.md\n  L3    agent=council-expert  model=haiku  effort=xhigh\n        prompt: Read and follow <ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/ideate/L3.prompt.md\n  CTRL  agent=council-expert  model=fable  effort=low\n        prompt: Read and follow <ROOT>/.council/runs/261113-120001-pick-queue-technology/control/CTRL.prompt.md\n  (Plugin agent names are council-loop:<agent>. Any fresh-context agent that can Read and Write works.)\nTHEN  council ingest\n",
+   "err": ""
+  },
+  {
+   "put": "<ROOT>/.council/runs/261113-120001-pick-queue-technology/control/CTRL.out.json",
+   "text": "{\"title\": \"one shot answer\", \"body\": \"seat L1 would say queue replica metric metric retries metric fallback replay audit backoff retries index queue latency latency metric rollout backoff cache cache replay fallback cache idempotent stream quorum audit audit stream budget replay budget latency queue idempotent backoff queue snapshot replica schema metric replay batch schema cache rollout batch retries audit idempotent shard throttle quorum index rollout fallback shard idempotent cache idempotent circuit rollout backoff tenant schema budget batch snapshot fallback cache stream index shard retries budget replay circuit audit shard shard metric circuit idempotent canary tenant schema canary canary throttle audit replay snapshot tenant batch canary queue replica ledger\", \"eli5\": \"just do the obvious thing\"}"
+  },
+  {
+   "put": "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/ideate/L1.out.json",
+   "text": "{\"lens\": \"L1\", \"eli5\": \"try the simple thing first\", \"ideas\": [\"idea 0 here: use idempotent to cut batch risk\", \"idea 1 here: use queue to cut throttle risk\"], \"cards\": [{\"title\": \"cache plan 848\", \"body\": \"schema backoff fallback tenant circuit snapshot budget circuit index tenant replica rollout retries backoff quorum backoff idempotent backoff retries snapshot replica throttle backoff audit idempotent backoff quorum circuit shard metric snapshot fallback shard circuit idempotent stream queue idempotent audit throttle cache batch stream snapshot quorum canary canary canary replay backoff quorum cache quorum metric rollout metric idempotent retries audit idempotent tenant throttle index throttle schema replica retries retries queue tenant shard throttle audit metric shard index budget throttle budget batch canary fallback shard idempotent budget budget fallback metric idempotent audit latency stream index audit audit circuit replica cache\", \"wins\": [\"R1\"], \"evidence\": \"unverified\", \"eli5\": \"a safer way to do it\"}, {\"title\": \"queue plan 706\", \"body\": \"fallback canary quorum index latency budget schema circuit index stream audit queue shard stream canary throttle schema queue latency metric circuit throttle throttle quorum replica latency retries snapshot idempotent snapshot audit fallback canary stream schema index circuit index budget throttle latency throttle queue stream schema idempotent throttle index cache throttle batch queue snapshot index index budget latency cache audit replay replay circuit idempotent idempotent queue circuit batch fallback cache quorum metric snapshot canary cache circuit throttle retries audit replica canary snapshot audit snapshot metric snapshot tenant rollout index retries backoff circuit batch audit replay schema stream index queue\", \"wins\": [\"R1\"], \"evidence\": \"unverified\", \"eli5\": \"a safer way to do it\"}], \"friction\": \"the facts section was thin\"}"
+  },
+  {
+   "put": "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/ideate/L2.out.json",
+   "text": "Here is my answer:\n```json\n{\"lens\": \"L2\", \"eli5\": \"try the simple thing first\", \"ideas\": [\"idea 0 here: use quorum to cut throttle risk\", \"idea 1 here: use queue to cut ledger risk\", \"idea 2 here: use rollout to cut quorum risk\", \"idea 3 here: use stream to cut batch risk\", \"idea 4 here: use snapshot to cut shard risk\"], \"cards\": [{\"title\": \"rollout plan 642\", \"body\": \"index idempotent replica queue audit queue replica canary idempotent idempotent snapshot tenant metric budget backoff index cache snapshot retries index budget budget batch stream canary budget queue canary replica fallback throttle idempotent throttle retries metric tenant tenant circuit tenant shard cache retries schema throttle throttle backoff budget tenant shard latency schema metric stream retries budget schema retries throttle index fallback stream snapshot shard index idempotent quorum latency schema replica stream quorum cache queue tenant retries audit index index idempotent ledger snapshot replica replay backoff stream queue fallback fallback shard circuit idempotent canary canary cache circuit retries batch queue\", \"wins\": [\"R1\"], \"evidence\": \"unverified\", \"eli5\": \"a safer way to do it\"}, {\"title\": \"cache plan 796\", \"body\": \"ledger stream audit rollout tenant cache batch latency throttle ledger budget queue fallback circuit throttle tenant schema retries backoff canary canary budget stream retries rollout cache shard canary latency rollout tenant circuit queue idempotent stream throttle index queue replica metric stream metric shard quorum batch rollout replica replica index schema index stream throttle shard cache metric cache metric throttle audit backoff circuit batch replay canary canary idempotent audit quorum shard audit metric replay circuit ledger replica snapshot replica schema throttle circuit quorum throttle rollout replica replay metric idempotent throttle ledger latency backoff circuit tenant replay canary index ledger\", \"wins\": [\"R1\"], \"evidence\": \"unverified\", \"eli5\": \"a safer way to do it\"}], \"friction\": \"\"}\n```\n"
+  },
+  {
+   "put": "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/ideate/L3.out.json",
+   "text": "Sure! Here are my thoughts in prose, with {braces} and \"quotes\"."
+  },
+  {
+   "cmd": [
+    "status"
+   ],
+   "clock": 7,
+   "rc": 0,
+   "out": "GATE tier=lite mode=fanout:claude profile=efficient loops<=1 calls~9 tokens~1.3M rel_cost=0.66 (explicit)\nrun 261113-120001-pick-queue-technology · phase ideate · loop 1/1\nask: Pick the queue technology for the billing pipeline\nbrief ELI5: choose the safest mail system\nrubric: R1 reliability (40), R2 cost (20), R3 simplicity (20), R4 speed to ship (10), R5 operability (10)\nlenses: L1 lens 1, L2 lens 2, L3 lens 3\nloop 1: in progress\nshared memory: files at <ROOT>/.council/memory · this run: 0 fact(s) added, 0 note(s), 0 question(s) waiting for the researchers\ncalls so far: 0 (estimate 9)\nthis step: 1 of 4 seat(s) in; still owed: L1 (output not checked yet), L3 (output not checked yet), CTRL (output not checked yet)\nnext: council next        # prints the exact commands for this step; safe to run again\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "next"
+   ],
+   "clock": 8,
+   "rc": 0,
+   "out": "[261113-120001-pick-queue-technology] tier=lite phase=ideate loop=1/1 calls=0/~9\nIdeate: 3 experts, each alone, at least 5 ideas, keep 2.\nSeat CTRL is the control arm: one fresh one-shot answer. Do not read its output; the tool blinds it for the elders.\n1 of 4 seat(s) are already in (L2). Only these are still needed:\nL1, L3, CTRL: an output is there but not valid. `council ingest` says why and writes a retry prompt.\nTHEN  council ingest\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "ingest"
+   ],
+   "clock": 9,
+   "rc": 2,
+   "out": "",
+   "err": "error: Not all seats are in yet (1 of 4 valid):\n  L1: REJECTED (output 1): 2 ideas, need at least 5\n  L3: REJECTED (output 1): the output is not a JSON object (it starts: 'Sure! Here are my thoughts in prose, with {braces} and \"quotes\".')\n  CTRL: REJECTED (output 1): control card: identity leak: the card names 'L1'. Reword it (\"one expert\", \"another card\"): cards are judged blind; control card: identity leak: 'seat L1'. Reword it without saying who wrote or holds what: cards are judged blind\n  SPAWN 3 fresh-context agent(s) in ONE message (parallel). Each prompt is one line:\n    L1    agent=council-expert  model=haiku  effort=xhigh  [retry]\n          prompt: Read and follow <ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/ideate/L1.retry.md\n    L3    agent=council-expert  model=haiku  effort=xhigh  [retry]\n          prompt: Read and follow <ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/ideate/L3.retry.md\n    CTRL  agent=council-expert  model=fable  effort=low  [retry]\n          prompt: Read and follow <ROOT>/.council/runs/261113-120001-pick-queue-technology/control/CTRL.retry.md\n    (Plugin agent names are council-loop:<agent>. Any fresh-context agent that can Read and Write works.)\n  THEN  council ingest\nTo go on without a seat that failed twice or never came back: council ingest --drop L1 --reason \"<why>\"   (this step needs 2 valid seat(s))\n"
+  },
+  {
+   "cmd": [
+    "status"
+   ],
+   "clock": 10,
+   "rc": 0,
+   "out": "GATE tier=lite mode=fanout:claude profile=efficient loops<=1 calls~9 tokens~1.3M rel_cost=0.66 (explicit)\nrun 261113-120001-pick-queue-technology · phase ideate · loop 1/1\nask: Pick the queue technology for the billing pipeline\nbrief ELI5: choose the safest mail system\nrubric: R1 reliability (40), R2 cost (20), R3 simplicity (20), R4 speed to ship (10), R5 operability (10)\nlenses: L1 lens 1, L2 lens 2, L3 lens 3\nloop 1: in progress\nshared memory: files at <ROOT>/.council/memory · this run: 0 fact(s) added, 0 note(s), 0 question(s) waiting for the researchers\ncalls so far: 0 (estimate 9)\nthis step: 1 of 4 seat(s) in; still owed: L1 (retry owed), L3 (retry owed), CTRL (retry owed)\nnext: council next        # prints the exact commands for this step; safe to run again\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "next"
+   ],
+   "clock": 11,
+   "rc": 0,
+   "out": "[261113-120001-pick-queue-technology] tier=lite phase=ideate loop=1/1 calls=0/~9\nIdeate: 3 experts, each alone, at least 5 ideas, keep 2.\nSeat CTRL is the control arm: one fresh one-shot answer. Do not read its output; the tool blinds it for the elders.\n1 of 4 seat(s) are already in (L2). Only these are still needed:\nSPAWN 3 fresh-context agent(s) in ONE message (parallel). Each prompt is one line:\n  L1    agent=council-expert  model=haiku  effort=xhigh  [retry]\n        prompt: Read and follow <ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/ideate/L1.retry.md\n  L3    agent=council-expert  model=haiku  effort=xhigh  [retry]\n        prompt: Read and follow <ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/ideate/L3.retry.md\n  CTRL  agent=council-expert  model=fable  effort=low  [retry]\n        prompt: Read and follow <ROOT>/.council/runs/261113-120001-pick-queue-technology/control/CTRL.retry.md\n  (Plugin agent names are council-loop:<agent>. Any fresh-context agent that can Read and Write works.)\nTHEN  council ingest\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "ingest"
+   ],
+   "clock": 12,
+   "rc": 2,
+   "out": "",
+   "err": "error: Not all seats are in yet (1 of 4 valid):\n  L1: its retry has not come back yet\n  L3: its retry has not come back yet\n  CTRL: its retry has not come back yet\n  SPAWN 3 fresh-context agent(s) in ONE message (parallel). Each prompt is one line:\n    L1    agent=council-expert  model=haiku  effort=xhigh  [retry]\n          prompt: Read and follow <ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/ideate/L1.retry.md\n    L3    agent=council-expert  model=haiku  effort=xhigh  [retry]\n          prompt: Read and follow <ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/ideate/L3.retry.md\n    CTRL  agent=council-expert  model=fable  effort=low  [retry]\n          prompt: Read and follow <ROOT>/.council/runs/261113-120001-pick-queue-technology/control/CTRL.retry.md\n    (Plugin agent names are council-loop:<agent>. Any fresh-context agent that can Read and Write works.)\n  THEN  council ingest\nTo go on without a seat that failed twice or never came back: council ingest --drop L1 --reason \"<why>\"   (this step needs 2 valid seat(s))\n"
+  },
+  {
+   "cmd": [
+    "ingest",
+    "--drop",
+    "L1, L9",
+    "--reason",
+    "no"
+   ],
+   "clock": 13,
+   "rc": 2,
+   "out": "",
+   "err": "error: Not all seats are in yet (1 of 4 valid):\n  L1: its retry has not come back yet\n  L3: its retry has not come back yet\n  CTRL: its retry has not come back yet\n  SPAWN 2 fresh-context agent(s) in ONE message (parallel). Each prompt is one line:\n    L3    agent=council-expert  model=haiku  effort=xhigh  [retry]\n          prompt: Read and follow <ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/ideate/L3.retry.md\n    CTRL  agent=council-expert  model=fable  effort=low  [retry]\n          prompt: Read and follow <ROOT>/.council/runs/261113-120001-pick-queue-technology/control/CTRL.retry.md\n    (Plugin agent names are council-loop:<agent>. Any fresh-context agent that can Read and Write works.)\n  THEN  council ingest\n  cannot drop: --drop needs --reason \"<why this seat is being left out>\"\n  cannot drop: L9 is not a seat of this step (seats: L1, L2, L3, CTRL)\nTo go on without a seat that failed twice or never came back: council ingest --drop L3 --reason \"<why>\"   (this step needs 2 valid seat(s))\n"
+  },
+  {
+   "cmd": [
+    "dispatch"
+   ],
+   "clock": 14,
+   "rc": 0,
+   "out": "nothing to dispatch: no CLI/API seat of this step is missing an output\n",
+   "err": ""
+  },
+  {
+   "put": "<ROOT>/.council/runs/261113-120001-pick-queue-technology/control/CTRL.out.json",
+   "text": "{\"title\": \"one shot answer\", \"body\": \"queue replica metric metric retries metric fallback replay audit backoff retries index queue latency latency metric rollout backoff cache cache replay fallback cache idempotent stream quorum audit audit stream budget replay budget latency queue idempotent backoff queue snapshot replica schema metric replay batch schema cache rollout batch retries audit idempotent shard throttle quorum index rollout fallback shard idempotent cache idempotent circuit rollout backoff tenant schema budget batch snapshot fallback cache stream index shard retries budget replay circuit audit shard shard metric circuit idempotent canary tenant schema canary canary throttle audit replay snapshot tenant batch canary queue replica ledger\", \"eli5\": \"just do the obvious thing\"}"
+  },
+  {
+   "put": "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/ideate/L1.out.json",
+   "text": "{\"lens\": \"L1\", \"eli5\": \"try the simple thing first\", \"ideas\": [\"idea 0 here: use idempotent to cut batch risk\", \"idea 1 here: use queue to cut throttle risk\"], \"cards\": [{\"title\": \"cache plan 848\", \"body\": \"schema backoff fallback tenant circuit snapshot budget circuit index tenant replica rollout retries backoff quorum backoff idempotent backoff retries snapshot replica throttle backoff audit idempotent backoff quorum circuit shard metric snapshot fallback shard circuit idempotent stream queue idempotent audit throttle cache batch stream snapshot quorum canary canary canary replay backoff quorum cache quorum metric rollout metric idempotent retries audit idempotent tenant throttle index throttle schema replica retries retries queue tenant shard throttle audit metric shard index budget throttle budget batch canary fallback shard idempotent budget budget fallback metric idempotent audit latency stream index audit audit circuit replica cache\", \"wins\": [\"R1\"], \"evidence\": \"unverified\", \"eli5\": \"a safer way to do it\"}, {\"title\": \"queue plan 706\", \"body\": \"fallback canary quorum index latency budget schema circuit index stream audit queue shard stream canary throttle schema queue latency metric circuit throttle throttle quorum replica latency retries snapshot idempotent snapshot audit fallback canary stream schema index circuit index budget throttle latency throttle queue stream schema idempotent throttle index cache throttle batch queue snapshot index index budget latency cache audit replay replay circuit idempotent idempotent queue circuit batch fallback cache quorum metric snapshot canary cache circuit throttle retries audit replica canary snapshot audit snapshot metric snapshot tenant rollout index retries backoff circuit batch audit replay schema stream index queue\", \"wins\": [\"R1\"], \"evidence\": \"unverified\", \"eli5\": \"a safer way to do it\"}], \"friction\": \"the facts section was thin\"}"
+  },
+  {
+   "put": "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/ideate/L3.out.json",
+   "text": "{\"lens\": \"L3\", \"eli5\": \"try the simple thing first\", \"ideas\": [\"idea 0 here: use canary to cut tenant risk and keep going with many more words than the cap allows for an idea line  and keep going with many more words than the cap allows for an idea line \", \"idea 1 here: use queue to cut rollout risk and keep going with many more words than the cap allows for an idea line  and keep going with many more words than the cap allows for an idea line \", \"idea 2 here: use tenant to cut stream risk and keep going with many more words than the cap allows for an idea line  and keep going with many more words than the cap allows for an idea line \", \"idea 3 here: use stream to cut replica risk and keep going with many more words than the cap allows for an idea line  and keep going with many more words than the cap allows for an idea line \", \"idea 4 here: use rollout to cut retries risk and keep going with many more words than the cap allows for an idea line  and keep going with many more words than the cap allows for an idea line \"], \"cards\": [{\"title\": \"shard plan 823\", \"body\": \"index batch ledger schema canary schema cache index replay replica retries ledger schema throttle fallback canary throttle replica cache tenant ledger replay canary throttle fallback idempotent queue quorum batch schema budget throttle latency throttle quorum idempotent cache quorum shard shard fallback quorum snapshot ledger fallback replay cache throttle canary canary replay tenant stream latency stream rollout shard stream quorum backoff tenant budget schema idempotent snapshot tenant backoff rollout ledger replay metric budget tenant batch throttle idempotent shard index backoff metric fallback quorum queue queue batch circuit snapshot batch retries stream ledger retries batch canary circuit snapshot quorum budget\", \"wins\": [\"R1\"], \"evidence\": \"unverified\", \"eli5\": \"a safer way to do it\"}, {\"title\": \"fallback plan 960\", \"body\": \"circuit replay snapshot queue shard circuit rollout replay ledger audit batch cache queue audit budget snapshot canary throttle throttle budget idempotent stream latency cache ledger stream latency replica throttle circuit circuit retries tenant rollout ledger throttle canary budget replay quorum index tenant ledger circuit circuit queue retries latency ledger audit backoff audit batch stream replay idempotent latency budget fallback budget replay canary audit index stream schema idempotent latency latency quorum queue rollout batch batch backoff quorum index backoff index tenant ledger metric fallback snapshot backoff shard ledger rollout retries circuit tenant replay replay batch latency backoff latency fallback\", \"wins\": [\"R1\"], \"evidence\": \"unverified\", \"eli5\": \"a safer way to do it\"}], \"friction\": \"\"}"
+  },
+  {
+   "cmd": [
+    "ingest",
+    "--drop",
+    "L2",
+    "--reason",
+    "it is fine really"
+   ],
+   "clock": 15,
+   "rc": 2,
+   "out": "",
+   "err": "error: Not all seats are in yet (3 of 4 valid):\n  L1: REJECTED (output 2): 2 ideas, need at least 5\n  SPAWN 1 fresh-context agent(s) in ONE message (parallel). Each prompt is one line:\n    L1    agent=council-expert  model=haiku  effort=xhigh  [retry]\n          prompt: Read and follow <ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/ideate/L1.retry.md\n    (Plugin agent names are council-loop:<agent>. Any fresh-context agent that can Read and Write works.)\n  THEN  council ingest\n  cannot drop: L2 returned a valid output\nTo go on without a seat that failed twice or never came back: council ingest --drop L1 --reason \"<why>\"   (this step needs 2 valid seat(s))\n"
+  },
+  {
+   "cmd": [
+    "status"
+   ],
+   "clock": 16,
+   "rc": 0,
+   "out": "GATE tier=lite mode=fanout:claude profile=efficient loops<=1 calls~9 tokens~1.3M rel_cost=0.66 (explicit)\nrun 261113-120001-pick-queue-technology · phase ideate · loop 1/1\nask: Pick the queue technology for the billing pipeline\nbrief ELI5: choose the safest mail system\nrubric: R1 reliability (40), R2 cost (20), R3 simplicity (20), R4 speed to ship (10), R5 operability (10)\nlenses: L1 lens 1, L2 lens 2, L3 lens 3\nloop 1: in progress\nshared memory: files at <ROOT>/.council/memory · this run: 0 fact(s) added, 0 note(s), 0 question(s) waiting for the researchers\ncalls so far: 0 (estimate 9)\nthis step: 3 of 4 seat(s) in; still owed: L1 (retry owed)\nnext: council next        # prints the exact commands for this step; safe to run again\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "ingest",
+    "--drop",
+    "L1",
+    "--reason",
+    "it failed twice in a row"
+   ],
+   "clock": 17,
+   "rc": 0,
+   "out": "L3: ideas [1, 2, 3, 4, 5] are over 25 words\nideas in: 10 from 2 experts; 4 cards kept\n\n[261113-120001-pick-queue-technology] tier=lite phase=merge loop=1/1 calls=7/~9\nMerge duplicates into idea families. Read <ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/cards.md\n  Edit <ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/pool.json (a draft with every kept card is already there):\n  - Merge cards that are the same idea into one card. \"from\" = every kept card it came from, e.g. [\"L1#2\", \"L4#1\"].\n    The tool works out the authors from \"from\"; every kept card must appear in some pool card.\n  - Keep distinct directions, including ones you do not like. You merge; you do not judge.\n  - Keep each body 90 to 110 words and free of seat ids and \"my lens\" talk. Set \"reviewed\": true.\nTHEN  council ingest\n",
+   "err": ""
+  },
+  {
+   "put": "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/pool.json",
+   "text": "{\n \"reviewed\": false,\n \"pool\": [\n  {\n   \"id\": \"X1\",\n   \"title\": \"rollout plan 642\",\n   \"body\": \"index idempotent replica queue audit queue replica canary idempotent idempotent snapshot tenant metric budget backoff index cache snapshot retries index budget budget batch stream canary budget queue canary replica fallback throttle idempotent throttle retries metric tenant tenant circuit tenant shard cache retries schema throttle throttle backoff budget tenant shard latency schema metric stream retries budget schema retries throttle index fallback stream snapshot shard index idempotent quorum latency schema replica stream quorum cache queue tenant retries audit index index idempotent ledger snapshot replica replay backoff stream queue fallback fallback shard circuit idempotent canary canary cache circuit retries batch queue\",\n   \"eli5\": \"a safer way to do it\",\n   \"from\": [\n    \"L2#1\"\n   ]\n  },\n  {\n   \"id\": \"P2\",\n   \"title\": \"cache plan 796\",\n   \"body\": \"ledger stream audit rollout tenant cache batch latency throttle ledger budget queue fallback circuit throttle tenant schema retries backoff canary canary budget stream retries rollout cache shard canary latency rollout tenant circuit queue idempotent stream throttle index queue replica metric stream metric shard quorum batch rollout replica replica index schema index stream throttle shard cache metric cache metric throttle audit backoff circuit batch replay canary canary idempotent audit quorum shard audit metric replay circuit ledger replica snapshot replica schema throttle circuit quorum throttle rollout replica replay metric idempotent throttle ledger latency backoff circuit tenant replay canary index ledger\",\n   \"eli5\": \"a safer way to do it\",\n   \"from\": [\n    \"L9#9\"\n   ]\n  },\n  {\n   \"id\": \"P3\",\n   \"title\": \"shard plan 823\",\n   \"body\": \"far too short to judge\",\n   \"eli5\": \"a safer way to do it\",\n   \"from\": [\n    \"L3#1\"\n   ]\n  },\n  {\n   \"id\": \"P4\",\n   \"title\": \"long long long long long long long long long long long long\",\n   \"body\": \"circuit replay snapshot queue shard circuit rollout replay ledger audit batch cache queue audit budget snapshot canary throttle throttle budget idempotent stream latency cache ledger stream latency replica throttle circuit circuit retries tenant rollout ledger throttle canary budget replay quorum index tenant ledger circuit circuit queue retries latency ledger audit backoff audit batch stream replay idempotent latency budget fallback budget replay canary audit index stream schema idempotent latency latency quorum queue rollout batch batch backoff quorum index backoff index tenant ledger metric fallback snapshot backoff shard ledger rollout retries circuit tenant replay replay batch latency backoff latency fallback\",\n   \"from\": [\n    \"L3#2\"\n   ]\n  }\n ]\n}"
+  },
+  {
+   "cmd": [
+    "ingest"
+   ],
+   "clock": 18,
+   "rc": 2,
+   "out": "",
+   "err": "error: pool.json is not ready:\n  card ids must be unique and look like P1\n  P3: body is only 5 words (write 90 to 110; cards of very different length cannot be judged fairly)\n  P4: title is 12 words (cap 10)\n  P4: missing eli5\n  P2: \"from\" must list the kept card(s) it came from, such as [\"L2#1\"]\n  set \"reviewed\": true once you have merged the duplicates\n"
+  },
+  {
+   "put": "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/pool.json",
+   "text": "{\n \"reviewed\": true,\n \"pool\": [\n  {\n   \"id\": \"P1\",\n   \"title\": \"rollout plan 642\",\n   \"body\": \"As seat L2 would say, my lens is the right one. index idempotent replica queue audit queue replica canary idempotent idempotent snapshot tenant metric budget backoff index cache snapshot retries index budget budget batch stream canary budget queue canary replica fallback throttle idempotent throttle retries metric tenant tenant circuit tenant shard cache retries schema throttle throttle backoff budget tenant shard latency schema metric stream retries budget schema retries throttle index fallback stream snapshot shard index idempotent quorum latency schema replica stream quorum cache queue tenant retries audit index index idempotent ledger snapshot replica replay backoff stream queue fallback fallback shard circuit idempotent canary canary cache circuit retries batch queue\",\n   \"eli5\": \"a safer way to do it\",\n   \"from\": [\n    \"L2#1\"\n   ]\n  },\n  {\n   \"id\": \"P2\",\n   \"title\": \"cache plan 796\",\n   \"body\": \"ledger stream audit rollout tenant cache batch latency throttle ledger budget queue fallback circuit throttle tenant schema retries backoff canary canary budget stream retries rollout cache shard canary latency rollout tenant circuit queue idempotent stream throttle index queue replica metric stream metric shard quorum batch rollout replica replica index schema index stream throttle shard cache metric cache metric throttle audit backoff circuit batch replay canary canary idempotent audit quorum shard audit metric replay circuit ledger replica snapshot replica schema throttle circuit quorum throttle rollout replica replay metric idempotent throttle ledger latency backoff circuit tenant replay canary index ledger\",\n   \"eli5\": \"a safer way to do it\",\n   \"from\": [\n    \"L2#2\"\n   ]\n  },\n  {\n   \"id\": \"P3\",\n   \"title\": \"shard plan 823\",\n   \"body\": \"index batch ledger schema canary schema cache index replay replica retries ledger schema throttle fallback canary throttle replica cache tenant ledger replay canary throttle fallback idempotent queue quorum batch schema budget throttle latency throttle quorum idempotent cache quorum shard shard fallback quorum snapshot ledger fallback replay cache throttle canary canary replay tenant stream latency stream rollout shard stream quorum backoff tenant budget schema idempotent snapshot tenant backoff rollout ledger replay metric budget tenant batch throttle idempotent shard index backoff metric fallback quorum queue queue batch circuit snapshot batch retries stream ledger retries batch canary circuit snapshot quorum budget\",\n   \"eli5\": \"a safer way to do it\",\n   \"from\": [\n    \"L3#1\"\n   ]\n  }\n ]\n}"
+  },
+  {
+   "cmd": [
+    "ingest"
+   ],
+   "clock": 19,
+   "rc": 2,
+   "out": "",
+   "err": "error: pool.json is not ready:\n  kept card(s) L3#2 are in no pool card. Merge each into a card (add it to \"from\") or keep it as its own card: you merge, you do not judge\n"
+  },
+  {
+   "put": "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/pool.json",
+   "text": "{\n \"reviewed\": true,\n \"pool\": [\n  {\n   \"id\": \"P1\",\n   \"title\": \"rollout plan 642\",\n   \"body\": \"As seat L2 would say, my lens is the right one. index idempotent replica queue audit queue replica canary idempotent idempotent snapshot tenant metric budget backoff index cache snapshot retries index budget budget batch stream canary budget queue canary replica fallback throttle idempotent throttle retries metric tenant tenant circuit tenant shard cache retries schema throttle throttle backoff budget tenant shard latency schema metric stream retries budget schema retries throttle index fallback stream snapshot shard index idempotent quorum latency schema replica stream quorum cache queue tenant retries audit index index idempotent ledger snapshot replica replay backoff stream queue fallback fallback shard circuit idempotent canary canary cache circuit retries batch queue\",\n   \"eli5\": \"a safer way to do it\",\n   \"from\": [\n    \"L2#1\"\n   ]\n  }\n ]\n}"
+  },
+  {
+   "cmd": [
+    "ingest"
+   ],
+   "clock": 20,
+   "rc": 2,
+   "out": "",
+   "err": "error: pool.json is not ready:\n  kept card(s) L2#2, L3#1, L3#2 are in no pool card. Merge each into a card (add it to \"from\") or keep it as its own card: you merge, you do not judge\n  the pool needs at least 2 cards\n"
+  },
+  {
+   "put": "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/pool.json",
+   "text": "not json at all"
+  },
+  {
+   "cmd": [
+    "ingest"
+   ],
+   "clock": 21,
+   "rc": 2,
+   "out": "",
+   "err": "error: <ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/pool.json must hold {\"reviewed\": true, \"pool\": [...]}\n"
+  },
+  {
+   "put": "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/pool.json",
+   "text": "{\n \"reviewed\": true,\n \"pool\": [\n  {\n   \"id\": \"P1\",\n   \"title\": \"rollout plan 642\",\n   \"body\": \"index idempotent replica queue audit queue replica canary idempotent idempotent snapshot tenant metric budget backoff index cache snapshot retries index budget budget batch stream canary budget queue canary replica fallback throttle idempotent throttle retries metric tenant tenant circuit tenant shard cache retries schema throttle throttle backoff budget tenant shard latency schema metric stream retries budget schema retries throttle index fallback stream snapshot shard index idempotent quorum latency schema replica stream quorum cache queue tenant retries audit index index idempotent ledger snapshot replica replay backoff stream queue fallback fallback shard circuit idempotent canary canary cache circuit retries batch queue\",\n   \"eli5\": \"a safer way to do it\",\n   \"from\": [\n    \"L2#1\",\n    \"L3#2\"\n   ]\n  },\n  {\n   \"id\": \"P2\",\n   \"title\": \"cache plan 796\",\n   \"body\": \"ledger stream audit rollout tenant cache batch latency throttle ledger budget queue fallback circuit throttle tenant schema retries backoff canary canary budget stream retries rollout cache shard canary latency rollout tenant circuit queue idempotent stream throttle index queue replica metric stream metric shard quorum batch rollout replica replica index schema index stream throttle shard cache metric cache metric throttle audit backoff circuit batch replay canary canary idempotent audit quorum shard audit metric replay circuit ledger replica snapshot replica schema throttle circuit quorum throttle rollout replica replay metric idempotent throttle ledger latency backoff circuit tenant replay canary index ledger\",\n   \"eli5\": \"a safer way to do it\",\n   \"from\": [\n    \"L2#2\"\n   ]\n  },\n  {\n   \"id\": \"P3\",\n   \"title\": \"shard plan 823\",\n   \"body\": \"index batch ledger schema canary schema cache index replay replica retries ledger schema throttle fallback canary throttle replica cache tenant ledger replay canary throttle fallback idempotent queue quorum batch schema budget throttle latency throttle quorum idempotent cache quorum shard shard fallback quorum snapshot ledger fallback replay cache throttle canary canary replay tenant stream latency stream rollout shard stream quorum backoff tenant budget schema idempotent snapshot tenant backoff rollout ledger replay metric budget tenant batch throttle idempotent shard index backoff metric fallback quorum queue queue batch circuit snapshot batch retries stream ledger retries batch canary circuit snapshot quorum budget\",\n   \"eli5\": \"a safer way to do it\",\n   \"from\": [\n    \"L3#1\"\n   ]\n  }\n ]\n}"
+  },
+  {
+   "cmd": [
+    "ingest"
+   ],
+   "clock": 22,
+   "rc": 0,
+   "out": "pool: 3 cards (small enough: no shortlist vote, all go to the red team)\n\n[261113-120001-pick-queue-technology] tier=lite phase=redteam loop=1/1 calls=7/~9\nRed team: pre-mortem on the 3 shortlisted cards.\nSPAWN 1 fresh-context agent(s) in ONE message (parallel). Each prompt is one line:\n  RT    agent=council-red-team  model=opus  effort=xhigh\n        prompt: Read and follow <ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/redteam/RT.prompt.md\n  (Plugin agent names are council-loop:<agent>. Any fresh-context agent that can Read and Write works.)\nTHEN  council ingest\n",
+   "err": ""
+  },
+  {
+   "put": "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/redteam/RT.out.json",
+   "text": "I could not find anything wrong."
+  },
+  {
+   "cmd": [
+    "ingest",
+    "--drop",
+    "RT",
+    "--reason",
+    "it timed out twice"
+   ],
+   "clock": 23,
+   "rc": 2,
+   "out": "",
+   "err": "error: Not all seats are in yet (0 of 1 valid):\n  RT: REJECTED (output 1): the output is not a JSON object (it starts: 'I could not find anything wrong.')\n  cannot drop: RT was rejected for the first time just now: retry it once first\nTo go on without a seat that failed twice or never came back: council ingest --drop <seat> --reason \"<why>\"   (this step needs 0 valid seat(s))\n"
+  },
+  {
+   "cmd": [
+    "ingest",
+    "--drop",
+    "RT",
+    "--reason",
+    "the red team never came back"
+   ],
+   "clock": 24,
+   "rc": 0,
+   "out": "red team: 0 findings (S1 0, S2 0, S3 0)\n\n[261113-120001-pick-queue-technology] tier=lite phase=fuse loop=1/1 calls=8/~9\nRefine and recombine into exactly 3 candidates. Read <ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/fuse-input.md\n  Edit <ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/candidates.json (a draft is there):\n  - responses: every S1/S2 finding gets action fixed | rebutted | accepted, with a note. A rebuttal needs evidence.\n  - candidates: fuse the strongest parts. \"parents\" = every pool card it was built from, e.g. [\"P2\", \"P5\"].\n    The tool works out the authors from the parents (their votes on it are discounted).\n  - body 90 to 110 words, no seat ids or \"my lens\" talk. Each card needs an ELI5.\n  - checks: {\"C1\": \"pass\" | \"fail\"} for any candidate you could test by machine. A fail ranks last.\n  You refine and recombine. You do not rank: the experts do that next, blind.\nTHEN  council ingest\n",
+   "err": ""
+  },
+  {
+   "put": "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/candidates.json",
+   "text": "{\n \"candidates\": [\n  {\n   \"id\": \"C1\",\n   \"title\": \"rollout plan 642\",\n   \"body\": \"index idempotent replica queue audit queue replica canary idempotent idempotent snapshot tenant metric budget backoff index cache snapshot retries index budget budget batch stream canary budget queue canary replica fallback throttle idempotent throttle retries metric tenant tenant circuit tenant shard cache retries schema throttle throttle backoff budget tenant shard latency schema metric stream retries budget schema retries throttle index fallback stream snapshot shard index idempotent quorum latency schema replica stream quorum cache queue tenant retries audit index index idempotent ledger snapshot replica replay backoff stream queue fallback fallback shard circuit idempotent canary canary cache circuit retries batch queue\",\n   \"eli5\": \"a safer way to do it\",\n   \"parents\": [\n    \"P99\"\n   ]\n  },\n  {\n   \"id\": \"C1\",\n   \"title\": \"cache plan 796\",\n   \"body\": \"ledger stream audit rollout tenant cache batch latency throttle ledger budget queue fallback circuit throttle tenant schema retries backoff canary canary budget stream retries rollout cache shard canary latency rollout tenant circuit queue idempotent stream throttle index queue replica metric stream metric shard quorum batch rollout replica replica index schema index stream throttle shard cache metric cache metric throttle audit backoff circuit batch replay canary canary idempotent audit quorum shard audit metric replay circuit ledger replica snapshot replica schema throttle circuit quorum throttle rollout replica replay metric idempotent throttle ledger latency backoff circuit tenant replay canary index ledger\",\n   \"eli5\": \"a safer way to do it\",\n   \"parents\": [\n    \"P2\"\n   ]\n  }\n ],\n \"responses\": [],\n \"checks\": {\n  \"C9\": \"pass\",\n  \"C1\": \"maybe\"\n }\n}"
+  },
+  {
+   "cmd": [
+    "ingest"
+   ],
+   "clock": 25,
+   "rc": 2,
+   "out": "",
+   "err": "error: candidates.json is not ready:\n  card ids must be unique and look like C1\n  C1: \"parents\" must list the shortlisted pool card(s) it was built from (P1, P2, P3)\n  this loop needs exactly 3 candidates (has 2)\n  checks must map candidate ids to pass | fail | n/a\n"
+  },
+  {
+   "put": "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/candidates.json",
+   "text": "{}"
+  },
+  {
+   "cmd": [
+    "ingest"
+   ],
+   "clock": 26,
+   "rc": 2,
+   "out": "",
+   "err": "error: <ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/candidates.json must hold {\"candidates\": [...], \"responses\": [...], \"checks\": {}}\n"
+  },
+  {
+   "put": "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/candidates.json",
+   "text": "{\n \"candidates\": [\n  {\n   \"id\": \"C1\",\n   \"title\": \"rollout plan 642\",\n   \"body\": \"index idempotent replica queue audit queue replica canary idempotent idempotent snapshot tenant metric budget backoff index cache snapshot retries index budget budget batch stream canary budget queue canary replica fallback throttle idempotent throttle retries metric tenant tenant circuit tenant shard cache retries schema throttle throttle backoff budget tenant shard latency schema metric stream retries budget schema retries throttle index fallback stream snapshot shard index idempotent quorum latency schema replica stream quorum cache queue tenant retries audit index index idempotent ledger snapshot replica replay backoff stream queue fallback fallback shard circuit idempotent canary canary cache circuit retries batch queue\",\n   \"eli5\": \"a safer way to do it\",\n   \"parents\": [\n    \"P1\"\n   ]\n  },\n  {\n   \"id\": \"C2\",\n   \"title\": \"cache plan 796\",\n   \"body\": \"ledger stream audit rollout tenant cache batch latency throttle ledger budget queue fallback circuit throttle tenant schema retries backoff canary canary budget stream retries rollout cache shard canary latency rollout tenant circuit queue idempotent stream throttle index queue replica metric stream metric shard quorum batch rollout replica replica index schema index stream throttle shard cache metric cache metric throttle audit backoff circuit batch replay canary canary idempotent audit quorum shard audit metric replay circuit ledger replica snapshot replica schema throttle circuit quorum throttle rollout replica replay metric idempotent throttle ledger latency backoff circuit tenant replay canary index ledger\",\n   \"eli5\": \"a safer way to do it\",\n   \"parents\": [\n    \"P2\"\n   ]\n  },\n  {\n   \"id\": \"C3\",\n   \"title\": \"shard plan 823\",\n   \"body\": \"index batch ledger schema canary schema cache index replay replica retries ledger schema throttle fallback canary throttle replica cache tenant ledger replay canary throttle fallback idempotent queue quorum batch schema budget throttle latency throttle quorum idempotent cache quorum shard shard fallback quorum snapshot ledger fallback replay cache throttle canary canary replay tenant stream latency stream rollout shard stream quorum backoff tenant budget schema idempotent snapshot tenant backoff rollout ledger replay metric budget tenant batch throttle idempotent shard index backoff metric fallback quorum queue queue batch circuit snapshot batch retries stream ledger retries batch canary circuit snapshot quorum budget\",\n   \"eli5\": \"a safer way to do it\",\n   \"parents\": [\n    \"P3\"\n   ]\n  }\n ],\n \"responses\": [],\n \"checks\": {\n  \"C1\": \"n/a\",\n  \"C2\": \"Pass\"\n }\n}"
+  },
+  {
+   "cmd": [
+    "ingest"
+   ],
+   "clock": 27,
+   "rc": 0,
+   "out": "3 candidates fused; every S1/S2 finding has a response\n\n[261113-120001-pick-queue-technology] tier=lite phase=rank loop=1/1 calls=8/~9\nRank vote: 3 fused candidates, blind, ranked by every expert seat.\nSPAWN 3 fresh-context agent(s) in ONE message (parallel). Each prompt is one line:\n  L1    agent=council-expert  model=haiku  effort=xhigh\n        prompt: Read and follow <ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/rank/L1.prompt.md\n  L2    agent=council-expert  model=fable  effort=low\n        prompt: Read and follow <ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/rank/L2.prompt.md\n  L3    agent=council-expert  model=haiku  effort=xhigh\n        prompt: Read and follow <ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/rank/L3.prompt.md\n  (Plugin agent names are council-loop:<agent>. Any fresh-context agent that can Read and Write works.)\nTHEN  council ingest\n",
+   "err": ""
+  },
+  {
+   "put": "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/rank/L3.out.json",
+   "text": "{\"voter\": \"L3\", \"ranking\": [\"B\", \"C\", \"A\"], \"reasons\": {\"B\": \"R1: strongest\"}, \"best_on\": {\"R1\": \"B\", \"R2\": \"B\", \"R3\": \"B\", \"R4\": \"B\", \"R5\": \"B\"}}"
+  },
+  {
+   "cmd": [
+    "ingest",
+    "--drop",
+    "L1 L2",
+    "--reason",
+    "both seats timed out again"
+   ],
+   "clock": 28,
+   "rc": 2,
+   "out": "",
+   "err": "error: Not all seats are in yet (1 of 3 valid):\n  L1: no output yet\n  L2: no output yet\n  cannot drop: that would leave 1 valid seat(s); this step needs 2\nTo go on without a seat that failed twice or never came back: council ingest --drop <seat> --reason \"<why>\"   (this step needs 2 valid seat(s))\n"
+  },
+  {
+   "put": "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/rank/L2.out.json",
+   "text": "{\"voter\": \"L2\", \"ranking\": [\"B\", \"A\"], \"reasons\": {\"B\": \"R1: strongest\"}, \"best_on\": {\"R1\": \"B\", \"R2\": \"B\", \"R3\": \"B\", \"R4\": \"B\", \"R5\": \"B\"}}"
+  },
+  {
+   "cmd": [
+    "ingest"
+   ],
+   "clock": 29,
+   "rc": 2,
+   "out": "",
+   "err": "error: Not all seats are in yet (1 of 3 valid):\n  L1: no output yet\n  L2: REJECTED (output 1): the ranking covers 2 of 3 cards: rank every label once, best first (missing ['C'], unknown [])\n  SPAWN 2 fresh-context agent(s) in ONE message (parallel). Each prompt is one line:\n    L1    agent=council-expert  model=haiku  effort=xhigh\n          prompt: Read and follow <ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/rank/L1.prompt.md\n    L2    agent=council-expert  model=fable  effort=low  [retry]\n          prompt: Read and follow <ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/rank/L2.retry.md\n    (Plugin agent names are council-loop:<agent>. Any fresh-context agent that can Read and Write works.)\n  THEN  council ingest\nTo go on without a seat that failed twice or never came back: council ingest --drop L1 --reason \"<why>\"   (this step needs 2 valid seat(s))\n"
+  },
+  {
+   "put": "<ROOT>/.council/runs/261113-120001-pick-queue-technology/control/CTRL.out.json",
+   "text": "{\"title\": \"another answer\", \"body\": \"audit latency cache budget batch stream stream budget metric queue cache cache quorum ledger shard batch batch rollout schema audit ledger schema canary throttle tenant replica latency idempotent quorum index metric backoff throttle rollout metric snapshot queue ledger tenant throttle shard retries cache snapshot ledger schema schema shard shard tenant index shard queue idempotent retries quorum cache idempotent shard stream schema throttle fallback replay circuit index retries queue shard throttle canary tenant circuit stream backoff index canary ledger latency index index queue fallback latency index tenant retries throttle budget snapshot stream replica replica canary cache backoff replica budget\", \"eli5\": \"changed\"}"
+  },
+  {
+   "put": "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/rank/L2.out.json",
+   "text": "{\n \"voter\": \"L2\",\n \"ranking\": [\n  \"B\",\n  \"A\",\n  \"C\",\n  \"B\",\n  \"Candidate Q\",\n  7\n ],\n \"reasons\": {\n  \"B\": \"R1: strongest\"\n },\n \"best_on\": {\n  \"R9\": \"A\",\n  \"R1\": \"Z\"\n }\n}"
+  },
+  {
+   "cmd": [
+    "ingest",
+    "--drop",
+    "L1",
+    "--reason",
+    "it timed out again"
+   ],
+   "clock": 30,
+   "rc": 2,
+   "out": "L2: ballot kept with gaps: missing [], unknown ['Candidate Q', 7], repeated ['B'] (a gap counts as no opinion, not as last place)\nL2: best_on entries ignored: ['R9->A', 'R1->Z']\nrank vote: 2 ballots, agreement 1.0 (strong); order C1 > C3 > C2\n\n[261113-120001-pick-queue-technology] tier=lite phase=elders loop=1/1 calls=11/~9\n",
+   "err": "error: the control arm is sealed, but <ROOT>/.council/runs/261113-120001-pick-queue-technology/control/CTRL.out.json is missing or was changed after it was ingested.\n  Restore the file. If it is gone for good, say so and go on without it:\n  council next --without-control \"<what happened>\"\n"
+  },
+  {
+   "cmd": [
+    "status"
+   ],
+   "clock": 31,
+   "rc": 0,
+   "out": "GATE tier=lite mode=fanout:claude profile=efficient loops<=1 calls~9 tokens~1.3M rel_cost=0.66 (explicit)\nrun 261113-120001-pick-queue-technology · phase elders · loop 1/1\nask: Pick the queue technology for the billing pipeline\nbrief ELI5: choose the safest mail system\nrubric: R1 reliability (40), R2 cost (20), R3 simplicity (20), R4 speed to ship (10), R5 operability (10)\nlenses: L1 lens 1, L2 lens 2, L3 lens 3\nloop 1: in progress (ideas, pool, red_team, candidates, rank done)\ndeviations (3): loop 1 ideate: seat L1 was left out after 2 rejected output(s): it failed twice in a row; loop 1 redteam: seat RT was left out after 1 rejected output(s): the red team never came back; loop 1 rank: seat L1 was left out after 0 rejected output(s): it timed out again\nshared memory: files at <ROOT>/.council/memory · this run: 0 fact(s) added, 0 note(s), 0 question(s) waiting for the researchers\ncalls so far: 11 (estimate 9)\nnext: council next        # prints the exact commands for this step; safe to run again\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "audit"
+   ],
+   "clock": 32,
+   "rc": 1,
+   "out": "loop 1 rank: ok  recorded C1 > C3 > C2 (2 ballots)\nseat outputs: 4 of 5 match what was ingested; CHANGED OR MISSING: control/CTRL.out.json\ncontrol arm: SEALED CARD MISSING OR CHANGED\naudit: 2 problem(s)\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "next"
+   ],
+   "clock": 33,
+   "rc": 2,
+   "out": "[261113-120001-pick-queue-technology] tier=lite phase=elders loop=1/1 calls=11/~9\n",
+   "err": "error: the control arm is sealed, but <ROOT>/.council/runs/261113-120001-pick-queue-technology/control/CTRL.out.json is missing or was changed after it was ingested.\n  Restore the file. If it is gone for good, say so and go on without it:\n  council next --without-control \"<what happened>\"\n"
+  },
+  {
+   "cmd": [
+    "next",
+    "--without-control",
+    "gone"
+   ],
+   "clock": 34,
+   "rc": 2,
+   "out": "",
+   "err": "error: say what happened to the control arm: --without-control \"<what happened>\"\n"
+  },
+  {
+   "cmd": [
+    "next",
+    "--without-control",
+    "the file was overwritten by a cleanup script"
+   ],
+   "clock": 35,
+   "rc": 0,
+   "out": "[261113-120001-pick-queue-technology] tier=lite phase=elders loop=1/1 calls=11/~9\nElder review: the top 3 candidate(s) (no control arm in this run).\nSPAWN 1 fresh-context agent(s) in ONE message (parallel). Each prompt is one line:\n  EA    agent=council-elder  model=opus  effort=xhigh\n        prompt: Read and follow <ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/elders/EA.prompt.md\n  (Plugin agent names are council-loop:<agent>. Any fresh-context agent that can Read and Write works.)\nTHEN  council ingest\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "next",
+    "--without-control",
+    "it cannot be given up twice"
+   ],
+   "clock": 36,
+   "rc": 2,
+   "out": "",
+   "err": "error: this run has no sealed control arm to give up\n"
+  },
+  {
+   "put": "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/elders/EA.out.json",
+   "text": "{\"scores\": {\"B\": {\"R1\": 7, \"R2\": 7, \"R3\": 7, \"R4\": 7, \"R5\": 7}, \"C\": {\"R2\": 7, \"R3\": 7, \"R4\": 7, \"R5\": 7}}, \"verdict\": {\"A\": \"ship\", \"B\": \"ship\", \"C\": \"ship\"}, \"preferred\": \"A\", \"confidence\": 0.7, \"top_risks\": [{\"risk\": \"operational load\", \"severity\": \"S2\", \"candidate\": \"all\"}], \"key_fix\": \"add a rollback plan\", \"own_idea\": \"replay a golden set first\", \"eli5\": \"looks solid\"}"
+  },
+  {
+   "cmd": [
+    "ingest"
+   ],
+   "clock": 37,
+   "rc": 0,
+   "out": "EA: scores for A are missing ['R1', 'R2', 'R3', 'R4', 'R5']\nEA: scores for C are missing ['R1']\n1 elder review(s) in\n\n[261113-120001-pick-queue-technology] tier=lite phase=cut loop=1/1 calls=12/~9\nStanding (rank vote, checks, elder verdicts):\n  1. C3: shard plan 823\n  2. C1: rollout plan 642\n  3. C2: cache plan 796\nRank vote: 2 blind ballots, 4 head-to-heads counted, 2 sat out (the voter alone wrote one side); agreement 1.0 (strong); LESS THAN ONE FULL VOTE for C3 vs C2 (the vote alone may not cut either)\nElders: 1 of 1 prefer a council candidate; 0 prefer the control arm.\nElders preferred the runner-up: it now leads.\nThis cut keeps 1.\nTHEN  council cut --eli5 \"<what happened this loop, one line>\" [--changed \"...\"] [--asked \"Q -> A\" | --unattended \"<option>\"] [--stop \"reason\"]\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "next"
+   ],
+   "clock": 38,
+   "rc": 0,
+   "out": "[261113-120001-pick-queue-technology] tier=lite phase=cut loop=1/1 calls=12/~9\nStanding (rank vote, checks, elder verdicts):\n  1. C3: shard plan 823\n  2. C1: rollout plan 642\n  3. C2: cache plan 796\nRank vote: 2 blind ballots, 4 head-to-heads counted, 2 sat out (the voter alone wrote one side); agreement 1.0 (strong); LESS THAN ONE FULL VOTE for C3 vs C2 (the vote alone may not cut either)\nElders: 1 of 1 prefer a council candidate; 0 prefer the control arm.\nElders preferred the runner-up: it now leads.\nThis cut keeps 1.\nTHEN  council cut --eli5 \"<what happened this loop, one line>\" [--changed \"...\"] [--asked \"Q -> A\" | --unattended \"<option>\"] [--stop \"reason\"]\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "cut",
+    "--eli5",
+    "two voters, one elder, no red team",
+    "--stop",
+    "it is the last loop anyway"
+   ],
+   "clock": 39,
+   "rc": 0,
+   "out": "cut: kept C3; eliminated C1, C2\nledger: <ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/ledger.md\n\n[261113-120001-pick-queue-technology] tier=lite phase=final loop=1/1 calls=12/~9\nWinner: shard plan 823\nControl arm: not run (the file was overwritten by a cleanup script)\nWrite the final for humans: <ROOT>/.council/runs/261113-120001-pick-queue-technology/final.md  (replace every TODO(chair))\n  Plain words, answer first, one diagram, evidence, risks, dissent, falsifiable metrics.\n  Merge in the best compatible ideas from the runners-up and the elders. Label every stand-in seat.\nTHEN  council ingest\n",
+   "err": ""
+  },
+  {
+   "put": "<ROOT>/.council/runs/261113-120001-pick-queue-technology/final.md",
+   "text": "# A decision\n\nNo sections here, and one TODO(chair) left.\n"
+  },
+  {
+   "cmd": [
+    "ingest"
+   ],
+   "clock": 40,
+   "rc": 2,
+   "out": "",
+   "err": "error: final.md is not ready:\n  1 TODO(chair) marker(s) left\n  missing section: **Answer:**\n  missing section: **ELI5:**\n  missing section: ## Risks\n  missing section: ## Dissent\n  missing section: ## How we'll know\n"
+  },
+  {
+   "put": "<ROOT>/.council/runs/261113-120001-pick-queue-technology/final.md",
+   "text": "# done: the decision in one line\n\n**Answer:** done: 2 to 3 plain sentences: the recommendation and its main reason.\n\n**ELI5:** done: 25 words at most.\n\ndone: one diagram of the decision, the flow, or before and after (or delete this line).\n\n## Why this wins\n- done: evidence with its source or check result.\n\n## What we considered and dropped\n| Option | Why it lost |\n| --- | --- |\n| rollout plan 642 | cut in loop 1: done one-line reason |\n| cache plan 796 | cut in loop 1: done one-line reason |\n\n## Risks and how we handle them\n| Risk | Severity | Mitigation | Owner |\n| --- | --- | --- | --- |\n| operational load | S2 | done | done |\n\n## Dissent (recorded, not averaged away)\n- None: every elder preferred the winner.\n\n## How we'll know (falsifiable)\n- Success metric at 30 and 90 days: done\n- Kill criterion: done\n\n## Next steps\n- [ ] done\n\n## Run facts\n- GATE tier=lite mode=fanout:claude profile=efficient loops<=1 calls~9 tokens~1.3M rel_cost=0.66 (explicit)\n- Winner: shard plan 823\n- Control arm (one-shot baseline, judged blind by the elders): not run (the file was overwritten by a cleanup script)\n- Seats: CTRL=Claude Fable 5.2 (low); EA=Claude Opus 5.5 (xhigh); L1=Claude Haiku 5.5 (xhigh); L2=Claude Fable 5.2 (low); L3=Claude Haiku 5.5 (xhigh); RT=Claude Opus 5.5 (xhigh)\n- Deviations: loop 1 ideate: seat L1 was left out after 2 rejected output(s): it failed twice in a row; loop 1 redteam: seat RT was left out after 1 rejected output(s): the red team never came back; loop 1 rank: seat L1 was left out after 0 rejected output(s): it timed out again; the control arm was lost after it was sealed: the file was overwritten by a cleanup script; loop 1 elders: C2 also went to the elders, because the vote could not judge it against C1, C3; protocol check: loop 1: no red-team step recorded\n"
+  },
+  {
+   "cmd": [
+    "ingest"
+   ],
+   "clock": 41,
+   "rc": 0,
+   "out": "final accepted\n\n[261113-120001-pick-queue-technology] tier=lite phase=retro loop=1/1 calls=12/~9\nWrite the retro: <ROOT>/.council/runs/261113-120001-pick-queue-technology/retro.md  (replace every TODO(chair); add 0 to 3 lesson lines)\n  Lessons must be things a future run can act on. Seat friction notes are prompts to fix the packets.\nTHEN  council ingest\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "ingest"
+   ],
+   "clock": 42,
+   "rc": 2,
+   "out": "",
+   "err": "error: retro.md has 4 TODO(chair) marker(s) left\n"
+  },
+  {
+   "put": "<ROOT>/.council/runs/261113-120001-pick-queue-technology/retro.md",
+   "text": "# Retro: 261113-120001-pick-queue-technology\n\nELI5: done one line\n\n- What worked: done\n- What did not: done\n- Calls: ideate 7, redteam 1, rank 3, elders 1. Total 12 (the gate estimated 9).\n- Loops used: 1 of 1. Rank-vote agreement per loop: 1.0.\n- Control arm: not run (the file was overwritten by a cleanup script)\n- Deviations: loop 1 ideate: seat L1 was left out after 2 rejected output(s): it failed twice in a row; loop 1 redteam: seat RT was left out after 1 rejected output(s): the red team never came back; loop 1 rank: seat L1 was left out after 0 rejected output(s): it timed out again; the control arm was lost after it was sealed: the file was overwritten by a cleanup script; loop 1 elders: C2 also went to the elders, because the vote could not judge it against C1, C3; protocol check: loop 1: no red-team step recorded\n- Shared memory (files: <ROOT>/.council/memory): 0 fact(s) added, 0 already held, 0 refused; 0 note(s), 0 of them questions for the researchers (0 never answered).\n- Codebase map: no mapper in this run\n- Friction reported by the seats:\n  - none\n\n## Lessons (0 to 3, one line each; they reach docs/lessons.md only through a PR)\n- [L-20261114-1] (helpful: 0 | harmful: 0) Lesson 1. Evidence: this run\n- [L-20261114-2] (helpful: 0 | harmful: 0) Lesson 2. Evidence: this run\n- [L-20261114-3] (helpful: 0 | harmful: 0) Lesson 3. Evidence: this run\n- [L-20261114-4] (helpful: 0 | harmful: 0) Lesson 4. Evidence: this run\n<!-- - [L-20261113-1] (helpful: 0 | harmful: 0) The lesson. Evidence: 261113-120001-pick-queue-technology -->\n\n## Lessons used in this run (bump helpful or harmful in the same PR)\n- L-20261113-1: done helpful or harmful, and why\n"
+  },
+  {
+   "cmd": [
+    "ingest"
+   ],
+   "clock": 43,
+   "rc": 2,
+   "out": "",
+   "err": "error: 4 lessons: keep the 3 that a future run can act on\n"
+  },
+  {
+   "put": "<ROOT>/.council/runs/261113-120001-pick-queue-technology/retro.md",
+   "text": "# Retro: 261113-120001-pick-queue-technology\n\nELI5: done one line\n\n- What worked: done\n- What did not: done\n- Calls: ideate 7, redteam 1, rank 3, elders 1. Total 12 (the gate estimated 9).\n- Loops used: 1 of 1. Rank-vote agreement per loop: 1.0.\n- Control arm: not run (the file was overwritten by a cleanup script)\n- Deviations: loop 1 ideate: seat L1 was left out after 2 rejected output(s): it failed twice in a row; loop 1 redteam: seat RT was left out after 1 rejected output(s): the red team never came back; loop 1 rank: seat L1 was left out after 0 rejected output(s): it timed out again; the control arm was lost after it was sealed: the file was overwritten by a cleanup script; loop 1 elders: C2 also went to the elders, because the vote could not judge it against C1, C3; protocol check: loop 1: no red-team step recorded\n- Shared memory (files: <ROOT>/.council/memory): 0 fact(s) added, 0 already held, 0 refused; 0 note(s), 0 of them questions for the researchers (0 never answered).\n- Codebase map: no mapper in this run\n- Friction reported by the seats:\n  - none\n\n## Lessons (0 to 3, one line each; they reach docs/lessons.md only through a PR)\n- [L1] a lesson in the wrong shape\n- [ ] not a lesson\n<!-- - [L-20261113-1] (helpful: 0 | harmful: 0) The lesson. Evidence: 261113-120001-pick-queue-technology -->\n\n## Lessons used in this run (bump helpful or harmful in the same PR)\n- L-20261113-1: done helpful or harmful, and why\n"
+  },
+  {
+   "cmd": [
+    "ingest"
+   ],
+   "clock": 44,
+   "rc": 2,
+   "out": "",
+   "err": "error: lesson lines must look like `- [L-YYYYMMDD-1] (helpful: 0 | harmful: 0) Text. Evidence: ...`:\n  - [L1] a lesson in the wrong shape\n  - [ ] not a lesson\n"
+  },
+  {
+   "put": "<ROOT>/.council/runs/261113-120001-pick-queue-technology/retro.md",
+   "text": "# Retro: 261113-120001-pick-queue-technology\n\nELI5: done one line\n\n- What worked: done\n- What did not: done\n- Calls: ideate 7, redteam 1, rank 3, elders 1. Total 12 (the gate estimated 9).\n- Loops used: 1 of 1. Rank-vote agreement per loop: 1.0.\n- Control arm: not run (the file was overwritten by a cleanup script)\n- Deviations: loop 1 ideate: seat L1 was left out after 2 rejected output(s): it failed twice in a row; loop 1 redteam: seat RT was left out after 1 rejected output(s): the red team never came back; loop 1 rank: seat L1 was left out after 0 rejected output(s): it timed out again; the control arm was lost after it was sealed: the file was overwritten by a cleanup script; loop 1 elders: C2 also went to the elders, because the vote could not judge it against C1, C3; protocol check: loop 1: no red-team step recorded\n- Shared memory (files: <ROOT>/.council/memory): 0 fact(s) added, 0 already held, 0 refused; 0 note(s), 0 of them questions for the researchers (0 never answered).\n- Codebase map: no mapper in this run\n- Friction reported by the seats:\n  - none\n\n## Lessons (0 to 3, one line each; they reach docs/lessons.md only through a PR)\n<!-- - [L-20261113-1] (helpful: 0 | harmful: 0) The lesson. Evidence: 261113-120001-pick-queue-technology -->\n\n## Lessons used in this run (bump helpful or harmful in the same PR)\n- L-20261113-1: done helpful or harmful, and why\n"
+  },
+  {
+   "cmd": [
+    "ingest"
+   ],
+   "clock": 45,
+   "rc": 0,
+   "out": "retro accepted: 0 lesson(s) proposed in <ROOT>/.council/runs/261113-120001-pick-queue-technology/lessons.proposed.md\nthe run is unblinded for the record: <ROOT>/.council/runs/261113-120001-pick-queue-technology/unblinded.json (check it any time with `council audit`)\nprotocol check: ERRORS ['loop 1: no red-team step recorded']; warnings: ['loop 1: L3 has 5 ideas over 25 words', 'deviation: loop 1 ideate: seat L1 was left out after 2 rejected output(s): it failed twice in a row', 'deviation: loop 1 redteam: seat RT was left out after 1 rejected output(s): the red team never came back', 'deviation: loop 1 rank: seat L1 was left out after 0 rejected output(s): it timed out again', 'deviation: the control arm was lost after it was sealed: the file was overwritten by a cleanup script', 'deviation: loop 1 elders: C2 also went to the elders, because the vote could not judge it against C1, C3', 'deviation: protocol check: loop 1: no red-team step recorded']\n\n[261113-120001-pick-queue-technology] tier=lite phase=done loop=1/1 calls=12/~9\nRun complete. Final: <ROOT>/.council/runs/261113-120001-pick-queue-technology/final.md\nOpen a PR that appends the proposed lessons to docs/lessons.md and adds a row to docs/outcomes.md (success metric, kill criterion, control-arm result). Check the outcome again at 30 and 90 days.\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "status"
+   ],
+   "clock": 46,
+   "rc": 0,
+   "out": "GATE tier=lite mode=fanout:claude profile=efficient loops<=1 calls~9 tokens~1.3M rel_cost=0.66 (explicit)\nrun 261113-120001-pick-queue-technology · phase done · loop 1/1\nask: Pick the queue technology for the billing pipeline\nbrief ELI5: choose the safest mail system\nrubric: R1 reliability (40), R2 cost (20), R3 simplicity (20), R4 speed to ship (10), R5 operability (10)\nlenses: L1 lens 1, L2 lens 2, L3 lens 3\nloop 1: two voters, one elder, no red team  -> kept C3 shard plan 823\nwinner: C3 · control arm: not run (the file was overwritten by a cleanup script)\ndeviations (6): loop 1 ideate: seat L1 was left out after 2 rejected output(s): it failed twice in a row; loop 1 redteam: seat RT was left out after 1 rejected output(s): the red team never came back; loop 1 rank: seat L1 was left out after 0 rejected output(s): it timed out again; the control arm was lost after it was sealed: the file was overwritten by a cleanup script; loop 1 elders: C2 also went to the elders, because the vote could not judge it against C1, C3; protocol check: loop 1: no red-team step recorded\nshared memory: files at <ROOT>/.council/memory · this run: 0 fact(s) added, 0 note(s), 0 question(s) waiting for the researchers\ncalls so far: 12 (estimate 9)\nnext: nothing, the run is finished. The decision: final.md in the run folder · re-count the votes: council audit\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "audit"
+   ],
+   "clock": 47,
+   "rc": 1,
+   "out": "loop 1 rank: ok  recorded C1 > C3 > C2 (2 ballots)\nseat outputs: 5 of 6 match what was ingested; CHANGED OR MISSING: control/CTRL.out.json\naudit: 1 problem(s)\n",
+   "err": ""
+  },
+  {
+   "put": "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/rank/L3.out.json",
+   "text": "{\n \"voter\": \"L3\",\n \"ranking\": [\n  \"A\",\n  \"C\",\n  \"B\"\n ],\n \"reasons\": {\n  \"B\": \"R1: strongest\"\n },\n \"best_on\": {\n  \"R1\": \"B\",\n  \"R2\": \"B\",\n  \"R3\": \"B\",\n  \"R4\": \"B\",\n  \"R5\": \"B\"\n }\n}"
+  },
+  {
+   "cmd": [
+    "audit"
+   ],
+   "clock": 48,
+   "rc": 1,
+   "out": "loop 1 rank: MISMATCH  recorded C1 > C3 > C2 (2 ballots); re-count C3 > C1 > C2 (2 ballots)\nseat outputs: 4 of 6 match what was ingested; CHANGED OR MISSING: control/CTRL.out.json, loop-1/rank/L3.out.json\naudit: 3 problem(s)\n",
+   "err": ""
+  },
+  {
+   "rm": "<BASE>/private/261113-120001-pick-queue-technology.json"
+  },
+  {
+   "rm": "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/ideate/L2.out.json"
+  },
+  {
+   "mkdir": "<BASE>/private"
+  },
+  {
+   "cmd": [
+    "audit"
+   ],
+   "clock": 49,
+   "rc": 1,
+   "out": "loop 1 rank: MISMATCH  recorded C1 > C3 > C2 (2 ballots); re-count C3 > C1 > C2 (2 ballots)\nseat outputs: 3 of 6 match what was ingested; CHANGED OR MISSING: loop-1/ideate/L2.out.json, control/CTRL.out.json, loop-1/rank/L3.out.json\naudit: 4 problem(s)\n",
+   "err": ""
+  },
+  {
+   "rm": "<ROOT>/.council/runs/261113-120001-pick-queue-technology/unblinded.json"
+  },
+  {
+   "cmd": [
+    "audit"
+   ],
+   "clock": 50,
+   "rc": 1,
+   "out": "loop 1 rank: CANNOT RE-COUNT (the who-wrote-what mapping is not available here)\nseat outputs: 3 of 6 match what was ingested; CHANGED OR MISSING: loop-1/ideate/L2.out.json, control/CTRL.out.json, loop-1/rank/L3.out.json\naudit: 4 problem(s)\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "check"
+   ],
+   "clock": 51,
+   "rc": 1,
+   "out": "{\n \"ok\": false,\n \"errors\": [\n  \"loop 1: no red-team step recorded\"\n ],\n \"warnings\": [\n  \"loop 1: L3 has 5 ideas over 25 words\",\n  \"deviation: loop 1 ideate: seat L1 was left out after 2 rejected output(s): it failed twice in a row\",\n  \"deviation: loop 1 redteam: seat RT was left out after 1 rejected output(s): the red team never came back\",\n  \"deviation: loop 1 rank: seat L1 was left out after 0 rejected output(s): it timed out again\",\n  \"deviation: the control arm was lost after it was sealed: the file was overwritten by a cleanup script\",\n  \"deviation: loop 1 elders: C2 also went to the elders, because the vote could not judge it against C1, C3\",\n  \"deviation: protocol check: loop 1: no red-team step recorded\"\n ]\n}\n",
+   "err": ""
+  }
+ ],
+ "final": {
+  "<ROOT>/.council/memory/index.md": {
+   "text": "---\ntype: \"index\"\ntags: [\"council/index\"]\nupdated: \"2026-11-13\"\n---\n\n# Council memory\n\nShared by every council run in this project. Written only by `council`; safe to read, link and tag.\n\n- **Research** (0 notes): one sourced fact per note, in `research/`.\n- **Commons** (0 runs): what members said to each other, in `commons/`.\n\n## Newest research\n\n- none yet\n\n## Use it\n\n- Find: `council memory search \"<words>\"`\n- Add by hand: `council memory add --claim \"…\" --source <url or file> --quote \"…\"`\n- Where this folder lives: `council memory status`\n"
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/brief.yaml": {
+   "as_put": true
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/control/CTRL.out.json": {
+   "as_put": true
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/control/CTRL.prompt.md": {
+   "text": "# Council packet · run 261113-120001-pick-queue-technology · CONTROL ARM · seat CTRL\n\nAnswer the ask below on your own, in one pass. Give your single best answer.\n\n## The ask (the requester's own words)\n> Pick the queue technology for the billing pipeline\n\n## Brief\nPick the queue technology for the billing pipeline.\n\n## Rubric (your answer is judged on this; weights sum to 100)\n| id | criterion | weight | checked by |\n| --- | --- | --- | --- |\n| R1 | reliability | 40 | judgment |\n| R2 | cost | 20 | judgment |\n| R3 | simplicity | 20 | judgment |\n| R4 | speed to ship | 10 | judgment |\n| R5 | operability | 10 | judgment |\n\n## Facts\nPeak is 4,000 events per second.\n\n## Do this\nWrite your one best answer as a card:\n- title: 8 words at most.\n- body: 90 to 110 words (a word is anything between spaces). What to do, how it works, and the\n  evidence it rests on. The card is judged blind next to others: do not say who or what you are,\n  and do not use seat ids such as L2 or RT.\n- eli5: 20 words at most.\nYou may read project files for evidence. If you have a shell, you may run code in a scratch copy to\ncheck a claim. Do not edit any project file.\n\n## Output\nWrite ONLY this JSON to the file `<ROOT>/.council/runs/261113-120001-pick-queue-technology/control/CTRL.out.json` (create it; overwrite it if it exists). Then reply with one line: done CTRL.out.json\n{\"title\": \"...\", \"body\": \"...\", \"eli5\": \"...\"}\n"
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/control/CTRL.rejected-1.json": {
+   "json": {
+    "title": "one shot answer",
+    "body": "seat L1 would say queue replica metric metric retries metric fallback replay audit backoff retries index queue latency latency metric rollout backoff cache cache replay fallback cache idempotent stream quorum audit audit stream budget replay budget latency queue idempotent backoff queue snapshot replica schema metric replay batch schema cache rollout batch retries audit idempotent shard throttle quorum index rollout fallback shard idempotent cache idempotent circuit rollout backoff tenant schema budget batch snapshot fallback cache stream index shard retries budget replay circuit audit shard shard metric circuit idempotent canary tenant schema canary canary throttle audit replay snapshot tenant batch canary queue replica ledger",
+    "eli5": "just do the obvious thing"
+   }
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/control/CTRL.retry.md": {
+   "text": "# Council packet · run 261113-120001-pick-queue-technology · CONTROL ARM · seat CTRL\n\nAnswer the ask below on your own, in one pass. Give your single best answer.\n\n## The ask (the requester's own words)\n> Pick the queue technology for the billing pipeline\n\n## Brief\nPick the queue technology for the billing pipeline.\n\n## Rubric (your answer is judged on this; weights sum to 100)\n| id | criterion | weight | checked by |\n| --- | --- | --- | --- |\n| R1 | reliability | 40 | judgment |\n| R2 | cost | 20 | judgment |\n| R3 | simplicity | 20 | judgment |\n| R4 | speed to ship | 10 | judgment |\n| R5 | operability | 10 | judgment |\n\n## Facts\nPeak is 4,000 events per second.\n\n## Do this\nWrite your one best answer as a card:\n- title: 8 words at most.\n- body: 90 to 110 words (a word is anything between spaces). What to do, how it works, and the\n  evidence it rests on. The card is judged blind next to others: do not say who or what you are,\n  and do not use seat ids such as L2 or RT.\n- eli5: 20 words at most.\nYou may read project files for evidence. If you have a shell, you may run code in a scratch copy to\ncheck a claim. Do not edit any project file.\n\n## Output\nWrite ONLY this JSON to the file `<ROOT>/.council/runs/261113-120001-pick-queue-technology/control/CTRL.out.json` (create it; overwrite it if it exists). Then reply with one line: done CTRL.out.json\n{\"title\": \"...\", \"body\": \"...\", \"eli5\": \"...\"}\n\n\n## Your previous output was rejected\n- control card: identity leak: the card names 'L1'. Reword it (\"one expert\", \"another card\"): cards are judged blind\n- control card: identity leak: 'seat L1'. Reword it without saying who wrote or holds what: cards are judged blind\nWrite the whole output again so that it is valid.\n"
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/events.jsonl": {
+   "text": "{\"t\": \"2026-11-13T12:00:01\", \"event\": \"verb\", \"verb\": \"init\", \"ok\": true, \"code\": 0, \"ms\": 0, \"phase\": [null, \"brief\"], \"loop\": [null, 0], \"error\": null}\n{\"t\": \"2026-11-13T12:00:02\", \"event\": \"verb\", \"verb\": \"ingest\", \"ok\": false, \"code\": 2, \"ms\": 0, \"phase\": [\"brief\", \"brief\"], \"loop\": [0, 0], \"error\": \"brief.yaml is not ready:\"}\n{\"t\": \"2026-11-13T12:00:03\", \"event\": \"verb\", \"verb\": \"ingest\", \"ok\": false, \"code\": 2, \"ms\": 0, \"phase\": [\"brief\", \"brief\"], \"loop\": [0, 0], \"error\": \"brief.yaml is not valid YAML: while parsing a flow sequence, expected ',' or ']' at byte 20 line 2 column 1\"}\n{\"t\": \"2026-11-13T12:00:04\", \"event\": \"verb\", \"verb\": \"ingest\", \"ok\": false, \"code\": 2, \"ms\": 0, \"phase\": [\"brief\", \"brief\"], \"loop\": [0, 0], \"error\": \"brief.yaml is missing. Run `council next`.\"}\n{\"t\": \"2026-11-13T12:00:05\", \"event\": \"verb\", \"verb\": \"next\", \"ok\": true, \"code\": 0, \"ms\": 0, \"phase\": [\"brief\", \"brief\"], \"loop\": [0, 0], \"error\": null}\n{\"t\": \"2026-11-13T12:00:06\", \"event\": \"verb\", \"verb\": \"ingest\", \"ok\": true, \"code\": 0, \"ms\": 0, \"phase\": [\"brief\", \"ideate\"], \"loop\": [0, 1], \"error\": null}\n{\"t\": \"2026-11-13T12:00:08\", \"event\": \"verb\", \"verb\": \"next\", \"ok\": true, \"code\": 0, \"ms\": 0, \"phase\": [\"ideate\", \"ideate\"], \"loop\": [1, 1], \"error\": null}\n{\"t\": \"2026-11-13T12:00:09\", \"event\": \"seat_output\", \"seat\": \"L1\", \"step\": \"ideate\", \"state\": \"rejected (attempt 1)\", \"errors\": [\"2 ideas, need at least 5\"]}\n{\"t\": \"2026-11-13T12:00:09\", \"event\": \"seat_output\", \"seat\": \"L3\", \"step\": \"ideate\", \"state\": \"rejected (attempt 1)\", \"errors\": [\"the output is not a JSON object (it starts: 'Sure! Here are my thoughts in prose, with {braces} and \\\"quotes\\\".')\"]}\n{\"t\": \"2026-11-13T12:00:09\", \"event\": \"seat_output\", \"seat\": \"CTRL\", \"step\": \"ideate\", \"state\": \"rejected (attempt 1)\", \"errors\": [\"control card: identity leak: the card names 'L1'. Reword it (\\\"one expert\\\", \\\"another card\\\"): cards are judged blind\", \"control card: identity leak: 'seat L1'. Reword it without saying who wrote or holds what: cards are judged blind\"]}\n{\"t\": \"2026-11-13T12:00:09\", \"event\": \"verb\", \"verb\": \"ingest\", \"ok\": false, \"code\": 2, \"ms\": 0, \"phase\": [\"ideate\", \"ideate\"], \"loop\": [1, 1], \"error\": \"Not all seats are in yet (1 of 4 valid):\"}\n{\"t\": \"2026-11-13T12:00:11\", \"event\": \"verb\", \"verb\": \"next\", \"ok\": true, \"code\": 0, \"ms\": 0, \"phase\": [\"ideate\", \"ideate\"], \"loop\": [1, 1], \"error\": null}\n{\"t\": \"2026-11-13T12:00:12\", \"event\": \"verb\", \"verb\": \"ingest\", \"ok\": false, \"code\": 2, \"ms\": 0, \"phase\": [\"ideate\", \"ideate\"], \"loop\": [1, 1], \"error\": \"Not all seats are in yet (1 of 4 valid):\"}\n{\"t\": \"2026-11-13T12:00:13\", \"event\": \"verb\", \"verb\": \"ingest\", \"ok\": false, \"code\": 2, \"ms\": 0, \"phase\": [\"ideate\", \"ideate\"], \"loop\": [1, 1], \"error\": \"Not all seats are in yet (1 of 4 valid):\"}\n{\"t\": \"2026-11-13T12:00:14\", \"event\": \"verb\", \"verb\": \"dispatch\", \"ok\": true, \"code\": 0, \"ms\": 0, \"phase\": [\"ideate\", \"ideate\"], \"loop\": [1, 1], \"error\": null}\n{\"t\": \"2026-11-13T12:00:15\", \"event\": \"seat_output\", \"seat\": \"L1\", \"step\": \"ideate\", \"state\": \"rejected (attempt 2)\", \"errors\": [\"2 ideas, need at least 5\"]}\n{\"t\": \"2026-11-13T12:00:15\", \"event\": \"verb\", \"verb\": \"ingest\", \"ok\": false, \"code\": 2, \"ms\": 0, \"phase\": [\"ideate\", \"ideate\"], \"loop\": [1, 1], \"error\": \"Not all seats are in yet (3 of 4 valid):\"}\n{\"t\": \"2026-11-13T12:00:17\", \"event\": \"verb\", \"verb\": \"ingest\", \"ok\": true, \"code\": 0, \"ms\": 0, \"phase\": [\"ideate\", \"merge\"], \"loop\": [1, 1], \"error\": null}\n{\"t\": \"2026-11-13T12:00:18\", \"event\": \"verb\", \"verb\": \"ingest\", \"ok\": false, \"code\": 2, \"ms\": 0, \"phase\": [\"merge\", \"merge\"], \"loop\": [1, 1], \"error\": \"pool.json is not ready:\"}\n{\"t\": \"2026-11-13T12:00:19\", \"event\": \"verb\", \"verb\": \"ingest\", \"ok\": false, \"code\": 2, \"ms\": 0, \"phase\": [\"merge\", \"merge\"], \"loop\": [1, 1], \"error\": \"pool.json is not ready:\"}\n{\"t\": \"2026-11-13T12:00:20\", \"event\": \"verb\", \"verb\": \"ingest\", \"ok\": false, \"code\": 2, \"ms\": 0, \"phase\": [\"merge\", \"merge\"], \"loop\": [1, 1], \"error\": \"pool.json is not ready:\"}\n{\"t\": \"2026-11-13T12:00:21\", \"event\": \"verb\", \"verb\": \"ingest\", \"ok\": false, \"code\": 2, \"ms\": 0, \"phase\": [\"merge\", \"merge\"], \"loop\": [1, 1], \"error\": \"<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/pool.json must hold {\\\"reviewed\\\": true, \\\"pool\\\": [...]}\"}\n{\"t\": \"2026-11-13T12:00:22\", \"event\": \"verb\", \"verb\": \"ingest\", \"ok\": true, \"code\": 0, \"ms\": 0, \"phase\": [\"merge\", \"redteam\"], \"loop\": [1, 1], \"error\": null}\n{\"t\": \"2026-11-13T12:00:23\", \"event\": \"seat_output\", \"seat\": \"RT\", \"step\": \"redteam\", \"state\": \"rejected (attempt 1)\", \"errors\": [\"the output is not a JSON object (it starts: 'I could not find anything wrong.')\"]}\n{\"t\": \"2026-11-13T12:00:23\", \"event\": \"verb\", \"verb\": \"ingest\", \"ok\": false, \"code\": 2, \"ms\": 0, \"phase\": [\"redteam\", \"redteam\"], \"loop\": [1, 1], \"error\": \"Not all seats are in yet (0 of 1 valid):\"}\n{\"t\": \"2026-11-13T12:00:24\", \"event\": \"verb\", \"verb\": \"ingest\", \"ok\": true, \"code\": 0, \"ms\": 0, \"phase\": [\"redteam\", \"fuse\"], \"loop\": [1, 1], \"error\": null}\n{\"t\": \"2026-11-13T12:00:25\", \"event\": \"verb\", \"verb\": \"ingest\", \"ok\": false, \"code\": 2, \"ms\": 0, \"phase\": [\"fuse\", \"fuse\"], \"loop\": [1, 1], \"error\": \"candidates.json is not ready:\"}\n{\"t\": \"2026-11-13T12:00:26\", \"event\": \"verb\", \"verb\": \"ingest\", \"ok\": false, \"code\": 2, \"ms\": 0, \"phase\": [\"fuse\", \"fuse\"], \"loop\": [1, 1], \"error\": \"<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/candidates.json must hold {\\\"candidates\\\": [...], \\\"responses\\\": [...], \\\"checks\\\": {}}\"}\n{\"t\": \"2026-11-13T12:00:27\", \"event\": \"verb\", \"verb\": \"ingest\", \"ok\": true, \"code\": 0, \"ms\": 0, \"phase\": [\"fuse\", \"rank\"], \"loop\": [1, 1], \"error\": null}\n{\"t\": \"2026-11-13T12:00:28\", \"event\": \"verb\", \"verb\": \"ingest\", \"ok\": false, \"code\": 2, \"ms\": 0, \"phase\": [\"rank\", \"rank\"], \"loop\": [1, 1], \"error\": \"Not all seats are in yet (1 of 3 valid):\"}\n{\"t\": \"2026-11-13T12:00:29\", \"event\": \"seat_output\", \"seat\": \"L2\", \"step\": \"rank\", \"state\": \"rejected (attempt 1)\", \"errors\": [\"the ranking covers 2 of 3 cards: rank every label once, best first (missing ['C'], unknown [])\"]}\n{\"t\": \"2026-11-13T12:00:29\", \"event\": \"verb\", \"verb\": \"ingest\", \"ok\": false, \"code\": 2, \"ms\": 0, \"phase\": [\"rank\", \"rank\"], \"loop\": [1, 1], \"error\": \"Not all seats are in yet (1 of 3 valid):\"}\n{\"t\": \"2026-11-13T12:00:30\", \"event\": \"verb\", \"verb\": \"ingest\", \"ok\": false, \"code\": 2, \"ms\": 0, \"phase\": [\"rank\", \"elders\"], \"loop\": [1, 1], \"error\": \"the control arm is sealed, but <ROOT>/.council/runs/261113-120001-pick-queue-technology/control/CTRL.out.json is missing or was changed after it was ingested.\"}\n{\"t\": \"2026-11-13T12:00:33\", \"event\": \"verb\", \"verb\": \"next\", \"ok\": false, \"code\": 2, \"ms\": 0, \"phase\": [\"elders\", \"elders\"], \"loop\": [1, 1], \"error\": \"the control arm is sealed, but <ROOT>/.council/runs/261113-120001-pick-queue-technology/control/CTRL.out.json is missing or was changed after it was ingested.\"}\n{\"t\": \"2026-11-13T12:00:34\", \"event\": \"verb\", \"verb\": \"next\", \"ok\": false, \"code\": 2, \"ms\": 0, \"phase\": [\"elders\", \"elders\"], \"loop\": [1, 1], \"error\": \"say what happened to the control arm: --without-control \\\"<what happened>\\\"\"}\n{\"t\": \"2026-11-13T12:00:35\", \"event\": \"verb\", \"verb\": \"next\", \"ok\": true, \"code\": 0, \"ms\": 0, \"phase\": [\"elders\", \"elders\"], \"loop\": [1, 1], \"error\": null}\n{\"t\": \"2026-11-13T12:00:36\", \"event\": \"verb\", \"verb\": \"next\", \"ok\": false, \"code\": 2, \"ms\": 0, \"phase\": [\"elders\", \"elders\"], \"loop\": [1, 1], \"error\": \"this run has no sealed control arm to give up\"}\n{\"t\": \"2026-11-13T12:00:37\", \"event\": \"verb\", \"verb\": \"ingest\", \"ok\": true, \"code\": 0, \"ms\": 0, \"phase\": [\"elders\", \"cut\"], \"loop\": [1, 1], \"error\": null}\n{\"t\": \"2026-11-13T12:00:38\", \"event\": \"verb\", \"verb\": \"next\", \"ok\": true, \"code\": 0, \"ms\": 0, \"phase\": [\"cut\", \"cut\"], \"loop\": [1, 1], \"error\": null}\n{\"t\": \"2026-11-13T12:00:39\", \"event\": \"verb\", \"verb\": \"cut\", \"ok\": true, \"code\": 0, \"ms\": 0, \"phase\": [\"cut\", \"final\"], \"loop\": [1, 1], \"error\": null}\n{\"t\": \"2026-11-13T12:00:40\", \"event\": \"verb\", \"verb\": \"ingest\", \"ok\": false, \"code\": 2, \"ms\": 0, \"phase\": [\"final\", \"final\"], \"loop\": [1, 1], \"error\": \"final.md is not ready:\"}\n{\"t\": \"2026-11-13T12:00:41\", \"event\": \"verb\", \"verb\": \"ingest\", \"ok\": true, \"code\": 0, \"ms\": 0, \"phase\": [\"final\", \"retro\"], \"loop\": [1, 1], \"error\": null}\n{\"t\": \"2026-11-13T12:00:42\", \"event\": \"verb\", \"verb\": \"ingest\", \"ok\": false, \"code\": 2, \"ms\": 0, \"phase\": [\"retro\", \"retro\"], \"loop\": [1, 1], \"error\": \"retro.md has 4 TODO(chair) marker(s) left\"}\n{\"t\": \"2026-11-13T12:00:43\", \"event\": \"verb\", \"verb\": \"ingest\", \"ok\": false, \"code\": 2, \"ms\": 0, \"phase\": [\"retro\", \"retro\"], \"loop\": [1, 1], \"error\": \"4 lessons: keep the 3 that a future run can act on\"}\n{\"t\": \"2026-11-13T12:00:44\", \"event\": \"verb\", \"verb\": \"ingest\", \"ok\": false, \"code\": 2, \"ms\": 0, \"phase\": [\"retro\", \"retro\"], \"loop\": [1, 1], \"error\": \"lesson lines must look like `- [L-YYYYMMDD-1] (helpful: 0 | harmful: 0) Text. Evidence: ...`:\"}\n{\"t\": \"2026-11-13T12:00:45\", \"event\": \"verb\", \"verb\": \"ingest\", \"ok\": true, \"code\": 0, \"ms\": 0, \"phase\": [\"retro\", \"done\"], \"loop\": [1, 1], \"error\": null}\n"
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/final.md": {
+   "as_put": true
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/focus-map.md": {
+   "text": ""
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/lessons.proposed.md": {
+   "text": ""
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/candidates.json": {
+   "as_put": true
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/cards.md": {
+   "text": "# Kept cards, loop 1 (4 cards)\n\nLikely overlaps (word overlap; your judgment decides):\n- L2#2 ~ L3#2 (100%)\n- L2#1 ~ L3#2 (100%)\n- L2#1 ~ L2#2 (100%)\n- L3#1 ~ L3#2 (96%)\n- L2#2 ~ L3#1 (96%)\n- L2#1 ~ L3#1 (96%)\n\n## L2#1: rollout plan 642\nindex idempotent replica queue audit queue replica canary idempotent idempotent snapshot tenant metric budget backoff index cache snapshot retries index budget budget batch stream canary budget queue canary replica fallback throttle idempotent throttle retries metric tenant tenant circuit tenant shard cache retries schema throttle throttle backoff budget tenant shard latency schema metric stream retries budget schema retries throttle index fallback stream snapshot shard index idempotent quorum latency schema replica stream quorum cache queue tenant retries audit index index idempotent ledger snapshot replica replay backoff stream queue fallback fallback shard circuit idempotent canary canary cache circuit retries batch queue\nWins: R1 · Evidence: unverified\nELI5: a safer way to do it\n\n## L2#2: cache plan 796\nledger stream audit rollout tenant cache batch latency throttle ledger budget queue fallback circuit throttle tenant schema retries backoff canary canary budget stream retries rollout cache shard canary latency rollout tenant circuit queue idempotent stream throttle index queue replica metric stream metric shard quorum batch rollout replica replica index schema index stream throttle shard cache metric cache metric throttle audit backoff circuit batch replay canary canary idempotent audit quorum shard audit metric replay circuit ledger replica snapshot replica schema throttle circuit quorum throttle rollout replica replay metric idempotent throttle ledger latency backoff circuit tenant replay canary index ledger\nWins: R1 · Evidence: unverified\nELI5: a safer way to do it\n\n## L3#1: shard plan 823\nindex batch ledger schema canary schema cache index replay replica retries ledger schema throttle fallback canary throttle replica cache tenant ledger replay canary throttle fallback idempotent queue quorum batch schema budget throttle latency throttle quorum idempotent cache quorum shard shard fallback quorum snapshot ledger fallback replay cache throttle canary canary replay tenant stream latency stream rollout shard stream quorum backoff tenant budget schema idempotent snapshot tenant backoff rollout ledger replay metric budget tenant batch throttle idempotent shard index backoff metric fallback quorum queue queue batch circuit snapshot batch retries stream ledger retries batch canary circuit snapshot quorum budget\nWins: R1 · Evidence: unverified\nELI5: a safer way to do it\n\n## L3#2: fallback plan 960\ncircuit replay snapshot queue shard circuit rollout replay ledger audit batch cache queue audit budget snapshot canary throttle throttle budget idempotent stream latency cache ledger stream latency replica throttle circuit circuit retries tenant rollout ledger throttle canary budget replay quorum index tenant ledger circuit circuit queue retries latency ledger audit backoff audit batch stream replay idempotent latency budget fallback budget replay canary audit index stream schema idempotent latency latency quorum queue rollout batch batch backoff quorum index backoff index tenant ledger metric fallback snapshot backoff shard ledger rollout retries circuit tenant replay replay batch latency backoff latency fallback\nWins: R1 · Evidence: unverified\nELI5: a safer way to do it\n"
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/elders/EA.out.json": {
+   "as_put": true
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/elders/EA.prompt.md": {
+   "text": "# Council packet · run 261113-120001-pick-queue-technology · loop 1 · ELDER REVIEW · seat EA\n\nYou are an independent elder reviewing the council's finalists. You do not know who or what wrote\nany candidate; do not guess. Judge only against the ask and the rubric below. Ignore length and\npolish. If you are unsure, say so in your confidence.\n\n## The ask (the requester's own words, verbatim)\n> Pick the queue technology for the billing pipeline\n\n## Rubric (weights sum to 100)\n| id | criterion | weight | checked by |\n| --- | --- | --- | --- |\n| R1 | reliability | 40 | judgment |\n| R2 | cost | 20 | judgment |\n| R3 | simplicity | 20 | judgment |\n| R4 | speed to ship | 10 | judgment |\n| R5 | operability | 10 | judgment |\n\n## Facts\nPeak is 4,000 events per second.\n\n## Candidates\n### Candidate A: shard plan 823\nindex batch ledger schema canary schema cache index replay replica retries ledger schema throttle fallback canary throttle replica cache tenant ledger replay canary throttle fallback idempotent queue quorum batch schema budget throttle latency throttle quorum idempotent cache quorum shard shard fallback quorum snapshot ledger fallback replay cache throttle canary canary replay tenant stream latency stream rollout shard stream quorum backoff tenant budget schema idempotent snapshot tenant backoff rollout ledger replay metric budget tenant batch throttle idempotent shard index backoff metric fallback quorum queue queue batch circuit snapshot batch retries stream ledger retries batch canary circuit snapshot quorum budget\nELI5: a safer way to do it\n\n### Candidate B: cache plan 796\nledger stream audit rollout tenant cache batch latency throttle ledger budget queue fallback circuit throttle tenant schema retries backoff canary canary budget stream retries rollout cache shard canary latency rollout tenant circuit queue idempotent stream throttle index queue replica metric stream metric shard quorum batch rollout replica replica index schema index stream throttle shard cache metric cache metric throttle audit backoff circuit batch replay canary canary idempotent audit quorum shard audit metric replay circuit ledger replica snapshot replica schema throttle circuit quorum throttle rollout replica replay metric idempotent throttle ledger latency backoff circuit tenant replay canary index ledger\nELI5: a safer way to do it\n\n### Candidate C: rollout plan 642\nindex idempotent replica queue audit queue replica canary idempotent idempotent snapshot tenant metric budget backoff index cache snapshot retries index budget budget batch stream canary budget queue canary replica fallback throttle idempotent throttle retries metric tenant tenant circuit tenant shard cache retries schema throttle throttle backoff budget tenant shard latency schema metric stream retries budget schema retries throttle index fallback stream snapshot shard index idempotent quorum latency schema replica stream quorum cache queue tenant retries audit index index idempotent ledger snapshot replica replay backoff stream queue fallback fallback shard circuit idempotent canary canary cache circuit retries batch queue\nELI5: a safer way to do it\n\n## Machine checks (a fail outranks any vote)\n- Candidate B: pass\n\n## Do this\n- Score every candidate 1 to 10 on every rubric id.\n- Give each a verdict: ship, revise or kill.\n- Name the one you prefer.\n- List at most 3 risks (S1 = blocks shipping, S2 = must fix soon, S3 = minor). No nitpicks.\n  If you can run code or read project files, reproduce a claim before you rely on it, in a scratch copy (never in the project), and say \"reproduced\" or \"not checked\".\n- Give the one fix that matters most, and one idea of your own that no candidate has.\n- Share what you learn. A fact you checked that others could use goes under \"research\" with its source (a web address you opened, a file path, or `test: <command>`): it is kept in the council's research memory. A thought, a doubt or a question goes under \"notes\", addressed to \"all\" (members read it unsigned at the next step), \"chair\". Describe an idea by what it does, never by its letter: letters change between steps. Both fields are optional.\n\n## Output\nWrite ONLY this JSON to the file `<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/elders/EA.out.json` (create it; overwrite it if it exists). Then reply with one line: done EA.out.json\n{\"scores\": {\"<label>\": {\"R1\": 0, \"R2\": 0}},\n \"verdict\": {\"<label>\": \"ship|revise|kill\"},\n \"preferred\": \"<label>\",\n \"confidence\": 0.0,\n \"top_risks\": [{\"risk\": \"...\", \"severity\": \"S1|S2|S3\", \"candidate\": \"<label or all>\"}],\n \"key_fix\": \"...\",\n \"own_idea\": \"...\",\n \"eli5\": \"<20 words at most>\",\n \"research\": [{\"claim\": \"...\", \"source\": \"<web address or file path>\", \"quote\": \"...\", \"confidence\": \"high|medium|low\"}],\n \"notes\": [{\"to\": \"all|chair|research\", \"text\": \"...\"}],\n \"friction\": \"<optional: one line on anything unclear in this packet>\"}\n"
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/elders/packet.md": {
+   "text": "### Candidate A: shard plan 823\nindex batch ledger schema canary schema cache index replay replica retries ledger schema throttle fallback canary throttle replica cache tenant ledger replay canary throttle fallback idempotent queue quorum batch schema budget throttle latency throttle quorum idempotent cache quorum shard shard fallback quorum snapshot ledger fallback replay cache throttle canary canary replay tenant stream latency stream rollout shard stream quorum backoff tenant budget schema idempotent snapshot tenant backoff rollout ledger replay metric budget tenant batch throttle idempotent shard index backoff metric fallback quorum queue queue batch circuit snapshot batch retries stream ledger retries batch canary circuit snapshot quorum budget\nELI5: a safer way to do it\n\n### Candidate B: cache plan 796\nledger stream audit rollout tenant cache batch latency throttle ledger budget queue fallback circuit throttle tenant schema retries backoff canary canary budget stream retries rollout cache shard canary latency rollout tenant circuit queue idempotent stream throttle index queue replica metric stream metric shard quorum batch rollout replica replica index schema index stream throttle shard cache metric cache metric throttle audit backoff circuit batch replay canary canary idempotent audit quorum shard audit metric replay circuit ledger replica snapshot replica schema throttle circuit quorum throttle rollout replica replay metric idempotent throttle ledger latency backoff circuit tenant replay canary index ledger\nELI5: a safer way to do it\n\n### Candidate C: rollout plan 642\nindex idempotent replica queue audit queue replica canary idempotent idempotent snapshot tenant metric budget backoff index cache snapshot retries index budget budget batch stream canary budget queue canary replica fallback throttle idempotent throttle retries metric tenant tenant circuit tenant shard cache retries schema throttle throttle backoff budget tenant shard latency schema metric stream retries budget schema retries throttle index fallback stream snapshot shard index idempotent quorum latency schema replica stream quorum cache queue tenant retries audit index index idempotent ledger snapshot replica replay backoff stream queue fallback fallback shard circuit idempotent canary canary cache circuit retries batch queue\nELI5: a safer way to do it"
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/fuse-input.md": {
+   "text": "# Fuse input, loop 1: make exactly 3 candidates\n\n## P1: rollout plan 642  (authors L2, L3)\nindex idempotent replica queue audit queue replica canary idempotent idempotent snapshot tenant metric budget backoff index cache snapshot retries index budget budget batch stream canary budget queue canary replica fallback throttle idempotent throttle retries metric tenant tenant circuit tenant shard cache retries schema throttle throttle backoff budget tenant shard latency schema metric stream retries budget schema retries throttle index fallback stream snapshot shard index idempotent quorum latency schema replica stream quorum cache queue tenant retries audit index index idempotent ledger snapshot replica replay backoff stream queue fallback fallback shard circuit idempotent canary canary cache circuit retries batch queue\nELI5: a safer way to do it\n\n## P2: cache plan 796  (authors L2)\nledger stream audit rollout tenant cache batch latency throttle ledger budget queue fallback circuit throttle tenant schema retries backoff canary canary budget stream retries rollout cache shard canary latency rollout tenant circuit queue idempotent stream throttle index queue replica metric stream metric shard quorum batch rollout replica replica index schema index stream throttle shard cache metric cache metric throttle audit backoff circuit batch replay canary canary idempotent audit quorum shard audit metric replay circuit ledger replica snapshot replica schema throttle circuit quorum throttle rollout replica replay metric idempotent throttle ledger latency backoff circuit tenant replay canary index ledger\nELI5: a safer way to do it\n\n## P3: shard plan 823  (authors L3)\nindex batch ledger schema canary schema cache index replay replica retries ledger schema throttle fallback canary throttle replica cache tenant ledger replay canary throttle fallback idempotent queue quorum batch schema budget throttle latency throttle quorum idempotent cache quorum shard shard fallback quorum snapshot ledger fallback replay cache throttle canary canary replay tenant stream latency stream rollout shard stream quorum backoff tenant budget schema idempotent snapshot tenant backoff rollout ledger replay metric budget tenant batch throttle idempotent shard index backoff metric fallback quorum queue queue batch circuit snapshot batch retries stream ledger retries batch canary circuit snapshot quorum budget\nELI5: a safer way to do it\n\n## Red-team findings (answer every S1 and S2)\n(none recorded)"
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/ideate/L1.prompt.md": {
+   "text": "# Council packet · run 261113-120001-pick-queue-technology · loop 1 · IDEATE · seat L1\n\nYou are one of 3 independent experts on a council. Work alone. Do not look for other\nexperts' files or try to guess what they will say: the council only works if ideas are independent.\n\n## The ask (the requester's own words)\n> Pick the queue technology for the billing pipeline\n\n## Brief\nPick the queue technology for the billing pipeline.\nELI5: choose the safest mail system\n\n## Rubric (every idea is judged on this; weights sum to 100)\n| id | criterion | weight | checked by |\n| --- | --- | --- | --- |\n| R1 | reliability | 40 | judgment |\n| R2 | cost | 20 | judgment |\n| R3 | simplicity | 20 | judgment |\n| R4 | speed to ship | 10 | judgment |\n| R5 | operability | 10 | judgment |\n\n## Your lens: lens 1\n- Maximise: one thing\n- Must respect: a limit\n- Method: first principles\n- Evidence to draw on: facts\n\n## Facts\nPeak is 4,000 events per second.\n\n## Do this\n1. Write at least 5 distinct ideas, one line each, 25 words at most: what it is, then why it\n   wins on the rubric. Go wide before you go deep: include at least 2 contrarian ideas and at least\n   2 that are much simpler than the obvious answer.\n2. Critique your own list against the rubric. Keep your best 2. Write each as a card:\n   - title: 8 words at most.\n   - body: 90 to 110 words (a word is anything between spaces). What it is, how it works, and the\n     evidence it rests on. Cards are judged blind: do not name yourself, your lens, or any seat id\n     such as L2 or RT, even as an example. Write \"one expert\" or \"the red team\" instead.\n   - wins: the rubric ids it is strongest on.\n   - evidence: where the support comes from (file path, number, source). Write \"unverified\" for a\n     claim you could not check. Never claim a check you did not run.\n   - eli5: 20 words at most.\n3. You may read project files for evidence. Facts from outside the project are the researchers'\n   to bring: ask for one in `notes` with \"to\": \"research\". If you have a shell, you may run code\n   in a scratch copy to check a claim. Do not edit any project file.\n4. Share what you learn. A fact you checked that others could use goes under \"research\" with its source (a web address you opened, a file path, or `test: <command>`): it is kept in the council's research memory. A thought, a doubt or a question goes under \"notes\", addressed to \"all\" (members read it unsigned at the next step), \"chair\". Describe an idea by what it does, never by its letter: letters change between steps. Both fields are optional.\n\n## Output\nWrite ONLY this JSON to the file `<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/ideate/L1.out.json` (create it; overwrite it if it exists). Then reply with one line: done L1.out.json\n{\"lens\": \"L1\",\n \"eli5\": \"<your overall take, 20 words at most>\",\n \"ideas\": [\"<idea 1>\", \"<idea 2>\", \"... at least 5\"],\n \"cards\": [{\"title\": \"...\", \"body\": \"...\", \"wins\": [\"R1\"], \"evidence\": \"...\", \"eli5\": \"...\"}],\n \"research\": [{\"claim\": \"...\", \"source\": \"<web address or file path>\", \"quote\": \"...\", \"confidence\": \"high|medium|low\"}],\n \"notes\": [{\"to\": \"all|chair|research\", \"text\": \"...\"}],\n \"friction\": \"<optional: one line on anything unclear or missing in this packet>\"}\n"
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/ideate/L1.rejected-1.json": {
+   "json": {
+    "lens": "L1",
+    "eli5": "try the simple thing first",
+    "ideas": [
+     "idea 0 here: use idempotent to cut batch risk",
+     "idea 1 here: use queue to cut throttle risk"
+    ],
+    "cards": [
+     {
+      "title": "cache plan 848",
+      "body": "schema backoff fallback tenant circuit snapshot budget circuit index tenant replica rollout retries backoff quorum backoff idempotent backoff retries snapshot replica throttle backoff audit idempotent backoff quorum circuit shard metric snapshot fallback shard circuit idempotent stream queue idempotent audit throttle cache batch stream snapshot quorum canary canary canary replay backoff quorum cache quorum metric rollout metric idempotent retries audit idempotent tenant throttle index throttle schema replica retries retries queue tenant shard throttle audit metric shard index budget throttle budget batch canary fallback shard idempotent budget budget fallback metric idempotent audit latency stream index audit audit circuit replica cache",
+      "wins": [
+       "R1"
+      ],
+      "evidence": "unverified",
+      "eli5": "a safer way to do it"
+     },
+     {
+      "title": "queue plan 706",
+      "body": "fallback canary quorum index latency budget schema circuit index stream audit queue shard stream canary throttle schema queue latency metric circuit throttle throttle quorum replica latency retries snapshot idempotent snapshot audit fallback canary stream schema index circuit index budget throttle latency throttle queue stream schema idempotent throttle index cache throttle batch queue snapshot index index budget latency cache audit replay replay circuit idempotent idempotent queue circuit batch fallback cache quorum metric snapshot canary cache circuit throttle retries audit replica canary snapshot audit snapshot metric snapshot tenant rollout index retries backoff circuit batch audit replay schema stream index queue",
+      "wins": [
+       "R1"
+      ],
+      "evidence": "unverified",
+      "eli5": "a safer way to do it"
+     }
+    ],
+    "friction": "the facts section was thin"
+   }
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/ideate/L1.rejected-2.json": {
+   "json": {
+    "lens": "L1",
+    "eli5": "try the simple thing first",
+    "ideas": [
+     "idea 0 here: use idempotent to cut batch risk",
+     "idea 1 here: use queue to cut throttle risk"
+    ],
+    "cards": [
+     {
+      "title": "cache plan 848",
+      "body": "schema backoff fallback tenant circuit snapshot budget circuit index tenant replica rollout retries backoff quorum backoff idempotent backoff retries snapshot replica throttle backoff audit idempotent backoff quorum circuit shard metric snapshot fallback shard circuit idempotent stream queue idempotent audit throttle cache batch stream snapshot quorum canary canary canary replay backoff quorum cache quorum metric rollout metric idempotent retries audit idempotent tenant throttle index throttle schema replica retries retries queue tenant shard throttle audit metric shard index budget throttle budget batch canary fallback shard idempotent budget budget fallback metric idempotent audit latency stream index audit audit circuit replica cache",
+      "wins": [
+       "R1"
+      ],
+      "evidence": "unverified",
+      "eli5": "a safer way to do it"
+     },
+     {
+      "title": "queue plan 706",
+      "body": "fallback canary quorum index latency budget schema circuit index stream audit queue shard stream canary throttle schema queue latency metric circuit throttle throttle quorum replica latency retries snapshot idempotent snapshot audit fallback canary stream schema index circuit index budget throttle latency throttle queue stream schema idempotent throttle index cache throttle batch queue snapshot index index budget latency cache audit replay replay circuit idempotent idempotent queue circuit batch fallback cache quorum metric snapshot canary cache circuit throttle retries audit replica canary snapshot audit snapshot metric snapshot tenant rollout index retries backoff circuit batch audit replay schema stream index queue",
+      "wins": [
+       "R1"
+      ],
+      "evidence": "unverified",
+      "eli5": "a safer way to do it"
+     }
+    ],
+    "friction": "the facts section was thin"
+   }
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/ideate/L1.retry.md": {
+   "text": "# Council packet · run 261113-120001-pick-queue-technology · loop 1 · IDEATE · seat L1\n\nYou are one of 3 independent experts on a council. Work alone. Do not look for other\nexperts' files or try to guess what they will say: the council only works if ideas are independent.\n\n## The ask (the requester's own words)\n> Pick the queue technology for the billing pipeline\n\n## Brief\nPick the queue technology for the billing pipeline.\nELI5: choose the safest mail system\n\n## Rubric (every idea is judged on this; weights sum to 100)\n| id | criterion | weight | checked by |\n| --- | --- | --- | --- |\n| R1 | reliability | 40 | judgment |\n| R2 | cost | 20 | judgment |\n| R3 | simplicity | 20 | judgment |\n| R4 | speed to ship | 10 | judgment |\n| R5 | operability | 10 | judgment |\n\n## Your lens: lens 1\n- Maximise: one thing\n- Must respect: a limit\n- Method: first principles\n- Evidence to draw on: facts\n\n## Facts\nPeak is 4,000 events per second.\n\n## Do this\n1. Write at least 5 distinct ideas, one line each, 25 words at most: what it is, then why it\n   wins on the rubric. Go wide before you go deep: include at least 2 contrarian ideas and at least\n   2 that are much simpler than the obvious answer.\n2. Critique your own list against the rubric. Keep your best 2. Write each as a card:\n   - title: 8 words at most.\n   - body: 90 to 110 words (a word is anything between spaces). What it is, how it works, and the\n     evidence it rests on. Cards are judged blind: do not name yourself, your lens, or any seat id\n     such as L2 or RT, even as an example. Write \"one expert\" or \"the red team\" instead.\n   - wins: the rubric ids it is strongest on.\n   - evidence: where the support comes from (file path, number, source). Write \"unverified\" for a\n     claim you could not check. Never claim a check you did not run.\n   - eli5: 20 words at most.\n3. You may read project files for evidence. Facts from outside the project are the researchers'\n   to bring: ask for one in `notes` with \"to\": \"research\". If you have a shell, you may run code\n   in a scratch copy to check a claim. Do not edit any project file.\n4. Share what you learn. A fact you checked that others could use goes under \"research\" with its source (a web address you opened, a file path, or `test: <command>`): it is kept in the council's research memory. A thought, a doubt or a question goes under \"notes\", addressed to \"all\" (members read it unsigned at the next step), \"chair\". Describe an idea by what it does, never by its letter: letters change between steps. Both fields are optional.\n\n## Output\nWrite ONLY this JSON to the file `<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/ideate/L1.out.json` (create it; overwrite it if it exists). Then reply with one line: done L1.out.json\n{\"lens\": \"L1\",\n \"eli5\": \"<your overall take, 20 words at most>\",\n \"ideas\": [\"<idea 1>\", \"<idea 2>\", \"... at least 5\"],\n \"cards\": [{\"title\": \"...\", \"body\": \"...\", \"wins\": [\"R1\"], \"evidence\": \"...\", \"eli5\": \"...\"}],\n \"research\": [{\"claim\": \"...\", \"source\": \"<web address or file path>\", \"quote\": \"...\", \"confidence\": \"high|medium|low\"}],\n \"notes\": [{\"to\": \"all|chair|research\", \"text\": \"...\"}],\n \"friction\": \"<optional: one line on anything unclear or missing in this packet>\"}\n\n\n## Your previous output was rejected\n- 2 ideas, need at least 5\nWrite the whole output again so that it is valid.\n"
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/ideate/L2.prompt.md": {
+   "text": "# Council packet · run 261113-120001-pick-queue-technology · loop 1 · IDEATE · seat L2\n\nYou are one of 3 independent experts on a council. Work alone. Do not look for other\nexperts' files or try to guess what they will say: the council only works if ideas are independent.\n\n## The ask (the requester's own words)\n> Pick the queue technology for the billing pipeline\n\n## Brief\nPick the queue technology for the billing pipeline.\nELI5: choose the safest mail system\n\n## Rubric (every idea is judged on this; weights sum to 100)\n| id | criterion | weight | checked by |\n| --- | --- | --- | --- |\n| R1 | reliability | 40 | judgment |\n| R2 | cost | 20 | judgment |\n| R3 | simplicity | 20 | judgment |\n| R4 | speed to ship | 10 | judgment |\n| R5 | operability | 10 | judgment |\n\n## Your lens: lens 2\n- Maximise: one thing\n- Must respect: a limit\n- Method: first principles\n- Evidence to draw on: facts\n\n## Facts\nPeak is 4,000 events per second.\n\n## Do this\n1. Write at least 5 distinct ideas, one line each, 25 words at most: what it is, then why it\n   wins on the rubric. Go wide before you go deep: include at least 2 contrarian ideas and at least\n   2 that are much simpler than the obvious answer.\n2. Critique your own list against the rubric. Keep your best 2. Write each as a card:\n   - title: 8 words at most.\n   - body: 90 to 110 words (a word is anything between spaces). What it is, how it works, and the\n     evidence it rests on. Cards are judged blind: do not name yourself, your lens, or any seat id\n     such as L2 or RT, even as an example. Write \"one expert\" or \"the red team\" instead.\n   - wins: the rubric ids it is strongest on.\n   - evidence: where the support comes from (file path, number, source). Write \"unverified\" for a\n     claim you could not check. Never claim a check you did not run.\n   - eli5: 20 words at most.\n3. You may read project files for evidence. Facts from outside the project are the researchers'\n   to bring: ask for one in `notes` with \"to\": \"research\". If you have a shell, you may run code\n   in a scratch copy to check a claim. Do not edit any project file.\n4. Share what you learn. A fact you checked that others could use goes under \"research\" with its source (a web address you opened, a file path, or `test: <command>`): it is kept in the council's research memory. A thought, a doubt or a question goes under \"notes\", addressed to \"all\" (members read it unsigned at the next step), \"chair\". Describe an idea by what it does, never by its letter: letters change between steps. Both fields are optional.\n\n## Output\nWrite ONLY this JSON to the file `<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/ideate/L2.out.json` (create it; overwrite it if it exists). Then reply with one line: done L2.out.json\n{\"lens\": \"L2\",\n \"eli5\": \"<your overall take, 20 words at most>\",\n \"ideas\": [\"<idea 1>\", \"<idea 2>\", \"... at least 5\"],\n \"cards\": [{\"title\": \"...\", \"body\": \"...\", \"wins\": [\"R1\"], \"evidence\": \"...\", \"eli5\": \"...\"}],\n \"research\": [{\"claim\": \"...\", \"source\": \"<web address or file path>\", \"quote\": \"...\", \"confidence\": \"high|medium|low\"}],\n \"notes\": [{\"to\": \"all|chair|research\", \"text\": \"...\"}],\n \"friction\": \"<optional: one line on anything unclear or missing in this packet>\"}\n"
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/ideate/L3.out.json": {
+   "as_put": true
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/ideate/L3.prompt.md": {
+   "text": "# Council packet · run 261113-120001-pick-queue-technology · loop 1 · IDEATE · seat L3\n\nYou are one of 3 independent experts on a council. Work alone. Do not look for other\nexperts' files or try to guess what they will say: the council only works if ideas are independent.\n\n## The ask (the requester's own words)\n> Pick the queue technology for the billing pipeline\n\n## Brief\nPick the queue technology for the billing pipeline.\nELI5: choose the safest mail system\n\n## Rubric (every idea is judged on this; weights sum to 100)\n| id | criterion | weight | checked by |\n| --- | --- | --- | --- |\n| R1 | reliability | 40 | judgment |\n| R2 | cost | 20 | judgment |\n| R3 | simplicity | 20 | judgment |\n| R4 | speed to ship | 10 | judgment |\n| R5 | operability | 10 | judgment |\n\n## Your lens: lens 3\n- Maximise: one thing\n- Must respect: a limit\n- Method: first principles\n- Evidence to draw on: facts\n\n## Facts\nPeak is 4,000 events per second.\n\n## Do this\n1. Write at least 5 distinct ideas, one line each, 25 words at most: what it is, then why it\n   wins on the rubric. Go wide before you go deep: include at least 2 contrarian ideas and at least\n   2 that are much simpler than the obvious answer.\n2. Critique your own list against the rubric. Keep your best 2. Write each as a card:\n   - title: 8 words at most.\n   - body: 90 to 110 words (a word is anything between spaces). What it is, how it works, and the\n     evidence it rests on. Cards are judged blind: do not name yourself, your lens, or any seat id\n     such as L2 or RT, even as an example. Write \"one expert\" or \"the red team\" instead.\n   - wins: the rubric ids it is strongest on.\n   - evidence: where the support comes from (file path, number, source). Write \"unverified\" for a\n     claim you could not check. Never claim a check you did not run.\n   - eli5: 20 words at most.\n3. You may read project files for evidence. Facts from outside the project are the researchers'\n   to bring: ask for one in `notes` with \"to\": \"research\". If you have a shell, you may run code\n   in a scratch copy to check a claim. Do not edit any project file.\n4. Share what you learn. A fact you checked that others could use goes under \"research\" with its source (a web address you opened, a file path, or `test: <command>`): it is kept in the council's research memory. A thought, a doubt or a question goes under \"notes\", addressed to \"all\" (members read it unsigned at the next step), \"chair\". Describe an idea by what it does, never by its letter: letters change between steps. Both fields are optional.\n\n## Output\nWrite ONLY this JSON to the file `<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/ideate/L3.out.json` (create it; overwrite it if it exists). Then reply with one line: done L3.out.json\n{\"lens\": \"L3\",\n \"eli5\": \"<your overall take, 20 words at most>\",\n \"ideas\": [\"<idea 1>\", \"<idea 2>\", \"... at least 5\"],\n \"cards\": [{\"title\": \"...\", \"body\": \"...\", \"wins\": [\"R1\"], \"evidence\": \"...\", \"eli5\": \"...\"}],\n \"research\": [{\"claim\": \"...\", \"source\": \"<web address or file path>\", \"quote\": \"...\", \"confidence\": \"high|medium|low\"}],\n \"notes\": [{\"to\": \"all|chair|research\", \"text\": \"...\"}],\n \"friction\": \"<optional: one line on anything unclear or missing in this packet>\"}\n"
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/ideate/L3.rejected-1.json": {
+   "text": "Sure! Here are my thoughts in prose, with {braces} and \"quotes\"."
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/ideate/L3.retry.md": {
+   "text": "# Council packet · run 261113-120001-pick-queue-technology · loop 1 · IDEATE · seat L3\n\nYou are one of 3 independent experts on a council. Work alone. Do not look for other\nexperts' files or try to guess what they will say: the council only works if ideas are independent.\n\n## The ask (the requester's own words)\n> Pick the queue technology for the billing pipeline\n\n## Brief\nPick the queue technology for the billing pipeline.\nELI5: choose the safest mail system\n\n## Rubric (every idea is judged on this; weights sum to 100)\n| id | criterion | weight | checked by |\n| --- | --- | --- | --- |\n| R1 | reliability | 40 | judgment |\n| R2 | cost | 20 | judgment |\n| R3 | simplicity | 20 | judgment |\n| R4 | speed to ship | 10 | judgment |\n| R5 | operability | 10 | judgment |\n\n## Your lens: lens 3\n- Maximise: one thing\n- Must respect: a limit\n- Method: first principles\n- Evidence to draw on: facts\n\n## Facts\nPeak is 4,000 events per second.\n\n## Do this\n1. Write at least 5 distinct ideas, one line each, 25 words at most: what it is, then why it\n   wins on the rubric. Go wide before you go deep: include at least 2 contrarian ideas and at least\n   2 that are much simpler than the obvious answer.\n2. Critique your own list against the rubric. Keep your best 2. Write each as a card:\n   - title: 8 words at most.\n   - body: 90 to 110 words (a word is anything between spaces). What it is, how it works, and the\n     evidence it rests on. Cards are judged blind: do not name yourself, your lens, or any seat id\n     such as L2 or RT, even as an example. Write \"one expert\" or \"the red team\" instead.\n   - wins: the rubric ids it is strongest on.\n   - evidence: where the support comes from (file path, number, source). Write \"unverified\" for a\n     claim you could not check. Never claim a check you did not run.\n   - eli5: 20 words at most.\n3. You may read project files for evidence. Facts from outside the project are the researchers'\n   to bring: ask for one in `notes` with \"to\": \"research\". If you have a shell, you may run code\n   in a scratch copy to check a claim. Do not edit any project file.\n4. Share what you learn. A fact you checked that others could use goes under \"research\" with its source (a web address you opened, a file path, or `test: <command>`): it is kept in the council's research memory. A thought, a doubt or a question goes under \"notes\", addressed to \"all\" (members read it unsigned at the next step), \"chair\". Describe an idea by what it does, never by its letter: letters change between steps. Both fields are optional.\n\n## Output\nWrite ONLY this JSON to the file `<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/ideate/L3.out.json` (create it; overwrite it if it exists). Then reply with one line: done L3.out.json\n{\"lens\": \"L3\",\n \"eli5\": \"<your overall take, 20 words at most>\",\n \"ideas\": [\"<idea 1>\", \"<idea 2>\", \"... at least 5\"],\n \"cards\": [{\"title\": \"...\", \"body\": \"...\", \"wins\": [\"R1\"], \"evidence\": \"...\", \"eli5\": \"...\"}],\n \"research\": [{\"claim\": \"...\", \"source\": \"<web address or file path>\", \"quote\": \"...\", \"confidence\": \"high|medium|low\"}],\n \"notes\": [{\"to\": \"all|chair|research\", \"text\": \"...\"}],\n \"friction\": \"<optional: one line on anything unclear or missing in this packet>\"}\n\n\n## Your previous output was rejected\n- the output is not a JSON object (it starts: 'Sure! Here are my thoughts in prose, with {braces} and \"quotes\".')\nWrite the whole output again so that it is valid.\n"
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/ledger.md": {
+   "text": "# Loop 1 ledger · 261113-120001-pick-queue-technology\n\nELI5: two voters, one elder, no red team\n\n- Ideas: 10 from 2 experts -> 4 kept -> pool of 3 -> 3 to the red team -> 3 fused\n- Red team: S1 0, S2 0, S3 0. Responses: none needed\n- RED TEAM DID NOT RUN: the red team never came back\n- Rank vote: 2 blind ballots, 4 head-to-heads counted, 2 sat out (the voter alone wrote one side); agreement 1.0 (strong); LESS THAN ONE FULL VOTE for C3 vs C2 (the vote alone may not cut either)\n  - C1 0.67: rollout plan 642\n  - C3 0.42: shard plan 823\n  - C2 0.42 [check: pass]: cache plan 796\n- Also sent to the elders (the vote could not judge it): C2\n- Elder EA (Claude Opus 5.5 (xhigh)): prefers C3; C3 ship, C2 ship, C1 ship; confidence 0.7. Fix: add a rollback plan\n- Cut: kept C3; eliminated C1, C2\n- Control arm: preferred by 0 of 1 elder(s)\n"
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/pool.json": {
+   "as_put": true
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/rank/L1.prompt.md": {
+   "text": "# Council packet · run 261113-120001-pick-queue-technology · loop 1 · VOTE (final ranking of this loop) · seat L1\n\nYou are a voter on a council, judging through the lens \"lens 1\" (one thing).\nThe candidates are anonymous. Every voter reads them in a different order. Do not try to work out\nwho wrote what, and read only this file: blind judging is what keeps the vote fair.\n\n## The ask (the requester's own words)\n> Pick the queue technology for the billing pipeline\n\n## Rubric (weights sum to 100)\n| id | criterion | weight | checked by |\n| --- | --- | --- | --- |\n| R1 | reliability | 40 | judgment |\n| R2 | cost | 20 | judgment |\n| R3 | simplicity | 20 | judgment |\n| R4 | speed to ship | 10 | judgment |\n| R5 | operability | 10 | judgment |\n\n## Candidates\n### Candidate A: shard plan 823\nindex batch ledger schema canary schema cache index replay replica retries ledger schema throttle fallback canary throttle replica cache tenant ledger replay canary throttle fallback idempotent queue quorum batch schema budget throttle latency throttle quorum idempotent cache quorum shard shard fallback quorum snapshot ledger fallback replay cache throttle canary canary replay tenant stream latency stream rollout shard stream quorum backoff tenant budget schema idempotent snapshot tenant backoff rollout ledger replay metric budget tenant batch throttle idempotent shard index backoff metric fallback quorum queue queue batch circuit snapshot batch retries stream ledger retries batch canary circuit snapshot quorum budget\nELI5: a safer way to do it\n\n### Candidate B: rollout plan 642\nindex idempotent replica queue audit queue replica canary idempotent idempotent snapshot tenant metric budget backoff index cache snapshot retries index budget budget batch stream canary budget queue canary replica fallback throttle idempotent throttle retries metric tenant tenant circuit tenant shard cache retries schema throttle throttle backoff budget tenant shard latency schema metric stream retries budget schema retries throttle index fallback stream snapshot shard index idempotent quorum latency schema replica stream quorum cache queue tenant retries audit index index idempotent ledger snapshot replica replay backoff stream queue fallback fallback shard circuit idempotent canary canary cache circuit retries batch queue\nELI5: a safer way to do it\n\n### Candidate C: cache plan 796\nledger stream audit rollout tenant cache batch latency throttle ledger budget queue fallback circuit throttle tenant schema retries backoff canary canary budget stream retries rollout cache shard canary latency rollout tenant circuit queue idempotent stream throttle index queue replica metric stream metric shard quorum batch rollout replica replica index schema index stream throttle shard cache metric cache metric throttle audit backoff circuit batch replay canary canary idempotent audit quorum shard audit metric replay circuit ledger replica snapshot replica schema throttle circuit quorum throttle rollout replica replay metric idempotent throttle ledger latency backoff circuit tenant replay canary index ledger\nELI5: a safer way to do it\n\n## Machine checks (a fail outranks any vote)\n- Candidate C: pass\n\n## Do this\n- Rank ALL 3 candidates from best to worst against the rubric. Weights matter. Use the labels\n  exactly as written (A, B, ...).\n- Judge substance. Ignore length, polish and confident wording.\n- For your top 2, give a reason of 15 words at most that names rubric ids.\n- For each rubric id, name the single best candidate on that criterion.\n\n## Output\nWrite ONLY this JSON to the file `<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/rank/L1.out.json` (create it; overwrite it if it exists). Then reply with one line: done L1.out.json\n{\"voter\": \"L1\",\n \"ranking\": [\"<best label>\", \"...\", \"<worst label>\"],\n \"reasons\": {\"<label>\": \"R2, R4: <why>\"},\n \"best_on\": {\"R1\": \"<label>\", \"R2\": \"<label>\"},\n \"notes\": [{\"to\": \"all|chair|research\", \"text\": \"<optional: a thought for the council, or a question for the researchers>\"}],\n \"friction\": \"<optional: one line on anything unclear in this packet>\"}\n"
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/rank/L2.out.json": {
+   "as_put": true
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/rank/L2.prompt.md": {
+   "text": "# Council packet · run 261113-120001-pick-queue-technology · loop 1 · VOTE (final ranking of this loop) · seat L2\n\nYou are a voter on a council, judging through the lens \"lens 2\" (one thing).\nThe candidates are anonymous. Every voter reads them in a different order. Do not try to work out\nwho wrote what, and read only this file: blind judging is what keeps the vote fair.\n\n## The ask (the requester's own words)\n> Pick the queue technology for the billing pipeline\n\n## Rubric (weights sum to 100)\n| id | criterion | weight | checked by |\n| --- | --- | --- | --- |\n| R1 | reliability | 40 | judgment |\n| R2 | cost | 20 | judgment |\n| R3 | simplicity | 20 | judgment |\n| R4 | speed to ship | 10 | judgment |\n| R5 | operability | 10 | judgment |\n\n## Candidates\n### Candidate B: rollout plan 642\nindex idempotent replica queue audit queue replica canary idempotent idempotent snapshot tenant metric budget backoff index cache snapshot retries index budget budget batch stream canary budget queue canary replica fallback throttle idempotent throttle retries metric tenant tenant circuit tenant shard cache retries schema throttle throttle backoff budget tenant shard latency schema metric stream retries budget schema retries throttle index fallback stream snapshot shard index idempotent quorum latency schema replica stream quorum cache queue tenant retries audit index index idempotent ledger snapshot replica replay backoff stream queue fallback fallback shard circuit idempotent canary canary cache circuit retries batch queue\nELI5: a safer way to do it\n\n### Candidate C: cache plan 796\nledger stream audit rollout tenant cache batch latency throttle ledger budget queue fallback circuit throttle tenant schema retries backoff canary canary budget stream retries rollout cache shard canary latency rollout tenant circuit queue idempotent stream throttle index queue replica metric stream metric shard quorum batch rollout replica replica index schema index stream throttle shard cache metric cache metric throttle audit backoff circuit batch replay canary canary idempotent audit quorum shard audit metric replay circuit ledger replica snapshot replica schema throttle circuit quorum throttle rollout replica replay metric idempotent throttle ledger latency backoff circuit tenant replay canary index ledger\nELI5: a safer way to do it\n\n### Candidate A: shard plan 823\nindex batch ledger schema canary schema cache index replay replica retries ledger schema throttle fallback canary throttle replica cache tenant ledger replay canary throttle fallback idempotent queue quorum batch schema budget throttle latency throttle quorum idempotent cache quorum shard shard fallback quorum snapshot ledger fallback replay cache throttle canary canary replay tenant stream latency stream rollout shard stream quorum backoff tenant budget schema idempotent snapshot tenant backoff rollout ledger replay metric budget tenant batch throttle idempotent shard index backoff metric fallback quorum queue queue batch circuit snapshot batch retries stream ledger retries batch canary circuit snapshot quorum budget\nELI5: a safer way to do it\n\n## Machine checks (a fail outranks any vote)\n- Candidate C: pass\n\n## Do this\n- Rank ALL 3 candidates from best to worst against the rubric. Weights matter. Use the labels\n  exactly as written (A, B, ...).\n- Judge substance. Ignore length, polish and confident wording.\n- For your top 2, give a reason of 15 words at most that names rubric ids.\n- For each rubric id, name the single best candidate on that criterion.\n\n## Output\nWrite ONLY this JSON to the file `<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/rank/L2.out.json` (create it; overwrite it if it exists). Then reply with one line: done L2.out.json\n{\"voter\": \"L2\",\n \"ranking\": [\"<best label>\", \"...\", \"<worst label>\"],\n \"reasons\": {\"<label>\": \"R2, R4: <why>\"},\n \"best_on\": {\"R1\": \"<label>\", \"R2\": \"<label>\"},\n \"notes\": [{\"to\": \"all|chair|research\", \"text\": \"<optional: a thought for the council, or a question for the researchers>\"}],\n \"friction\": \"<optional: one line on anything unclear in this packet>\"}\n"
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/rank/L2.rejected-1.json": {
+   "json": {
+    "voter": "L2",
+    "ranking": [
+     "B",
+     "A"
+    ],
+    "reasons": {
+     "B": "R1: strongest"
+    },
+    "best_on": {
+     "R1": "B",
+     "R2": "B",
+     "R3": "B",
+     "R4": "B",
+     "R5": "B"
+    }
+   }
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/rank/L2.retry.md": {
+   "text": "# Council packet · run 261113-120001-pick-queue-technology · loop 1 · VOTE (final ranking of this loop) · seat L2\n\nYou are a voter on a council, judging through the lens \"lens 2\" (one thing).\nThe candidates are anonymous. Every voter reads them in a different order. Do not try to work out\nwho wrote what, and read only this file: blind judging is what keeps the vote fair.\n\n## The ask (the requester's own words)\n> Pick the queue technology for the billing pipeline\n\n## Rubric (weights sum to 100)\n| id | criterion | weight | checked by |\n| --- | --- | --- | --- |\n| R1 | reliability | 40 | judgment |\n| R2 | cost | 20 | judgment |\n| R3 | simplicity | 20 | judgment |\n| R4 | speed to ship | 10 | judgment |\n| R5 | operability | 10 | judgment |\n\n## Candidates\n### Candidate B: rollout plan 642\nindex idempotent replica queue audit queue replica canary idempotent idempotent snapshot tenant metric budget backoff index cache snapshot retries index budget budget batch stream canary budget queue canary replica fallback throttle idempotent throttle retries metric tenant tenant circuit tenant shard cache retries schema throttle throttle backoff budget tenant shard latency schema metric stream retries budget schema retries throttle index fallback stream snapshot shard index idempotent quorum latency schema replica stream quorum cache queue tenant retries audit index index idempotent ledger snapshot replica replay backoff stream queue fallback fallback shard circuit idempotent canary canary cache circuit retries batch queue\nELI5: a safer way to do it\n\n### Candidate C: cache plan 796\nledger stream audit rollout tenant cache batch latency throttle ledger budget queue fallback circuit throttle tenant schema retries backoff canary canary budget stream retries rollout cache shard canary latency rollout tenant circuit queue idempotent stream throttle index queue replica metric stream metric shard quorum batch rollout replica replica index schema index stream throttle shard cache metric cache metric throttle audit backoff circuit batch replay canary canary idempotent audit quorum shard audit metric replay circuit ledger replica snapshot replica schema throttle circuit quorum throttle rollout replica replay metric idempotent throttle ledger latency backoff circuit tenant replay canary index ledger\nELI5: a safer way to do it\n\n### Candidate A: shard plan 823\nindex batch ledger schema canary schema cache index replay replica retries ledger schema throttle fallback canary throttle replica cache tenant ledger replay canary throttle fallback idempotent queue quorum batch schema budget throttle latency throttle quorum idempotent cache quorum shard shard fallback quorum snapshot ledger fallback replay cache throttle canary canary replay tenant stream latency stream rollout shard stream quorum backoff tenant budget schema idempotent snapshot tenant backoff rollout ledger replay metric budget tenant batch throttle idempotent shard index backoff metric fallback quorum queue queue batch circuit snapshot batch retries stream ledger retries batch canary circuit snapshot quorum budget\nELI5: a safer way to do it\n\n## Machine checks (a fail outranks any vote)\n- Candidate C: pass\n\n## Do this\n- Rank ALL 3 candidates from best to worst against the rubric. Weights matter. Use the labels\n  exactly as written (A, B, ...).\n- Judge substance. Ignore length, polish and confident wording.\n- For your top 2, give a reason of 15 words at most that names rubric ids.\n- For each rubric id, name the single best candidate on that criterion.\n\n## Output\nWrite ONLY this JSON to the file `<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/rank/L2.out.json` (create it; overwrite it if it exists). Then reply with one line: done L2.out.json\n{\"voter\": \"L2\",\n \"ranking\": [\"<best label>\", \"...\", \"<worst label>\"],\n \"reasons\": {\"<label>\": \"R2, R4: <why>\"},\n \"best_on\": {\"R1\": \"<label>\", \"R2\": \"<label>\"},\n \"notes\": [{\"to\": \"all|chair|research\", \"text\": \"<optional: a thought for the council, or a question for the researchers>\"}],\n \"friction\": \"<optional: one line on anything unclear in this packet>\"}\n\n\n## Your previous output was rejected\n- the ranking covers 2 of 3 cards: rank every label once, best first (missing ['C'], unknown [])\nWrite the whole output again so that it is valid.\n"
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/rank/L3.out.json": {
+   "as_put": true
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/rank/L3.prompt.md": {
+   "text": "# Council packet · run 261113-120001-pick-queue-technology · loop 1 · VOTE (final ranking of this loop) · seat L3\n\nYou are a voter on a council, judging through the lens \"lens 3\" (one thing).\nThe candidates are anonymous. Every voter reads them in a different order. Do not try to work out\nwho wrote what, and read only this file: blind judging is what keeps the vote fair.\n\n## The ask (the requester's own words)\n> Pick the queue technology for the billing pipeline\n\n## Rubric (weights sum to 100)\n| id | criterion | weight | checked by |\n| --- | --- | --- | --- |\n| R1 | reliability | 40 | judgment |\n| R2 | cost | 20 | judgment |\n| R3 | simplicity | 20 | judgment |\n| R4 | speed to ship | 10 | judgment |\n| R5 | operability | 10 | judgment |\n\n## Candidates\n### Candidate C: cache plan 796\nledger stream audit rollout tenant cache batch latency throttle ledger budget queue fallback circuit throttle tenant schema retries backoff canary canary budget stream retries rollout cache shard canary latency rollout tenant circuit queue idempotent stream throttle index queue replica metric stream metric shard quorum batch rollout replica replica index schema index stream throttle shard cache metric cache metric throttle audit backoff circuit batch replay canary canary idempotent audit quorum shard audit metric replay circuit ledger replica snapshot replica schema throttle circuit quorum throttle rollout replica replay metric idempotent throttle ledger latency backoff circuit tenant replay canary index ledger\nELI5: a safer way to do it\n\n### Candidate A: shard plan 823\nindex batch ledger schema canary schema cache index replay replica retries ledger schema throttle fallback canary throttle replica cache tenant ledger replay canary throttle fallback idempotent queue quorum batch schema budget throttle latency throttle quorum idempotent cache quorum shard shard fallback quorum snapshot ledger fallback replay cache throttle canary canary replay tenant stream latency stream rollout shard stream quorum backoff tenant budget schema idempotent snapshot tenant backoff rollout ledger replay metric budget tenant batch throttle idempotent shard index backoff metric fallback quorum queue queue batch circuit snapshot batch retries stream ledger retries batch canary circuit snapshot quorum budget\nELI5: a safer way to do it\n\n### Candidate B: rollout plan 642\nindex idempotent replica queue audit queue replica canary idempotent idempotent snapshot tenant metric budget backoff index cache snapshot retries index budget budget batch stream canary budget queue canary replica fallback throttle idempotent throttle retries metric tenant tenant circuit tenant shard cache retries schema throttle throttle backoff budget tenant shard latency schema metric stream retries budget schema retries throttle index fallback stream snapshot shard index idempotent quorum latency schema replica stream quorum cache queue tenant retries audit index index idempotent ledger snapshot replica replay backoff stream queue fallback fallback shard circuit idempotent canary canary cache circuit retries batch queue\nELI5: a safer way to do it\n\n## Machine checks (a fail outranks any vote)\n- Candidate C: pass\n\n## Do this\n- Rank ALL 3 candidates from best to worst against the rubric. Weights matter. Use the labels\n  exactly as written (A, B, ...).\n- Judge substance. Ignore length, polish and confident wording.\n- For your top 2, give a reason of 15 words at most that names rubric ids.\n- For each rubric id, name the single best candidate on that criterion.\n\n## Output\nWrite ONLY this JSON to the file `<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/rank/L3.out.json` (create it; overwrite it if it exists). Then reply with one line: done L3.out.json\n{\"voter\": \"L3\",\n \"ranking\": [\"<best label>\", \"...\", \"<worst label>\"],\n \"reasons\": {\"<label>\": \"R2, R4: <why>\"},\n \"best_on\": {\"R1\": \"<label>\", \"R2\": \"<label>\"},\n \"notes\": [{\"to\": \"all|chair|research\", \"text\": \"<optional: a thought for the council, or a question for the researchers>\"}],\n \"friction\": \"<optional: one line on anything unclear in this packet>\"}\n"
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/rank/packet.md": {
+   "text": "### Candidate A: shard plan 823\nindex batch ledger schema canary schema cache index replay replica retries ledger schema throttle fallback canary throttle replica cache tenant ledger replay canary throttle fallback idempotent queue quorum batch schema budget throttle latency throttle quorum idempotent cache quorum shard shard fallback quorum snapshot ledger fallback replay cache throttle canary canary replay tenant stream latency stream rollout shard stream quorum backoff tenant budget schema idempotent snapshot tenant backoff rollout ledger replay metric budget tenant batch throttle idempotent shard index backoff metric fallback quorum queue queue batch circuit snapshot batch retries stream ledger retries batch canary circuit snapshot quorum budget\nELI5: a safer way to do it\n\n### Candidate B: rollout plan 642\nindex idempotent replica queue audit queue replica canary idempotent idempotent snapshot tenant metric budget backoff index cache snapshot retries index budget budget batch stream canary budget queue canary replica fallback throttle idempotent throttle retries metric tenant tenant circuit tenant shard cache retries schema throttle throttle backoff budget tenant shard latency schema metric stream retries budget schema retries throttle index fallback stream snapshot shard index idempotent quorum latency schema replica stream quorum cache queue tenant retries audit index index idempotent ledger snapshot replica replay backoff stream queue fallback fallback shard circuit idempotent canary canary cache circuit retries batch queue\nELI5: a safer way to do it\n\n### Candidate C: cache plan 796\nledger stream audit rollout tenant cache batch latency throttle ledger budget queue fallback circuit throttle tenant schema retries backoff canary canary budget stream retries rollout cache shard canary latency rollout tenant circuit queue idempotent stream throttle index queue replica metric stream metric shard quorum batch rollout replica replica index schema index stream throttle shard cache metric cache metric throttle audit backoff circuit batch replay canary canary idempotent audit quorum shard audit metric replay circuit ledger replica snapshot replica schema throttle circuit quorum throttle rollout replica replay metric idempotent throttle ledger latency backoff circuit tenant replay canary index ledger\nELI5: a safer way to do it"
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/redteam/RT.prompt.md": {
+   "text": "# Council packet · run 261113-120001-pick-queue-technology · loop 1 · RED TEAM · seat RT\n\nYou are the council's red team. Your job is to find what would make these candidates fail, before\nreality does. Attack ideas, not wording. The candidates are anonymous.\n\n## The ask (the requester's own words)\n> Pick the queue technology for the billing pipeline\n\n## Rubric\n| id | criterion | weight | checked by |\n| --- | --- | --- | --- |\n| R1 | reliability | 40 | judgment |\n| R2 | cost | 20 | judgment |\n| R3 | simplicity | 20 | judgment |\n| R4 | speed to ship | 10 | judgment |\n| R5 | operability | 10 | judgment |\n\n## Facts\nPeak is 4,000 events per second.\n\n## Candidates\n### Candidate A: cache plan 796\nledger stream audit rollout tenant cache batch latency throttle ledger budget queue fallback circuit throttle tenant schema retries backoff canary canary budget stream retries rollout cache shard canary latency rollout tenant circuit queue idempotent stream throttle index queue replica metric stream metric shard quorum batch rollout replica replica index schema index stream throttle shard cache metric cache metric throttle audit backoff circuit batch replay canary canary idempotent audit quorum shard audit metric replay circuit ledger replica snapshot replica schema throttle circuit quorum throttle rollout replica replay metric idempotent throttle ledger latency backoff circuit tenant replay canary index ledger\nELI5: a safer way to do it\n\n### Candidate B: rollout plan 642\nindex idempotent replica queue audit queue replica canary idempotent idempotent snapshot tenant metric budget backoff index cache snapshot retries index budget budget batch stream canary budget queue canary replica fallback throttle idempotent throttle retries metric tenant tenant circuit tenant shard cache retries schema throttle throttle backoff budget tenant shard latency schema metric stream retries budget schema retries throttle index fallback stream snapshot shard index idempotent quorum latency schema replica stream quorum cache queue tenant retries audit index index idempotent ledger snapshot replica replay backoff stream queue fallback fallback shard circuit idempotent canary canary cache circuit retries batch queue\nELI5: a safer way to do it\n\n### Candidate C: shard plan 823\nindex batch ledger schema canary schema cache index replay replica retries ledger schema throttle fallback canary throttle replica cache tenant ledger replay canary throttle fallback idempotent queue quorum batch schema budget throttle latency throttle quorum idempotent cache quorum shard shard fallback quorum snapshot ledger fallback replay cache throttle canary canary replay tenant stream latency stream rollout shard stream quorum backoff tenant budget schema idempotent snapshot tenant backoff rollout ledger replay metric budget tenant batch throttle idempotent shard index backoff metric fallback quorum queue queue batch circuit snapshot batch retries stream ledger retries batch canary circuit snapshot quorum budget\nELI5: a safer way to do it\n\n## Do this\n1. For each candidate, imagine it shipped and had clearly failed six months later. Why did it fail?\n2. Report at most 10 findings in total, the most serious first. For each:\n   - candidate: its label.\n   - severity: S1 = blocks shipping, S2 = must fix soon, S3 = minor.\n   - finding: 40 words at most.\n   - evidence: the fact, file, number or reasoning behind it. If you are unsure, start the finding\n     with \"suspected\" and say what check would confirm it.\n   - fix: a concrete fix, 30 words at most.\n3. No nitpicks, no style notes, no invented problems. Look for hidden costs, security and data\n   risks, irreversible steps, failure under load, ways to game the checks, unclear ownership, and\n   anything the rubric missed. A flaw that a candidate inherits or makes worse counts against it:\n   say which it is.\n4. Reproduce before you assert. You may read project files and run code in a scratch copy (never in\n   the project itself). Say \"reproduced\" or \"probe\" in the evidence when you ran something.\n5. Share what you learn. A fact you checked that others could use goes under \"research\" with its source (a web address you opened, a file path, or `test: <command>`): it is kept in the council's research memory. A thought, a doubt or a question goes under \"notes\", addressed to \"all\" (members read it unsigned at the next step), \"chair\". Describe an idea by what it does, never by its letter: letters change between steps. Both fields are optional.\n\n## Output\nWrite ONLY this JSON to the file `<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/redteam/RT.out.json` (create it; overwrite it if it exists). Then reply with one line: done RT.out.json\n{\"findings\": [{\"candidate\": \"<label>\", \"severity\": \"S1\", \"finding\": \"...\", \"evidence\": \"...\", \"fix\": \"...\"}],\n \"eli5\": \"<the single biggest risk, 20 words at most>\",\n \"research\": [{\"claim\": \"...\", \"source\": \"<web address or file path>\", \"quote\": \"...\", \"confidence\": \"high|medium|low\"}],\n \"notes\": [{\"to\": \"all|chair|research\", \"text\": \"...\"}],\n \"friction\": \"<optional: one line on anything unclear in this packet>\"}\n"
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/redteam/RT.rejected-1.json": {
+   "text": "I could not find anything wrong."
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/redteam/RT.retry.md": {
+   "text": "# Council packet · run 261113-120001-pick-queue-technology · loop 1 · RED TEAM · seat RT\n\nYou are the council's red team. Your job is to find what would make these candidates fail, before\nreality does. Attack ideas, not wording. The candidates are anonymous.\n\n## The ask (the requester's own words)\n> Pick the queue technology for the billing pipeline\n\n## Rubric\n| id | criterion | weight | checked by |\n| --- | --- | --- | --- |\n| R1 | reliability | 40 | judgment |\n| R2 | cost | 20 | judgment |\n| R3 | simplicity | 20 | judgment |\n| R4 | speed to ship | 10 | judgment |\n| R5 | operability | 10 | judgment |\n\n## Facts\nPeak is 4,000 events per second.\n\n## Candidates\n### Candidate A: cache plan 796\nledger stream audit rollout tenant cache batch latency throttle ledger budget queue fallback circuit throttle tenant schema retries backoff canary canary budget stream retries rollout cache shard canary latency rollout tenant circuit queue idempotent stream throttle index queue replica metric stream metric shard quorum batch rollout replica replica index schema index stream throttle shard cache metric cache metric throttle audit backoff circuit batch replay canary canary idempotent audit quorum shard audit metric replay circuit ledger replica snapshot replica schema throttle circuit quorum throttle rollout replica replay metric idempotent throttle ledger latency backoff circuit tenant replay canary index ledger\nELI5: a safer way to do it\n\n### Candidate B: rollout plan 642\nindex idempotent replica queue audit queue replica canary idempotent idempotent snapshot tenant metric budget backoff index cache snapshot retries index budget budget batch stream canary budget queue canary replica fallback throttle idempotent throttle retries metric tenant tenant circuit tenant shard cache retries schema throttle throttle backoff budget tenant shard latency schema metric stream retries budget schema retries throttle index fallback stream snapshot shard index idempotent quorum latency schema replica stream quorum cache queue tenant retries audit index index idempotent ledger snapshot replica replay backoff stream queue fallback fallback shard circuit idempotent canary canary cache circuit retries batch queue\nELI5: a safer way to do it\n\n### Candidate C: shard plan 823\nindex batch ledger schema canary schema cache index replay replica retries ledger schema throttle fallback canary throttle replica cache tenant ledger replay canary throttle fallback idempotent queue quorum batch schema budget throttle latency throttle quorum idempotent cache quorum shard shard fallback quorum snapshot ledger fallback replay cache throttle canary canary replay tenant stream latency stream rollout shard stream quorum backoff tenant budget schema idempotent snapshot tenant backoff rollout ledger replay metric budget tenant batch throttle idempotent shard index backoff metric fallback quorum queue queue batch circuit snapshot batch retries stream ledger retries batch canary circuit snapshot quorum budget\nELI5: a safer way to do it\n\n## Do this\n1. For each candidate, imagine it shipped and had clearly failed six months later. Why did it fail?\n2. Report at most 10 findings in total, the most serious first. For each:\n   - candidate: its label.\n   - severity: S1 = blocks shipping, S2 = must fix soon, S3 = minor.\n   - finding: 40 words at most.\n   - evidence: the fact, file, number or reasoning behind it. If you are unsure, start the finding\n     with \"suspected\" and say what check would confirm it.\n   - fix: a concrete fix, 30 words at most.\n3. No nitpicks, no style notes, no invented problems. Look for hidden costs, security and data\n   risks, irreversible steps, failure under load, ways to game the checks, unclear ownership, and\n   anything the rubric missed. A flaw that a candidate inherits or makes worse counts against it:\n   say which it is.\n4. Reproduce before you assert. You may read project files and run code in a scratch copy (never in\n   the project itself). Say \"reproduced\" or \"probe\" in the evidence when you ran something.\n5. Share what you learn. A fact you checked that others could use goes under \"research\" with its source (a web address you opened, a file path, or `test: <command>`): it is kept in the council's research memory. A thought, a doubt or a question goes under \"notes\", addressed to \"all\" (members read it unsigned at the next step), \"chair\". Describe an idea by what it does, never by its letter: letters change between steps. Both fields are optional.\n\n## Output\nWrite ONLY this JSON to the file `<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/redteam/RT.out.json` (create it; overwrite it if it exists). Then reply with one line: done RT.out.json\n{\"findings\": [{\"candidate\": \"<label>\", \"severity\": \"S1\", \"finding\": \"...\", \"evidence\": \"...\", \"fix\": \"...\"}],\n \"eli5\": \"<the single biggest risk, 20 words at most>\",\n \"research\": [{\"claim\": \"...\", \"source\": \"<web address or file path>\", \"quote\": \"...\", \"confidence\": \"high|medium|low\"}],\n \"notes\": [{\"to\": \"all|chair|research\", \"text\": \"...\"}],\n \"friction\": \"<optional: one line on anything unclear in this packet>\"}\n\n\n## Your previous output was rejected\n- the output is not a JSON object (it starts: 'I could not find anything wrong.')\nWrite the whole output again so that it is valid.\n"
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/loop-1/redteam/packet.md": {
+   "text": "### Candidate A: cache plan 796\nledger stream audit rollout tenant cache batch latency throttle ledger budget queue fallback circuit throttle tenant schema retries backoff canary canary budget stream retries rollout cache shard canary latency rollout tenant circuit queue idempotent stream throttle index queue replica metric stream metric shard quorum batch rollout replica replica index schema index stream throttle shard cache metric cache metric throttle audit backoff circuit batch replay canary canary idempotent audit quorum shard audit metric replay circuit ledger replica snapshot replica schema throttle circuit quorum throttle rollout replica replay metric idempotent throttle ledger latency backoff circuit tenant replay canary index ledger\nELI5: a safer way to do it\n\n### Candidate B: rollout plan 642\nindex idempotent replica queue audit queue replica canary idempotent idempotent snapshot tenant metric budget backoff index cache snapshot retries index budget budget batch stream canary budget queue canary replica fallback throttle idempotent throttle retries metric tenant tenant circuit tenant shard cache retries schema throttle throttle backoff budget tenant shard latency schema metric stream retries budget schema retries throttle index fallback stream snapshot shard index idempotent quorum latency schema replica stream quorum cache queue tenant retries audit index index idempotent ledger snapshot replica replay backoff stream queue fallback fallback shard circuit idempotent canary canary cache circuit retries batch queue\nELI5: a safer way to do it\n\n### Candidate C: shard plan 823\nindex batch ledger schema canary schema cache index replay replica retries ledger schema throttle fallback canary throttle replica cache tenant ledger replay canary throttle fallback idempotent queue quorum batch schema budget throttle latency throttle quorum idempotent cache quorum shard shard fallback quorum snapshot ledger fallback replay cache throttle canary canary replay tenant stream latency stream rollout shard stream quorum backoff tenant budget schema idempotent snapshot tenant backoff rollout ledger replay metric budget tenant batch throttle idempotent shard index backoff metric fallback quorum queue queue batch circuit snapshot batch retries stream ledger retries batch canary circuit snapshot quorum budget\nELI5: a safer way to do it"
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/retro.md": {
+   "as_put": true
+  },
+  "<ROOT>/.council/runs/261113-120001-pick-queue-technology/run.json": {
+   "json": {
+    "id": "261113-120001-pick-queue-technology",
+    "created": "2026-11-13T12:00:01",
+    "ask": "Pick the queue technology for the billing pipeline",
+    "paths": [],
+    "gate": "GATE tier=lite mode=fanout:claude profile=efficient loops<=1 calls~9 tokens~1.3M rel_cost=0.66 (explicit)",
+    "tier": "lite",
+    "mode": "fanout:claude",
+    "profile": "efficient",
+    "tripwires": [],
+    "gate_reason": "explicit",
+    "calls_estimate": 9,
+    "deviations": [
+     "loop 1 ideate: seat L1 was left out after 2 rejected output(s): it failed twice in a row",
+     "loop 1 redteam: seat RT was left out after 1 rejected output(s): the red team never came back",
+     "loop 1 rank: seat L1 was left out after 0 rejected output(s): it timed out again",
+     "the control arm was lost after it was sealed: the file was overwritten by a cleanup script",
+     "loop 1 elders: C2 also went to the elders, because the vote could not judge it against C1, C3",
+     "protocol check: loop 1: no red-team step recorded"
+    ],
+    "friction": [],
+    "calls": {
+     "ideate": 7,
+     "redteam": 1,
+     "rank": 3,
+     "elders": 1
+    },
+    "loops": [
+     {
+      "research_seats": [],
+      "started": "2026-11-13T12:00:06",
+      "ideas": {
+       "L2": [
+        "idea 0 here: use quorum to cut throttle risk",
+        "idea 1 here: use queue to cut ledger risk",
+        "idea 2 here: use rollout to cut quorum risk",
+        "idea 3 here: use stream to cut batch risk",
+        "idea 4 here: use snapshot to cut shard risk"
+       ],
+       "L3": [
+        "idea 0 here: use canary to cut tenant risk and keep going with many more words than the cap allows for an idea line  and keep going with many more words than the cap allows for an idea line ",
+        "idea 1 here: use queue to cut rollout risk and keep going with many more words than the cap allows for an idea line  and keep going with many more words than the cap allows for an idea line ",
+        "idea 2 here: use tenant to cut stream risk and keep going with many more words than the cap allows for an idea line  and keep going with many more words than the cap allows for an idea line ",
+        "idea 3 here: use stream to cut replica risk and keep going with many more words than the cap allows for an idea line  and keep going with many more words than the cap allows for an idea line ",
+        "idea 4 here: use rollout to cut retries risk and keep going with many more words than the cap allows for an idea line  and keep going with many more words than the cap allows for an idea line "
+       ]
+      },
+      "kept": {
+       "L2": [
+        {
+         "title": "rollout plan 642",
+         "body": "index idempotent replica queue audit queue replica canary idempotent idempotent snapshot tenant metric budget backoff index cache snapshot retries index budget budget batch stream canary budget queue canary replica fallback throttle idempotent throttle retries metric tenant tenant circuit tenant shard cache retries schema throttle throttle backoff budget tenant shard latency schema metric stream retries budget schema retries throttle index fallback stream snapshot shard index idempotent quorum latency schema replica stream quorum cache queue tenant retries audit index index idempotent ledger snapshot replica replay backoff stream queue fallback fallback shard circuit idempotent canary canary cache circuit retries batch queue",
+         "eli5": "a safer way to do it",
+         "wins": [
+          "R1"
+         ],
+         "evidence": "unverified"
+        },
+        {
+         "title": "cache plan 796",
+         "body": "ledger stream audit rollout tenant cache batch latency throttle ledger budget queue fallback circuit throttle tenant schema retries backoff canary canary budget stream retries rollout cache shard canary latency rollout tenant circuit queue idempotent stream throttle index queue replica metric stream metric shard quorum batch rollout replica replica index schema index stream throttle shard cache metric cache metric throttle audit backoff circuit batch replay canary canary idempotent audit quorum shard audit metric replay circuit ledger replica snapshot replica schema throttle circuit quorum throttle rollout replica replay metric idempotent throttle ledger latency backoff circuit tenant replay canary index ledger",
+         "eli5": "a safer way to do it",
+         "wins": [
+          "R1"
+         ],
+         "evidence": "unverified"
+        }
+       ],
+       "L3": [
+        {
+         "title": "shard plan 823",
+         "body": "index batch ledger schema canary schema cache index replay replica retries ledger schema throttle fallback canary throttle replica cache tenant ledger replay canary throttle fallback idempotent queue quorum batch schema budget throttle latency throttle quorum idempotent cache quorum shard shard fallback quorum snapshot ledger fallback replay cache throttle canary canary replay tenant stream latency stream rollout shard stream quorum backoff tenant budget schema idempotent snapshot tenant backoff rollout ledger replay metric budget tenant batch throttle idempotent shard index backoff metric fallback quorum queue queue batch circuit snapshot batch retries stream ledger retries batch canary circuit snapshot quorum budget",
+         "eli5": "a safer way to do it",
+         "wins": [
+          "R1"
+         ],
+         "evidence": "unverified"
+        },
+        {
+         "title": "fallback plan 960",
+         "body": "circuit replay snapshot queue shard circuit rollout replay ledger audit batch cache queue audit budget snapshot canary throttle throttle budget idempotent stream latency cache ledger stream latency replica throttle circuit circuit retries tenant rollout ledger throttle canary budget replay quorum index tenant ledger circuit circuit queue retries latency ledger audit backoff audit batch stream replay idempotent latency budget fallback budget replay canary audit index stream schema idempotent latency latency quorum queue rollout batch batch backoff quorum index backoff index tenant ledger metric fallback snapshot backoff shard ledger rollout retries circuit tenant replay replay batch latency backoff latency fallback",
+         "eli5": "a safer way to do it",
+         "wins": [
+          "R1"
+         ],
+         "evidence": "unverified"
+        }
+       ]
+      },
+      "pool": [
+       {
+        "id": "P1",
+        "title": "rollout plan 642",
+        "body": "index idempotent replica queue audit queue replica canary idempotent idempotent snapshot tenant metric budget backoff index cache snapshot retries index budget budget batch stream canary budget queue canary replica fallback throttle idempotent throttle retries metric tenant tenant circuit tenant shard cache retries schema throttle throttle backoff budget tenant shard latency schema metric stream retries budget schema retries throttle index fallback stream snapshot shard index idempotent quorum latency schema replica stream quorum cache queue tenant retries audit index index idempotent ledger snapshot replica replay backoff stream queue fallback fallback shard circuit idempotent canary canary cache circuit retries batch queue",
+        "eli5": "a safer way to do it",
+        "authors": [
+         "L2",
+         "L3"
+        ],
+        "from": [
+         "L2#1",
+         "L3#2"
+        ]
+       },
+       {
+        "id": "P2",
+        "title": "cache plan 796",
+        "body": "ledger stream audit rollout tenant cache batch latency throttle ledger budget queue fallback circuit throttle tenant schema retries backoff canary canary budget stream retries rollout cache shard canary latency rollout tenant circuit queue idempotent stream throttle index queue replica metric stream metric shard quorum batch rollout replica replica index schema index stream throttle shard cache metric cache metric throttle audit backoff circuit batch replay canary canary idempotent audit quorum shard audit metric replay circuit ledger replica snapshot replica schema throttle circuit quorum throttle rollout replica replay metric idempotent throttle ledger latency backoff circuit tenant replay canary index ledger",
+        "eli5": "a safer way to do it",
+        "authors": [
+         "L2"
+        ],
+        "from": [
+         "L2#2"
+        ]
+       },
+       {
+        "id": "P3",
+        "title": "shard plan 823",
+        "body": "index batch ledger schema canary schema cache index replay replica retries ledger schema throttle fallback canary throttle replica cache tenant ledger replay canary throttle fallback idempotent queue quorum batch schema budget throttle latency throttle quorum idempotent cache quorum shard shard fallback quorum snapshot ledger fallback replay cache throttle canary canary replay tenant stream latency stream rollout shard stream quorum backoff tenant budget schema idempotent snapshot tenant backoff rollout ledger replay metric budget tenant batch throttle idempotent shard index backoff metric fallback quorum queue queue batch circuit snapshot batch retries stream ledger retries batch canary circuit snapshot quorum budget",
+        "eli5": "a safer way to do it",
+        "authors": [
+         "L3"
+        ],
+        "from": [
+         "L3#1"
+        ]
+       }
+      ],
+      "shortlist": [
+       "P1",
+       "P2",
+       "P3"
+      ],
+      "red_team": [],
+      "red_team_skipped": "the red team never came back",
+      "candidates": [
+       {
+        "id": "C1",
+        "title": "rollout plan 642",
+        "body": "index idempotent replica queue audit queue replica canary idempotent idempotent snapshot tenant metric budget backoff index cache snapshot retries index budget budget batch stream canary budget queue canary replica fallback throttle idempotent throttle retries metric tenant tenant circuit tenant shard cache retries schema throttle throttle backoff budget tenant shard latency schema metric stream retries budget schema retries throttle index fallback stream snapshot shard index idempotent quorum latency schema replica stream quorum cache queue tenant retries audit index index idempotent ledger snapshot replica replay backoff stream queue fallback fallback shard circuit idempotent canary canary cache circuit retries batch queue",
+        "eli5": "a safer way to do it",
+        "authors": [
+         "L2",
+         "L3"
+        ],
+        "parents": [
+         "P1"
+        ]
+       },
+       {
+        "id": "C2",
+        "title": "cache plan 796",
+        "body": "ledger stream audit rollout tenant cache batch latency throttle ledger budget queue fallback circuit throttle tenant schema retries backoff canary canary budget stream retries rollout cache shard canary latency rollout tenant circuit queue idempotent stream throttle index queue replica metric stream metric shard quorum batch rollout replica replica index schema index stream throttle shard cache metric cache metric throttle audit backoff circuit batch replay canary canary idempotent audit quorum shard audit metric replay circuit ledger replica snapshot replica schema throttle circuit quorum throttle rollout replica replay metric idempotent throttle ledger latency backoff circuit tenant replay canary index ledger",
+        "eli5": "a safer way to do it",
+        "authors": [
+         "L2"
+        ],
+        "parents": [
+         "P2"
+        ]
+       },
+       {
+        "id": "C3",
+        "title": "shard plan 823",
+        "body": "index batch ledger schema canary schema cache index replay replica retries ledger schema throttle fallback canary throttle replica cache tenant ledger replay canary throttle fallback idempotent queue quorum batch schema budget throttle latency throttle quorum idempotent cache quorum shard shard fallback quorum snapshot ledger fallback replay cache throttle canary canary replay tenant stream latency stream rollout shard stream quorum backoff tenant budget schema idempotent snapshot tenant backoff rollout ledger replay metric budget tenant batch throttle idempotent shard index backoff metric fallback quorum queue queue batch circuit snapshot batch retries stream ledger retries batch canary circuit snapshot quorum budget",
+        "eli5": "a safer way to do it",
+        "authors": [
+         "L3"
+        ],
+        "parents": [
+         "P3"
+        ]
+       }
+      ],
+      "not_carried": [],
+      "checks": {
+       "C1": "n/a",
+       "C2": "pass"
+      },
+      "rank": {
+       "order": [
+        "C1",
+        "C3",
+        "C2"
+       ],
+       "ranking": [
+        {
+         "id": "C1",
+         "score": 0.667,
+         "check": "n/a"
+        },
+        {
+         "id": "C3",
+         "score": 0.417,
+         "check": "n/a"
+        },
+        {
+         "id": "C2",
+         "score": 0.417,
+         "check": "pass"
+        }
+       ],
+       "agreement": 1.0,
+       "agreement_note": "strong",
+       "ballots": 2,
+       "head_to_heads": 4,
+       "recused": 2,
+       "gaps": 0,
+       "thin": [
+        [
+         "C3",
+         "C2"
+        ]
+       ],
+       "ties": [
+        [
+         "C3",
+         "C2"
+        ]
+       ],
+       "best_on": {}
+      },
+      "protected_elders": [
+       "C2"
+      ],
+      "reviewed": [
+       "C1",
+       "C3",
+       "C2"
+      ],
+      "elder_reviews": [
+       {
+        "seat": "EA",
+        "model": "Claude Opus 5.5 (xhigh)",
+        "stand_in_for": null,
+        "model_source": null,
+        "preferred": "C3",
+        "verdict": {
+         "C3": "ship",
+         "C2": "ship",
+         "C1": "ship"
+        },
+        "scores": {
+         "C3": {},
+         "C2": {
+          "R1": 7,
+          "R2": 7,
+          "R3": 7,
+          "R4": 7,
+          "R5": 7
+         },
+         "C1": {
+          "R2": 7,
+          "R3": 7,
+          "R4": 7,
+          "R5": 7
+         }
+        },
+        "confidence": 0.7,
+        "top_risks": [
+         {
+          "risk": "operational load",
+          "severity": "S2",
+          "candidate": "all"
+         }
+        ],
+        "key_fix": "add a rollback plan",
+        "own_idea": "replay a golden set first",
+        "eli5": "looks solid"
+       }
+      ],
+      "survivors": [
+       "C3"
+      ],
+      "eliminated": [
+       "C1",
+       "C2"
+      ],
+      "wildcard": null,
+      "eli5": "two voters, one elder, no red team",
+      "changed": "",
+      "control_votes": 0,
+      "finished": "2026-11-13T12:00:39"
+     }
+    ],
+    "shape": {
+     "experts": 3,
+     "ideas_min": 5,
+     "keep": 2,
+     "elders": 1,
+     "start": 3,
+     "loops": 1,
+     "rubric": [
+      3,
+      7
+     ],
+     "schedule": [
+      3,
+      1
+     ]
+    },
+    "max_loops": 1,
+    "schedule": [
+     3,
+     1
+    ],
+    "chair": {
+     "model": "Claude Fable 5.2 (low)",
+     "creator": "Anthropic",
+     "quality": 54,
+     "cost_per_task": 3.1
+    },
+    "support": {
+     "research": {
+      "budget": {
+       "lite": 10,
+       "full": 15
+      },
+      "seats": 0,
+      "later_loops": "on_request",
+      "model": "auto",
+      "beats": []
+     },
+     "map": {
+      "when": "never",
+      "model": "chair",
+      "focus_tokens": 700,
+      "skeleton_lines": 420,
+      "path": "",
+      "due": false,
+      "reason": "switched off"
+     },
+     "digest": 14,
+     "origin": {
+      "research.seats": "flag",
+      "research.budget.lite": "default",
+      "research.budget.full": "default",
+      "research.later_loops": "default",
+      "research.model": "default",
+      "research.beats": "default",
+      "map.when": "flag",
+      "map.model": "default",
+      "map.focus_tokens": "default",
+      "map.skeleton_lines": "default",
+      "map.path": "default",
+      "digest": "default"
+     },
+     "problems": []
+    },
+    "memory": {
+     "backend": "files",
+     "dir": "<ROOT>/.council/memory",
+     "links": "markdown",
+     "source": "default",
+     "ok": true,
+     "problem": null
+    },
+    "commons": [],
+    "seats": {
+     "L1": {
+      "role": "expert",
+      "model": "Claude Haiku 5.5 (xhigh)",
+      "creator": "Anthropic",
+      "effort": "xhigh",
+      "via": "subagent",
+      "alias": "haiku"
+     },
+     "L2": {
+      "role": "expert",
+      "model": "Claude Fable 5.2 (low)",
+      "creator": "Anthropic",
+      "effort": "low",
+      "via": "subagent",
+      "alias": "fable"
+     },
+     "L3": {
+      "role": "expert",
+      "model": "Claude Haiku 5.5 (xhigh)",
+      "creator": "Anthropic",
+      "effort": "xhigh",
+      "via": "subagent",
+      "alias": "haiku"
+     },
+     "RT": {
+      "role": "red_team",
+      "model": "Claude Opus 5.5 (xhigh)",
+      "creator": "Anthropic",
+      "effort": "xhigh",
+      "via": "subagent",
+      "alias": "opus"
+     },
+     "EA": {
+      "role": "elder",
+      "model": "Claude Opus 5.5 (xhigh)",
+      "creator": "Anthropic",
+      "effort": "xhigh",
+      "via": "subagent",
+      "alias": "opus"
+     },
+     "CTRL": {
+      "role": "control",
+      "model": "Claude Fable 5.2 (low)",
+      "creator": "Anthropic",
+      "effort": "low",
+      "via": "subagent",
+      "alias": "fable"
+     }
+    },
+    "loop": 1,
+    "phase": "done",
+    "updated": "2026-11-13T12:00:45",
+    "brief": {
+     "restated": "Pick the queue technology for the billing pipeline.",
+     "eli5": "choose the safest mail system",
+     "rubric": [
+      {
+       "id": "R1",
+       "name": "reliability",
+       "weight": 40,
+       "check": "judgment"
+      },
+      {
+       "id": "R2",
+       "name": "cost",
+       "weight": 20,
+       "check": "judgment"
+      },
+      {
+       "id": "R3",
+       "name": "simplicity",
+       "weight": 20,
+       "check": "judgment"
+      },
+      {
+       "id": "R4",
+       "name": "speed to ship",
+       "weight": 10,
+       "check": "judgment"
+      },
+      {
+       "id": "R5",
+       "name": "operability",
+       "weight": 10,
+       "check": "judgment"
+      }
+     ],
+     "evidence_plan": [
+      "load test"
+     ],
+     "lenses": [
+      {
+       "id": "L1",
+       "name": "lens 1",
+       "maximize": "one thing",
+       "respect": "a limit",
+       "method": "first principles",
+       "evidence": "facts"
+      },
+      {
+       "id": "L2",
+       "name": "lens 2",
+       "maximize": "one thing",
+       "respect": "a limit",
+       "method": "first principles",
+       "evidence": "facts"
+      },
+      {
+       "id": "L3",
+       "name": "lens 3",
+       "maximize": "one thing",
+       "respect": "a limit",
+       "method": "first principles",
+       "evidence": "facts"
+      }
+     ],
+     "facts": "Peak is 4,000 events per second.",
+     "lessons_applied": [
+      "L-20261113-1"
+     ],
+     "approved_by": "unattended",
+     "research_questions": []
+    },
+    "attempts": {
+     "1/ideate/L1": 2,
+     "1/ideate/L3": 1,
+     "1/ideate/CTRL": 1,
+     "1/redteam/RT": 1,
+     "1/rank/L2": 1
+    },
+    "hashes": {
+     "loop-1/ideate/L2.out.json": "4fd5dfff052057bca83aeaec0bec9d398321777b0507e070a5e1b1f760ed9b64",
+     "loop-1/ideate/L3.out.json": "6e6f31f7e187d9fc138ac7f9d7a0f004a7e8cf99874a624f5fe38502966718d9",
+     "control/CTRL.out.json": "92d048a3531a46b39624dba926b840d1ccb62b86b616f049a0b0e9e540d89efb",
+     "loop-1/rank/L2.out.json": "8f8ba8bf44143eb340d5ce67692a533a369662c2c766b1a8e6ab99aa25ea968e",
+     "loop-1/rank/L3.out.json": "34aa7846c50da78cb271bccbb7d303c9d55e750532b4e5130cf329787477c798",
+     "loop-1/elders/EA.out.json": "6ce175c60e37b066c887f5c9c31d44a3f313cbf82a927b06856ea075a038c319"
+    },
+    "shared": {
+     "facts_added": 0,
+     "facts_merged": 0,
+     "facts_refused": 0,
+     "notes": 0
+    },
+    "control": {
+     "done": false,
+     "lost": "the file was overwritten by a cleanup script"
+    },
+    "winner": "C3",
+    "control_result": "not run",
+    "control_line": "not run (the file was overwritten by a cleanup script)",
+    "final": {
+     "file": "final.md",
+     "words": 334
+    },
+    "retro": {
+     "file": "retro.md",
+     "lessons": []
+    }
+   }
+  },
+  "<ROOT>/.council/runs/CURRENT": {
+   "text": "261113-120001-pick-queue-technology\n"
+  }
+ }
+}

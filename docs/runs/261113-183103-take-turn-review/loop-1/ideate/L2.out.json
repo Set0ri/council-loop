@@ -9,7 +9,7 @@
   "Make check_run errors block the retro-to-done transition instead of just printing them; a failing protocol check should not close a run.",
   "Record sha256 of every seat out.json at ingest; a new audit command re-tallies from raw ballots plus the private mapping and flags any mismatch.",
   "Contrarian: drop the shortlist vote in Full and send top pool cards by red-team triage instead; saves 7 seat calls per loop.",
-  "Contrarian: stop trusting approved_by: logan typed by the chair; require Logan's own words via --override-style flag, else record unattended.",
+  "Contrarian: stop trusting approved_by: <a name> typed by the chair; require the requester's own words via --override-style flag, else record unattended.",
   "Simpler: treat an empty red-team result after --force as a hard deviation in check_run, not a silently empty list.",
   "Simpler: add model names to blind() forbidden tokens so cards mentioning 'Gemini thinks' or a seat model cannot leak authorship."
  ],

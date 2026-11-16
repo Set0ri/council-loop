@@ -13,7 +13,23 @@ models come out, you re-run the script, read the diff, and merge.
 | `fanout:openrouter` | Any model reachable through OpenRouter (one key, one bill) | You want breadth without many accounts |
 | `fanout:open` | Open-weight models only (self-hosted or via a provider) | Data residency, cost, or no closed models allowed |
 | `fanout:mix` | The best-scoring models across all families, picked purely by the numbers | Quality per dollar is all that matters |
-| `crosslab` | Experts from mix, guaranteed one seat per lab that clears the floor. Elders are one flagship each from Anthropic, OpenAI and Google | The default for Full councils when three labs can be reached: decorrelated errors |
+| `crosslab` | Experts from mix, guaranteed one seat per lab that clears the floor. Elders are one flagship each from Anthropic, OpenAI and Google | The strongest check, for decisions that are expensive to get wrong: three labs make different mistakes. Needs three labs in reach |
+
+**What a run takes when you say nothing.** The cheapest mode this machine can reach, and the
+`efficient` profile. `council doctor` lists the modes in reach with their relative cost
+(`mode_costs`), names the cheapest (`recommended_mode`) and the strongest (`strongest_mode`).
+`council plan` and `council init` print the choice on the GATE line and say when a stronger one is
+in reach. Ask for more with `--mode` and `--profile`, or keep a choice for every run in your own
+`~/.council/config.yaml`:
+
+```yaml
+defaults:
+  profile: balanced
+  mode: crosslab
+```
+
+A project's settings file cannot set these: it travels with the repository, and what a run costs
+is yours to decide.
 
 ## Profiles: one formula for every pick
 
@@ -113,7 +129,7 @@ each seat into something this machine can actually call, in this order, and prin
   be logged out.
 - **Force a route.** `COUNCIL_SEATS_VIA=cli:claude` (or `subagents`, `cli:codex`, `cli:gemini`, `none`).
 - **Status of the adapters.** The claude path is exercised by real runs. The codex and gemini paths
-  are written from their documentation and tested against a fake CLI only (`tests/fakecli.py`).
+  are written from their documentation and tested against stand-in tools only (`tests/scenarios.rs`).
   Run `doctor --probe` and one Lite council before you rely on them.
 
 ## What a run costs in tokens (measured)

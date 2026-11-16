@@ -192,7 +192,33 @@ pub const TRIPWIRE_PATHS: [(&str, &[&str]); 3] = [
 /// A text file as UTF-8 with `\n` line ends, whatever the machine that wrote it. A byte-order mark is
 /// tolerated (Windows PowerShell's `>` writes UTF-16, some editors put a mark before UTF-8) and a
 /// stray byte is replaced, so a file made on another machine loads instead of ending the run.
+///
+/// Only a plain file of a sane size is read (links are followed): a device or a pipe never ends,
+/// and a settings file that is one would hang the tool that opens it.
 pub fn read_text(path: &Path) -> std::io::Result<String> {
+    use std::io::{Error, ErrorKind};
+    let meta = std::fs::metadata(path)?;
+    if !meta.is_file() {
+        return Err(Error::new(
+            ErrorKind::InvalidInput,
+            "it is not a plain file",
+        ));
+    }
+    if meta.len() > crate::safe::MAX_READ {
+        return Err(Error::new(
+            ErrorKind::InvalidData,
+            format!(
+                "it is {} bytes; the limit is {}",
+                py::commas(meta.len() as i64),
+                py::commas(crate::safe::MAX_READ as i64)
+            ),
+        ));
+    }
+    Ok(decode(&std::fs::read(path)?))
+}
+
+/// A file the person named on the command line: read whatever it is (a pipe from the shell, say).
+pub fn read_named(path: &Path) -> std::io::Result<String> {
     Ok(decode(&std::fs::read(path)?))
 }
 
@@ -218,13 +244,10 @@ fn utf16(data: &[u8], unit: fn([u8; 2]) -> u16) -> String {
         .collect()
 }
 
-/// Write a text file as UTF-8, creating the folders above it.
+/// Write a text file of this tool's own as UTF-8, creating the folders above it. Only where this
+/// tool may write, and never through a link (see [`crate::safe::guard`]).
 pub fn write_text(path: &Path, text: &str) -> Result<()> {
-    if let Some(parent) = path.parent() {
-        std::fs::create_dir_all(parent)
-            .with_context(|| format!("cannot create {}", parent.display()))?;
-    }
-    std::fs::write(path, text).with_context(|| format!("cannot write {}", path.display()))
+    crate::safe::write_text(path, text)
 }
 
 /// Read a YAML file.
@@ -299,9 +322,14 @@ pub fn home_dir() -> PathBuf {
 pub fn project_root_from(start: &Path) -> PathBuf {
     let start = resolve(start);
     let own = user_config_path().parent().map(resolve);
+    let home_own = resolve(&home_dir().join(".council"));
     for cand in start.ancestors() {
         let council = cand.join(".council");
-        if cand.join(".git").exists() || (council.is_dir() && Some(resolve(&council)) != own) {
+        let is_project_council = council.is_dir() && {
+            let resolved = resolve(&council);
+            Some(&resolved) != own.as_ref() && resolved != home_own
+        };
+        if cand.join(".git").exists() || is_project_council {
             return cand.to_path_buf();
         }
     }
@@ -342,17 +370,48 @@ pub fn authors_of(card: &Value) -> Vec<String> {
 
 // ----------------------------------------------------------------------------- gate pieces
 
-/// Names of the tripwires the ask or the touched paths set off.
-pub fn tripwires_hit(task: &str, paths: &[String], root: &Path) -> Vec<String> {
+/// The built-in tripwires plus the project's own.
+pub struct Tripwires {
+    /// Name -> pattern, matched against the ask with letter case ignored.
+    pub text: IndexMap<String, Regex>,
+    /// The names in `text` whose pattern is a built-in one. Those are built as ASCII patterns and
+    /// are matched against [`ascii_reading`] of the ask.
+    pub built_in: BTreeSet<String>,
+    /// Name -> globs, matched against the touched paths.
+    pub paths: IndexMap<String, Vec<String>>,
+    /// What was wrong with the project's own entries (each was ignored).
+    pub problems: Vec<String>,
+}
+
+/// The built-in tripwires plus the ones in the project's `.council/config.yaml`, and what was
+/// wrong with the project's. A pattern from a settings file must be one that matches in linear
+/// time (see [`crate::safe::simple_pattern`]): the file comes with the repository, and its author
+/// is not always a friend.
+pub fn tripwire_rules(root: &Path) -> Tripwires {
+    // The built-in patterns are compiled once for the life of the process (a server answers many
+    // calls), and as ASCII patterns: `\w` over all of Unicode, some thirty times over, cost more to
+    // build than everything else the gate does. They still mean what they would mean over all of
+    // Unicode, because the ask is read through `ascii_reading` first.
+    static BUILT_IN: LazyLock<Vec<(&'static str, Regex)>> = LazyLock::new(|| {
+        TRIPWIRES
+            .iter()
+            .map(|(name, rx)| {
+                let built = regex::RegexBuilder::new(rx)
+                    .case_insensitive(true)
+                    .unicode(false)
+                    .build()
+                    .expect("the built-in tripwires are valid");
+                (*name, built)
+            })
+            .collect()
+    });
     let cfg = config(root);
-    let mut text_rules: IndexMap<String, String> = TRIPWIRES
+    let mut text: IndexMap<String, Regex> = BUILT_IN
         .iter()
-        .map(|(k, v)| ((*k).to_string(), (*v).to_string()))
+        .map(|(name, rx)| ((*name).to_string(), rx.clone()))
         .collect();
-    for (name, rx) in items(cfg.at("tripwires")) {
-        text_rules.insert(name.clone(), py::to_str(rx));
-    }
-    let mut path_rules: IndexMap<String, Vec<String>> = TRIPWIRE_PATHS
+    let mut built_in: BTreeSet<String> = text.keys().cloned().collect();
+    let mut paths: IndexMap<String, Vec<String>> = TRIPWIRE_PATHS
         .iter()
         .map(|(k, v)| {
             (
@@ -361,20 +420,106 @@ pub fn tripwires_hit(task: &str, paths: &[String], root: &Path) -> Vec<String> {
             )
         })
         .collect();
-    for (name, globs) in items(cfg.at("tripwire_paths")) {
-        path_rules.insert(name.clone(), crate::val::strings(globs));
+    let mut problems: Vec<String> = Vec::new();
+    match cfg.at("tripwires") {
+        Value::Null => {}
+        Value::Object(own) => {
+            for (name, rx) in own {
+                let found = match crate::safe::simple_pattern(rx) {
+                    Some(why) => Err(why),
+                    None => crate::safe::project_pattern(rx.as_str().unwrap_or_default())
+                        .map_err(|_| "it is not a valid pattern".to_string()),
+                };
+                match found {
+                    Ok(re) => {
+                        built_in.remove(name); // the project's own pattern replaces ours
+                        text.insert(name.clone(), re);
+                    }
+                    Err(why) => problems.push(format!(
+                        "tripwire {} in .council/config.yaml was ignored: {why}",
+                        py::str_repr(&crate::safe::shown(name))
+                    )),
+                }
+            }
+        }
+        _ => problems.push(
+            "tripwires in .council/config.yaml must map a name to a pattern: ignored".to_string(),
+        ),
     }
+    match cfg.at("tripwire_paths") {
+        Value::Null => {}
+        Value::Object(own) => {
+            for (name, globs) in own {
+                let list: Option<Vec<String>> = match globs {
+                    Value::String(one) => Some(vec![one.clone()]),
+                    Value::Array(many) if !many.is_empty() => many
+                        .iter()
+                        .map(|g| g.as_str().map(str::to_string))
+                        .collect(),
+                    _ => None,
+                };
+                match list {
+                    Some(list) if list.iter().all(|g| g.len() <= 200) && list.len() <= 100 => {
+                        paths.insert(name.clone(), list);
+                    }
+                    _ => problems.push(format!(
+                        "tripwire_paths {} in .council/config.yaml was ignored: it must be a list of globs",
+                        py::str_repr(&crate::safe::shown(name))
+                    )),
+                }
+            }
+        }
+        _ => problems.push(
+            "tripwire_paths in .council/config.yaml must map a name to a list of globs: ignored"
+                .to_string(),
+        ),
+    }
+    Tripwires {
+        text,
+        built_in,
+        paths,
+        problems,
+    }
+}
+
+/// A text as the built-in tripwires read it. Their patterns are ASCII patterns: ASCII words, `\w`,
+/// `\s` and `\b`. Read this way they match exactly where the same patterns over all of Unicode
+/// would match the text itself. Every word character outside ASCII (a letter, a digit, a mark) is
+/// read as `_`, and every space outside ASCII as a tab: a word character and a space that no
+/// pattern spells out. The two characters outside ASCII that are an ASCII letter when case is
+/// ignored (the Kelvin sign, the long s) are read as that letter. Whatever else lies outside
+/// ASCII is neither a word character nor a space in either reading, and stays.
+pub fn ascii_reading(text: &str) -> std::borrow::Cow<'_, str> {
+    if text.is_ascii() {
+        return std::borrow::Cow::Borrowed(text);
+    }
+    let read = |c: char| match c {
+        c if c.is_ascii() => c,
+        '\u{212A}' => 'k',
+        '\u{017F}' => 's',
+        c if c.is_whitespace() => '\t',
+        c if regex_syntax::try_is_word_character(c).unwrap_or(false) => '_',
+        c => c,
+    };
+    std::borrow::Cow::Owned(text.chars().map(read).collect())
+}
+
+/// Names of the tripwires the ask or the touched paths set off.
+pub fn tripwires_hit(task: &str, paths: &[String], root: &Path) -> Vec<String> {
+    let rules = tripwire_rules(root);
+    let plain = ascii_reading(task);
     let mut hits: Vec<String> = Vec::new();
-    for (name, rx) in &text_rules {
-        let found = match FancyRegex::new(&format!("(?i){rx}")) {
-            Ok(re) => re.is_match(task).unwrap_or(false),
-            Err(_) => false,
+    for (name, re) in &rules.text {
+        let text = if rules.built_in.contains(name) {
+            &*plain
+        } else {
+            task
         };
-        if found {
+        if re.is_match(text) {
             hits.push(name.clone());
         }
     }
-    for (name, globs) in &path_rules {
+    for (name, globs) in &rules.paths {
         if !hits.contains(name)
             && paths
                 .iter()
@@ -580,6 +725,22 @@ pub fn members(root: &Path, flags: &MemberFlags) -> Value {
                 user_path.display()
             )),
         }
+    }
+    let project_path = root.join(".council").join("config.yaml");
+    if project_path.exists() {
+        // a settings file that cannot be read is ignored, but never silently
+        match load_yaml(&project_path) {
+            Ok(doc) if doc.is_object() || !py::truthy(&doc) => {}
+            Ok(_) => problems.push(
+                ".council/config.yaml is not a mapping (key: value lines): the project's settings were ignored"
+                    .to_string(),
+            ),
+            Err(err) => problems.push(format!(
+                ".council/config.yaml could not be read ({}): the project's settings were ignored",
+                py::head(&py::squash(&format!("{err:#}")), 160)
+            )),
+        }
+        problems.extend(tripwire_rules(root).problems);
     }
     let mut flag_layer: IndexMap<String, Value> = IndexMap::new();
     match flags.research {
@@ -800,8 +961,28 @@ pub fn elders_verify(tier: &str, profile: &str) -> bool {
 /// The model policy (`models/policy.yaml`).
 pub fn policy() -> Value {
     crate::assets::read_model("policy.yaml")
-        .and_then(|text| crate::yaml::load(&text).ok())
+        .map(|text| (*parsed_once(&POLICY_CACHE, &text)).clone())
         .unwrap_or(Value::Null)
+}
+
+type Parsed = std::sync::Mutex<Option<(String, std::sync::Arc<Value>)>>;
+static LOCK_CACHE: Parsed = std::sync::Mutex::new(None);
+static POLICY_CACHE: Parsed = std::sync::Mutex::new(None);
+
+/// A YAML text as a value, parsed once for as long as the text stays the same. The gate asks for
+/// the model data several times in one command; a long-lived server sees a refreshed file at once.
+fn parsed_once(cache: &Parsed, text: &str) -> std::sync::Arc<Value> {
+    let mut held = cache
+        .lock()
+        .unwrap_or_else(|poisoned| poisoned.into_inner());
+    match &*held {
+        Some((seen, value)) if seen == text => value.clone(),
+        _ => {
+            let value = std::sync::Arc::new(crate::yaml::load(text).unwrap_or(Value::Null));
+            *held = Some((text.to_string(), value.clone()));
+            value
+        }
+    }
 }
 
 /// Rough tokens for the seat calls of a run, from MEASURED per-call numbers in `models/policy.yaml`
@@ -863,7 +1044,7 @@ pub fn models_for(mode: &str, profile: &str) -> Value {
     let Some(text) = crate::assets::read_model("lock.yaml") else {
         return json!({"error": format!("{} missing: run `council refresh`", crate::assets::models_dir().join("lock.yaml").display())});
     };
-    let lock = crate::yaml::load(&text).unwrap_or(Value::Null);
+    let lock = parsed_once(&LOCK_CACHE, &text);
     let key = if mode == "solo" || mode == "crosslab" || mode.starts_with("fanout:") {
         mode.to_string()
     } else {
@@ -944,6 +1125,9 @@ pub fn blind(
     forbidden: &[String],
     spread: f64,
 ) -> Value {
+    // a card's text goes to judges and to a terminal: control characters do not
+    let cards: Vec<Value> = cards.iter().cloned().map(crate::safe::cleaned).collect();
+    let cards = &cards[..];
     let (mut errors, mut warnings): (Vec<String>, Vec<String>) = (Vec::new(), Vec::new());
     for c in cards {
         let id = c.show("id");
@@ -1617,18 +1801,60 @@ fn lock_path(root: &Path) -> PathBuf {
     root.join(".council").join("locks.json")
 }
 
+/// A plain file of a sane size: not a link, not a device or a pipe (those never stop giving bytes).
+pub fn lockable(path: &Path) -> bool {
+    crate::safe::plain_file(path, crate::safe::MAX_LOCKED).is_some()
+}
+
+/// Every lockable file under a folder. Links are not followed: one that points at a folder above
+/// would go round for ever, and one that points outside is not the project's to lock.
 fn files_under(dir: &Path, out: &mut Vec<PathBuf>) {
     let Ok(entries) = std::fs::read_dir(dir) else {
         return;
     };
     for entry in entries.flatten() {
         let path = entry.path();
-        if path.is_dir() {
-            files_under(&path, out);
-        } else if path.is_file() {
-            out.push(path);
+        match entry.file_type() {
+            Ok(kind) if kind.is_dir() => files_under(&path, out),
+            Ok(kind) if kind.is_file() && lockable(&path) => out.push(path),
+            _ => {}
         }
     }
+}
+
+/// A lock manifest as `{path: hash}`, and the entries that were refused. A path must stay inside
+/// the project: relative, no `..`, no drive, no root. The manifest travels with the repository, so
+/// it is checked before it is believed.
+pub fn lock_entries(data: &Value) -> (Map<String, Value>, Vec<String>) {
+    let listed: Vec<(String, Value)> = match data {
+        Value::Object(map) => map.iter().map(|(k, v)| (k.clone(), v.clone())).collect(),
+        // an older form: a list of paths
+        Value::Array(list) => list
+            .iter()
+            .filter_map(Value::as_str)
+            .map(|p| (p.to_string(), Value::Null))
+            .collect(),
+        _ => Vec::new(),
+    };
+    let (mut good, mut bad) = (Map::new(), Vec::new());
+    for (path, digest) in listed {
+        let slashed = path.replace('\\', "/");
+        let drive =
+            path.as_bytes().get(1) == Some(&b':') && path.as_bytes()[0].is_ascii_alphabetic();
+        if py::strip(&path).is_empty()
+            || slashed.starts_with('/')
+            || slashed.split('/').any(|part| part == "..")
+            || drive
+            || path.contains('\0')
+            || path.len() > 4096
+        {
+            bad.push(crate::safe::shown(&path).into_owned());
+        } else {
+            good.insert(path, digest);
+        }
+    }
+    bad.sort();
+    (good, bad)
 }
 
 /// Record sha256 for files (or every file under a directory). Paths are stored relative to the
@@ -1637,28 +1863,46 @@ pub fn lock_files(paths: &[String], root: &Path) -> Result<Value> {
     let root = resolve(root);
     let lock = lock_path(&root);
     let mut data: Map<String, Value> = if lock.exists() {
-        serde_json::from_str(&read_text(&lock)?)
-            .with_context(|| format!("{} is not valid JSON", lock.display()))?
+        let parsed = crate::safe::read_own(&lock)
+            .ok()
+            .and_then(|text| serde_json::from_str::<Value>(&text).ok());
+        match parsed {
+            Some(parsed) => lock_entries(&parsed).0,
+            None => {
+                return fail(format!(
+                    "{} is not valid JSON: put it right or delete it, then lock again",
+                    lock.display()
+                ))
+            }
+        }
     } else {
         Map::new()
     };
     for p in paths {
-        let fp = resolve(&cwd().join(p));
+        let given = cwd().join(p);
         let mut files = Vec::new();
-        if fp.is_dir() {
-            files_under(&fp, &mut files);
+        if given.is_dir() && !crate::safe::is_link(&given) {
+            files_under(&given, &mut files);
             files.sort();
         } else {
-            files.push(fp);
+            files.push(given);
         }
         for f in files {
-            let rel = f.strip_prefix(&root).with_context(|| {
-                format!(
-                    "{} is not inside the project {}",
+            if !lockable(&f) {
+                return fail(format!(
+                    "cannot lock {}: it is not a plain file (or is over {} MB)",
+                    f.display(),
+                    crate::safe::MAX_LOCKED / 1_000_000
+                ));
+            }
+            let full = resolve(&f);
+            let Ok(rel) = full.strip_prefix(&root) else {
+                return fail(format!(
+                    "cannot lock {}: it is outside the project ({})",
                     f.display(),
                     root.display()
-                )
-            })?;
+                ));
+            };
             let hash = sha_file(&f).with_context(|| format!("cannot read {}", f.display()))?;
             data.insert(py::posix(rel), json!(hash));
         }
@@ -1676,22 +1920,42 @@ pub fn lock_files(paths: &[String], root: &Path) -> Result<Value> {
 /// Compare locked files with their recorded hashes.
 ///
 /// `against` = a git ref: read the lock manifest from that ref (e.g. `origin/main`), so a change that
-/// edits a test AND its hash in the same PR is still caught. Use that form in CI.
+/// edits a test AND its hash in the same PR is still caught. Use that form in CI. A ref that cannot
+/// be read fails the check: a check that could not look must not pass.
 pub fn verify_locks(root: &Path, against: Option<&str>) -> Result<Value> {
     let root = resolve(root);
     let mut note: Option<String> = None;
-    let data: Map<String, Value> = if let Some(reference) = against {
-        let out = std::process::Command::new("git")
-            .arg("-C")
-            .arg(&root)
-            .arg("show")
-            .arg(format!("{reference}:.council/locks.json"))
-            .output();
-        match out {
+    let broken =
+        || json!({"ok": false, "changed": [], "note": "the lock manifest is not valid JSON"});
+    let text = if let Some(reference) = against {
+        if !crate::safe::plain_arg(reference) {
+            return fail(format!(
+                "--against takes a git ref such as origin/main, not {}",
+                py::str_repr(&crate::safe::shown(reference))
+            ));
+        }
+        let git = |args: &[&str]| crate::safe::git(&root).args(args).output();
+        match git(&[
+            "rev-parse",
+            "--verify",
+            "--quiet",
+            &format!("{reference}^{{commit}}"),
+        ]) {
+            Ok(out) if out.status.success() => {}
+            Ok(_) => {
+                return Ok(json!({"ok": false, "changed": [], "note": format!(
+                    "cannot read {reference}: git does not know that ref here. In CI, fetch it first (actions/checkout with fetch-depth: 0)")}))
+            }
+            Err(err) => {
+                return Ok(
+                    json!({"ok": false, "changed": [], "note": format!("cannot run git to read {reference}: {err}")}),
+                )
+            }
+        }
+        match git(&["show", &format!("{reference}:.council/locks.json")]) {
             Ok(out) if out.status.success() => {
                 note = Some(format!("manifest from {reference}"));
-                serde_json::from_str(&decode(&out.stdout))
-                    .context("the lock manifest at that ref is not valid JSON")?
+                decode(&out.stdout)
             }
             _ => {
                 return Ok(
@@ -1701,21 +1965,32 @@ pub fn verify_locks(root: &Path, against: Option<&str>) -> Result<Value> {
         }
     } else {
         let lock = lock_path(&root);
-        if !lock.exists() {
+        if !lock.exists() && !crate::safe::is_link(&lock) {
             return Ok(json!({"ok": true, "changed": [], "note": "no locks"}));
         }
-        serde_json::from_str(&read_text(&lock)?)
-            .with_context(|| format!("{} is not valid JSON", lock.display()))?
+        match crate::safe::read_own(&lock) {
+            Ok(text) => text,
+            Err(_) => return Ok(broken()),
+        }
     };
-    let changed: Vec<&String> = data
+    let Ok(data) = serde_json::from_str::<Value>(&text) else {
+        return Ok(broken());
+    };
+    let (good, bad) = lock_entries(&data);
+    let changed: Vec<&String> = good
         .iter()
         .filter(|(p, h)| {
             let file = root.join(p.as_str());
-            !file.exists() || sha_file(&file).ok().as_deref() != h.as_str()
+            !lockable(&file)
+                || !crate::safe::within(&file, &root)
+                || sha_file(&file).ok().as_deref() != h.as_str()
         })
         .map(|(p, _)| p)
         .collect();
-    let mut out = json!({"ok": changed.is_empty(), "changed": changed});
+    let mut out = json!({"ok": changed.is_empty() && bad.is_empty(), "changed": changed});
+    if !bad.is_empty() {
+        out["refused"] = json!(bad);
+    }
     if let Some(note) = note {
         out["note"] = json!(note);
     }
@@ -1726,7 +2001,7 @@ pub fn verify_locks(root: &Path, against: Option<&str>) -> Result<Value> {
 pub fn read_json_arg(arg: &str) -> Result<Value> {
     let path = Path::new(arg);
     let text = if path.exists() {
-        read_text(path)?
+        read_named(path)?
     } else {
         arg.to_string()
     };
@@ -1739,6 +2014,155 @@ mod tests {
 
     fn card(id: &str, author: &str, body_words: usize) -> Value {
         json!({"id": id, "title": format!("Title {id}"), "body": vec!["word"; body_words].join(" "), "eli5": "simple", "author": author})
+    }
+
+    /// The built-in tripwires are built as ASCII patterns and matched against `ascii_reading` of
+    /// the ask. That must give the answer the same patterns give over all of Unicode on the ask
+    /// itself: on every text here, hand-picked and made up by chance alike.
+    #[test]
+    fn the_ascii_reading_of_an_ask_trips_what_the_ask_trips() {
+        let over_unicode: Vec<Regex> = TRIPWIRES
+            .iter()
+            .map(|(_, rx)| {
+                regex::RegexBuilder::new(rx)
+                    .case_insensitive(true)
+                    .build()
+                    .unwrap()
+            })
+            .collect();
+        let rules = tripwire_rules(Path::new("/nowhere/at/all"));
+        assert_eq!(rules.built_in.len(), TRIPWIRES.len());
+        for (name, rx) in TRIPWIRES {
+            // the stand-ins must be characters no pattern spells out, and the patterns must use
+            // nothing whose meaning the reading does not keep
+            for not_kept in [
+                "_", "\t", "\\t", "\\d", "\\D", "\\W", "\\S", "\\B", "[^", "\\p", "\\x", "\\u",
+            ] {
+                assert!(
+                    !rx.contains(not_kept),
+                    "{name}: the pattern uses {not_kept:?}"
+                );
+            }
+            assert!(rx.is_ascii(), "{name}");
+        }
+        let same = |text: &str| {
+            let plain = ascii_reading(text);
+            assert_eq!(plain.chars().count(), text.chars().count(), "{text:?}");
+            for ((name, _), unicode) in TRIPWIRES.iter().zip(&over_unicode) {
+                assert_eq!(
+                    rules.text[*name].is_match(&plain),
+                    unicode.is_match(text),
+                    "{name}: {text:?} read as {plain:?}"
+                );
+            }
+        };
+        let picked = [
+            "drop the café table",
+            "drop the cafe\u{301} table",
+            "alter\u{a0}table users",
+            "auth—flow",
+            "réauth the user",
+            "auth² levels",
+            "the \u{17f}so login",
+            "a \u{212a}8s cluster",
+            "\u{212a}ubernetes",
+            "migrate données database",
+            "ｍｉｇｒａｔｉｏｎ",
+            "delete all 顧客 records",
+            "delete\u{2003}users",
+            "force‑push it",
+            "publish über blog",
+            "deprecate the ‿ endpoints",
+            "api\u{200d}keys",
+            "delete x\u{200d}y rows",
+            "password²",
+            "ßecrets",
+            "se\u{301}crets",
+            "prod\u{a0}deploy",
+            "…sso…",
+            "«rfc»",
+            "the migration’s plan",
+            "ALTER\u{2028}TABLE",
+            "truncate les données rows",
+            "purge ０１２ buckets",
+            "wipe\u{feff}data",
+            "announce™",
+            "Ⅳ strategy",
+            "roadmap№",
+            "\u{1d4ea}pi contract",
+        ];
+        for text in picked {
+            same(text);
+        }
+        // made up by chance, from the words the patterns know and the characters that could fool them
+        let words = [
+            "delete",
+            "drop",
+            "truncate",
+            "users",
+            "tables",
+            "data",
+            "migrate",
+            "migration",
+            "the",
+            "all",
+            "prod",
+            "deploy",
+            "auth",
+            "api",
+            "keys",
+            "password",
+            "sso",
+            "public",
+            "release",
+            "blog",
+            "post",
+            "schema",
+            "database",
+            "alter",
+            "table",
+            "rm",
+            "-rf",
+            "force",
+            "push",
+            "publish",
+            "package",
+            "strategy",
+            "rfc",
+            "k8s",
+            "dns",
+            "café",
+            "naïve",
+            "顧客",
+            "über",
+            "x\u{301}",
+            "²",
+            "\u{212a}",
+            "\u{17f}",
+            "ｋ８ｓ",
+            "données",
+        ];
+        let joins = [
+            " ", " ", " ", "  ", "\u{a0}", "\u{2003}", "-", "—", "‑", "/", ".", "", "\u{200d}",
+            "\u{301}", "’", "_", "\n", "\t", "²",
+        ];
+        let mut state = 0x9e37_79b9_7f4a_7c15u64;
+        let mut pick = |n: usize| {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            (state % n as u64) as usize
+        };
+        for _ in 0..20_000 {
+            let mut text = String::new();
+            for _ in 0..2 + pick(5) {
+                text.push_str(words[pick(words.len())]);
+                text.push_str(joins[pick(joins.len())]);
+            }
+            same(&text);
+        }
+        // a project's own pattern replaces ours and is read over all of Unicode, as it was written
+        assert_eq!(&*ascii_reading("plain ask"), "plain ask");
     }
 
     #[test]

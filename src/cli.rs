@@ -18,8 +18,11 @@ votes, cutting 7 -> 5 -> 3 -> 1, checking the rules were followed, and locking t
 Every surface (Claude Code skill, plugin hook, MCP server, AGENTS.md tools, CI) calls these same
 functions, so the rules are enforced the same way everywhere.
 
-Run loop (resumable; state lives in .council/runs/<id>/run.json)
+Start here
+  demo          a whole council on a made-up question, played by a script: no model, no cost
   doctor        what can be called from here (CLIs, keys, stale data) and which mode fits
+
+Run loop (resumable; state lives in .council/runs/<id>/run.json)
   init          start a run: gate, seats, files. Prints the GATE line
   next          prepare the current step (writes prompt packets) and say exactly what to do
   dispatch      run the seats that live behind a CLI or API (codex, gemini, openrouter, claude -p)
@@ -28,6 +31,7 @@ Run loop (resumable; state lives in .council/runs/<id>/run.json)
   status        one-screen digest of the run and what is still missing (use it after a context reset)
   deviation     record that the run left the protocol, and why
   audit         re-count every vote from the ballots on disk and compare with the record
+  log           the run's diary: every step taken and every seat called, with times
 
 Building blocks (also used on their own)
   plan          dry-run the gate (no tokens spent)
@@ -39,14 +43,21 @@ Building blocks (also used on their own)
   verify-locks  fail if a locked file changed (use --against <git ref> in CI)
   ask / elders  one prompt to one provider / one blinded packet to the elder council
   refresh       rebuild models/lock.yaml from Artificial Analysis data
-  mcp           serve these commands to any MCP client over stdio
-  hook          the Claude Code hook that blocks edits to locked files
+  api           the same operations as JSON in, JSON out (council api --list)
+  mcp           serve the API to any MCP client over stdio
+  hook          the Claude Code hook that guards locked files and keeps council seats in their lane
 Run `council <command> -h` for options.";
 
 #[derive(Parser)]
 #[command(name = "council", version, about = "The Council Loop: gate, seats, blind votes, cuts, locks", long_about = ABOUT)]
 #[command(infer_long_args = true, disable_help_subcommand = true)]
 struct Cli {
+    /// Say more about what is being done, on standard error: -v decisions, -vv every read, write and call.
+    #[arg(short = 'v', long = "verbose", action = clap::ArgAction::Count, global = true)]
+    verbose: u8,
+    /// How much to say: off, error, warn (default), info, debug, trace. Also the COUNCIL_LOG variable.
+    #[arg(long, global = true, value_name = "LEVEL", value_parser = ["off", "error", "warn", "info", "debug", "trace"])]
+    log_level: Option<String>,
     #[command(subcommand)]
     cmd: Cmd,
 }
@@ -57,12 +68,13 @@ pub struct GateOpts {
     /// The size of the work; `auto` lets the gate choose.
     #[arg(long, default_value = "auto", value_parser = ["auto", "direct", "lite", "full"])]
     pub tier: String,
-    /// solo | crosslab | fanout:<claude|gemini|openai|openrouter|open|mix>  (default: what `doctor` recommends)
+    /// solo | crosslab | fanout:<claude|gemini|openai|openrouter|open|mix>  (default: the cheapest
+    /// that can be reached from here, as `doctor` shows; or `defaults.mode` in your settings)
     #[arg(long)]
     pub mode: Option<String>,
-    /// How much to spend on models.
-    #[arg(long, default_value = "balanced", value_parser = ["max", "balanced", "efficient"])]
-    pub profile: String,
+    /// How much to spend on models (default: efficient, the cheapest; or `defaults.profile` in your settings).
+    #[arg(long, value_parser = ["max", "balanced", "efficient"])]
+    pub profile: Option<String>,
     /// Loop cap (default 3 for full, 1 for lite). Only the requester raises it.
     #[arg(long, allow_negative_numbers = true)]
     pub loops: Option<i64>,
@@ -73,7 +85,7 @@ pub struct GateOpts {
     #[arg(long, value_parser = ["yes", "no"])]
     pub reversible: Option<String>,
     /// The requester's own words when they override the gate, e.g. "lite is fine".
-    #[arg(long = "override")]
+    #[arg(long = "override", allow_hyphen_values = true)]
     pub override_words: Option<String>,
     /// Files the task will touch (path tripwires).
     #[arg(long, num_args = 0..)]
@@ -147,6 +159,7 @@ enum Cmd {
     },
     /// Dry-run the gate (no tokens spent).
     Plan {
+        /// The ask, in the requester's own words.
         task: String,
         #[command(flatten)]
         gate: GateOpts,
@@ -167,7 +180,7 @@ enum Cmd {
         #[arg(long)]
         run: Option<String>,
         /// The sealed control arm is gone for good: go on without it (logged).
-        #[arg(long, value_name = "WHAT_HAPPENED")]
+        #[arg(long, value_name = "WHAT_HAPPENED", allow_hyphen_values = true)]
         without_control: Option<String>,
     },
     /// One-screen digest of the run.
@@ -184,6 +197,7 @@ enum Cmd {
         /// Only this seat.
         #[arg(long)]
         seat: Option<String>,
+        /// Print the commands that would run, and run nothing.
         #[arg(long)]
         dry_run: bool,
     },
@@ -196,39 +210,54 @@ enum Cmd {
         #[arg(long, value_name = "SEATS")]
         drop: Option<String>,
         /// Why they are left out (logged as a deviation).
-        #[arg(long)]
+        #[arg(long, allow_hyphen_values = true)]
         reason: Option<String>,
     },
     /// Re-count every vote from the ballots on disk; exit 1 on a mismatch.
     Audit {
+        /// Run id (default: the current run).
         #[arg(long)]
         run: Option<String>,
+    },
+    /// The run's diary: every step taken and every seat called, with times.
+    Log {
+        /// Run id (default: the current run).
+        #[arg(long)]
+        run: Option<String>,
+        /// Only the last N events.
+        #[arg(long, short = 'n', value_name = "N")]
+        tail: Option<usize>,
+        /// One JSON object per line, as the file holds them.
+        #[arg(long)]
+        json: bool,
     },
     /// Record that the run left the protocol, and why.
     Deviation {
         /// One line: what was done differently, and why.
         text: String,
+        /// Run id (default: the current run).
         #[arg(long)]
         run: Option<String>,
     },
     /// Tally + elders + wildcard -> survivors; writes the loop ledger.
     Cut {
+        /// Run id (default: the current run).
         #[arg(long)]
         run: Option<String>,
         /// One line: what happened in this loop.
-        #[arg(long)]
+        #[arg(long, allow_hyphen_values = true)]
         eli5: String,
         /// One line: what changed since the last loop.
-        #[arg(long, default_value = "")]
+        #[arg(long, default_value = "", allow_hyphen_values = true)]
         changed: String,
         /// Stop early: converged or stalled (keeps 1).
-        #[arg(long, value_name = "REASON")]
+        #[arg(long, value_name = "REASON", allow_hyphen_values = true)]
         stop: Option<String>,
         /// The one question put to the requester and the answer: "Q -> A".
-        #[arg(long, value_name = "Q_AND_A")]
+        #[arg(long, value_name = "Q_AND_A", allow_hyphen_values = true)]
         asked: Option<String>,
         /// Elders split or an S1 is open and the requester cannot be asked: the safer option you are taking.
-        #[arg(long, value_name = "SAFER_OPTION")]
+        #[arg(long, value_name = "SAFER_OPTION", allow_hyphen_values = true)]
         unattended: Option<String>,
     },
     /// Show every setting for the researchers, the mapper and the shared memory, and who set it.
@@ -239,9 +268,12 @@ enum Cmd {
     },
     /// Post to the run's commons: a thought for the members or a question for the researchers.
     Note {
+        /// The note: one thought, or one question.
         text: String,
+        /// Who it is for: every member, the chair only, or a question for the researchers.
         #[arg(long, default_value = "all", value_parser = ["all", "chair", "research"])]
         to: String,
+        /// Run id (default: the current run).
         #[arg(long)]
         run: Option<String>,
     },
@@ -282,17 +314,21 @@ enum Cmd {
     },
     /// Show model picks.
     Models {
+        /// solo, crosslab or fanout:<claude|gemini|openai|openrouter|open|mix>.
         #[arg(long, default_value = "crosslab")]
         mode: String,
-        #[arg(long, default_value = "balanced", value_parser = ["max", "balanced", "efficient"])]
+        /// How much to spend on models.
+        #[arg(long, default_value = crate::gate::DEFAULT_PROFILE, value_parser = ["max", "balanced", "efficient"])]
         profile: String,
     },
     /// Anonymise + shuffle cards.
     Blind {
         /// JSON file or string: list of cards.
         cards: String,
+        /// The shuffle's seed: the same seed gives the same order.
         #[arg(long, default_value_t = 0)]
         seed: u64,
+        /// The longest a card's body may be, in words.
         #[arg(long, default_value_t = core::caps::CARD)]
         max_words: usize,
         /// Write packet markdown here; mapping goes to <out>.mapping.json.
@@ -301,12 +337,17 @@ enum Cmd {
     },
     /// Count blind ballots (head-to-heads weighted by stake) + cut.
     Tally {
+        /// JSON file or string: the ballots, each {voter, ranking, best_on}.
         votes: String,
+        /// JSON file or string: the private mapping that `blind` wrote (label -> card and authors).
         mapping: String,
+        /// JSON file or string: label -> {criterion: score}, from machine checks or judges.
         #[arg(long)]
         scores: Option<String>,
+        /// JSON file or string: label -> "pass" or "fail". A failed check ranks last.
         #[arg(long)]
         checks: Option<String>,
+        /// How many to keep (default: rank only).
         #[arg(long)]
         keep: Option<usize>,
     },
@@ -317,6 +358,7 @@ enum Cmd {
     },
     /// Lock files/dirs agents may not edit.
     LockTests {
+        /// Files or folders to lock (a folder locks every file in it).
         #[arg(required = true)]
         paths: Vec<String>,
     },
@@ -328,27 +370,37 @@ enum Cmd {
     },
     /// One prompt to one provider.
     Ask {
+        /// Whose model to ask.
         #[arg(long, value_parser = ["claude", "openai", "gemini", "openrouter"])]
         provider: String,
+        /// The model's id as that provider names it (default: the provider's own default).
         #[arg(long)]
         model: Option<String>,
+        /// Reasoning effort, where the provider has such a setting.
         #[arg(long)]
         effort: Option<String>,
+        /// The file that holds the prompt.
         #[arg(long)]
         prompt_file: String,
+        /// Print the command that would run, and run nothing.
         #[arg(long)]
         dry_run: bool,
     },
     /// Blinded packet -> elder council (stand-alone use).
     Elders {
+        /// The file that holds the blinded packet (Markdown).
         #[arg(long)]
         packet: String,
-        #[arg(long, default_value = "balanced", value_parser = ["max", "balanced", "efficient"])]
+        /// How much to spend on models.
+        #[arg(long, default_value = crate::gate::DEFAULT_PROFILE, value_parser = ["max", "balanced", "efficient"])]
         profile: String,
+        /// Which providers to ask, comma-separated.
         #[arg(long, default_value = "claude,openai,gemini")]
         providers: String,
+        /// The folder for each provider's review.
         #[arg(long, default_value = ".council/elders")]
         out: String,
+        /// Print the commands that would run, and run nothing.
         #[arg(long)]
         dry_run: bool,
     },
@@ -367,8 +419,62 @@ enum Cmd {
         #[arg(long)]
         out: Option<String>,
     },
-    /// Serve these commands to any MCP client over stdio.
-    Mcp,
+    /// Play a whole council on a made-up question with a script for every seat: no model, no cost.
+    Demo {
+        /// Play it in this (new or empty) folder and keep it.
+        #[arg(long, value_name = "FOLDER")]
+        dir: Option<String>,
+        /// Keep the folder the demo made, to look around.
+        #[arg(long)]
+        keep: bool,
+        /// Play a Full council (three loops, seven experts) instead of a Lite one.
+        #[arg(long)]
+        full: bool,
+        /// Print every line each command printed.
+        #[arg(long)]
+        all: bool,
+    },
+    /// Serve the API to any MCP client over stdio (tools, resources, prompts).
+    Mcp {
+        /// Serve this one project: project_dir may be left out, other projects are refused.
+        #[arg(long, value_name = "DIR")]
+        project: Option<String>,
+        /// Offer only the operations that change nothing.
+        #[arg(long)]
+        read_only: bool,
+        /// Never offer an operation that sends prompts to model vendors.
+        #[arg(long)]
+        no_dispatch: bool,
+        /// Groups of tools to offer: run, memory, map, blocks or all (default run,memory,map).
+        #[arg(long, value_name = "SETS")]
+        toolsets: Option<String>,
+        /// Offer exactly these operations (comma-separated; `council api --list` names them).
+        #[arg(long, value_name = "NAMES")]
+        tools: Option<String>,
+        /// Never offer these operations.
+        #[arg(long, value_name = "NAMES")]
+        deny_tools: Option<String>,
+        /// List each tool's output schema too (a larger tool list for the client to carry).
+        #[arg(long)]
+        output_schemas: bool,
+    },
+    /// The API surface from a shell: list the operations, describe them, or call one with JSON.
+    Api {
+        /// The operation to call or describe (see --list).
+        operation: Option<String>,
+        /// The arguments, as one JSON object.
+        #[arg(long, value_name = "JSON", allow_hyphen_values = true)]
+        args: Option<String>,
+        /// Read the arguments from this file (- for standard input).
+        #[arg(long, value_name = "FILE", allow_hyphen_values = true)]
+        args_file: Option<String>,
+        /// List the operations.
+        #[arg(long)]
+        list: bool,
+        /// Print the description (input and output schemas) of one operation, or of all.
+        #[arg(long)]
+        describe: bool,
+    },
     /// The Claude Code hook: reads the event on stdin and denies edits to locked files.
     Hook,
 }
@@ -400,15 +506,19 @@ enum MemoryCmd {
     },
     /// Add one fact by hand.
     Add {
-        #[arg(long)]
+        /// One fact, 45 words at most.
+        #[arg(long, allow_hyphen_values = true)]
         claim: String,
         /// A web address, a file in the project, or 'test: <command>'.
-        #[arg(long)]
+        #[arg(long, allow_hyphen_values = true)]
         source: String,
-        #[arg(long, default_value = "")]
+        /// The exact words or number from the source.
+        #[arg(long, default_value = "", allow_hyphen_values = true)]
         quote: String,
+        /// paper, docs, blog, repo, code, data, talk, test or other.
         #[arg(long, default_value = "other")]
         kind: String,
+        /// How far the source can be trusted.
         #[arg(long, default_value = "medium", value_parser = ["high", "medium", "low"])]
         confidence: String,
         /// Comma-separated.
@@ -417,16 +527,21 @@ enum MemoryCmd {
         /// When the source was published.
         #[arg(long, default_value = "")]
         date: String,
-        #[arg(long, default_value = "")]
+        /// Why it matters here.
+        #[arg(long, default_value = "", allow_hyphen_values = true)]
         why: String,
+        /// Who adds it (a name or a seat).
         #[arg(long, default_value = "chair")]
         by: String,
     },
     /// Find facts by keyword.
     Search {
+        /// Keywords.
         query: String,
+        /// Only facts with this tag.
         #[arg(long)]
         tag: Option<String>,
+        /// The most facts to show.
         #[arg(long, default_value_t = 10, allow_negative_numbers = true)]
         limit: i64,
         /// Also show facts that were retired.
@@ -437,7 +552,8 @@ enum MemoryCmd {
     Retire {
         /// The note's file name, without .md.
         note: String,
-        #[arg(long)]
+        /// Why it no longer holds (at least three words).
+        #[arg(long, allow_hyphen_values = true)]
         because: String,
         /// The note that replaces it.
         #[arg(long)]
@@ -445,6 +561,7 @@ enum MemoryCmd {
     },
     /// Bring research notes from another memory folder into this one.
     Import {
+        /// The folder to import from.
         #[arg(long = "from")]
         src: String,
     },
@@ -582,6 +699,7 @@ fn run_cmd(cmd: Cmd) -> Result<i32> {
             without_control,
         } => crate::run::cmd_next(run.as_deref(), without_control.as_deref()),
         Cmd::Audit { run } => crate::run::cmd_audit(run.as_deref()),
+        Cmd::Log { run, tail, json } => crate::run::cmd_log(run.as_deref(), tail, json),
         Cmd::Status { run } => crate::run::cmd_status(run.as_deref()),
         Cmd::Dispatch { run, seat, dry_run } => {
             crate::run::cmd_dispatch(run.as_deref(), seat.as_deref(), dry_run)
@@ -624,8 +742,9 @@ fn run_cmd(cmd: Cmd) -> Result<i32> {
                 1.5,
             );
             if let Some(path) = out {
-                core::write_text(Path::new(&path), result.s("packet"))?;
-                core::write_text(
+                // paths the person named are theirs to choose
+                crate::safe::write_named(Path::new(&path), result.s("packet"))?;
+                crate::safe::write_named(
                     Path::new(&format!("{path}.mapping.json")),
                     &dump(result.at("mapping")),
                 )?;
@@ -693,7 +812,7 @@ fn run_cmd(cmd: Cmd) -> Result<i32> {
             prompt_file,
             dry_run,
         } => {
-            let prompt = core::read_text(Path::new(&prompt_file))?;
+            let prompt = core::read_named(Path::new(&prompt_file))?;
             let out = crate::providers::ask(
                 &provider,
                 &prompt,
@@ -713,7 +832,7 @@ fn run_cmd(cmd: Cmd) -> Result<i32> {
             out,
             dry_run,
         } => {
-            let text = core::read_text(Path::new(&packet))?;
+            let text = core::read_named(Path::new(&packet))?;
             let names: Vec<String> = providers
                 .split(',')
                 .map(crate::py::strip)
@@ -726,6 +845,7 @@ fn run_cmd(cmd: Cmd) -> Result<i32> {
                 &names,
                 Some(Path::new(&out)),
                 dry_run,
+                true,
             );
             say!("{}", dump(&result));
             Ok(if result.truthy("ok") { 0 } else { 1 })
@@ -736,7 +856,42 @@ fn run_cmd(cmd: Cmd) -> Result<i32> {
             table,
             out,
         } => crate::refresh::run(offline.as_deref(), check, table.as_deref(), out.as_deref()),
-        Cmd::Mcp => crate::mcp::serve(),
+        Cmd::Demo {
+            dir,
+            keep,
+            full,
+            all,
+        } => crate::demo::cmd_demo(dir.as_deref(), keep, all, full),
+        Cmd::Mcp {
+            project,
+            read_only,
+            no_dispatch,
+            toolsets,
+            tools,
+            deny_tools,
+            output_schemas,
+        } => crate::mcp::serve(crate::mcp::Options::resolve(
+            project.as_deref(),
+            read_only,
+            no_dispatch,
+            toolsets.as_deref(),
+            tools.as_deref(),
+            deny_tools.as_deref(),
+            output_schemas,
+        )?),
+        Cmd::Api {
+            operation,
+            args,
+            args_file,
+            list,
+            describe,
+        } => crate::api::cmd_api(
+            operation.as_deref(),
+            args.as_deref(),
+            args_file.as_deref(),
+            list,
+            describe,
+        ),
         Cmd::Hook => Ok(crate::hook::run()),
     }
 }
@@ -744,13 +899,35 @@ fn run_cmd(cmd: Cmd) -> Result<i32> {
 /// Run the command line. Returns the process exit code: 0 done, 1 a check failed or something broke,
 /// 2 the user must fix something (the message says what).
 pub fn main() -> i32 {
-    let cli = match Cli::try_parse() {
-        Ok(cli) => cli,
+    use clap::{CommandFactory as _, FromArgMatches as _};
+    if std::env::args_os().len() <= 1 {
+        // no command: say what there is, and succeed. (A hook runner that drops the `hook` argument
+        // must not have every tool call blocked by a usage error.)
+        say!("{ABOUT}");
+        return 0;
+    }
+    let parsed = Cli::command().try_get_matches().and_then(|matches| {
+        let verb = matches.subcommand_name().unwrap_or("").to_string();
+        Cli::from_arg_matches(&matches).map(|cli| (cli, verb))
+    });
+    let (cli, verb) = match parsed {
+        Ok(found) => found,
         Err(err) => {
             let _ = err.print();
             return if err.use_stderr() { 2 } else { 0 };
         }
     };
+    match (
+        cli.log_level.as_deref().and_then(crate::log::Level::parse),
+        cli.verbose,
+    ) {
+        (Some(level), _) => crate::log::set_level(level),
+        (None, 1) => crate::log::set_level(crate::log::Level::Info),
+        (None, 2) => crate::log::set_level(crate::log::Level::Debug),
+        (None, n) if n > 2 => crate::log::set_level(crate::log::Level::Trace),
+        _ => {}
+    }
+    crate::welcome::first_run(&verb);
     match run_cmd(cli.cmd) {
         Ok(code) => code,
         Err(err) => {

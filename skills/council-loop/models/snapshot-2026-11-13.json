@@ -9,7 +9,7 @@
   "index": "Artificial Analysis Intelligence Index v5.0.1 (0-100)",
   "cost_metric": "AA cost per task, USD (accounts for how many tokens a model actually spends)",
   "notes": [
-    "Hand-copied snapshot for offline use and tests. Run refresh_models.py with AA_API_KEY for live data.",
+    "Hand-copied snapshot for offline use and tests. Run `council refresh` with AA_API_KEY for live data.",
     "Gemini 4 Carbon is limited to Google's Fairwind Program (no public model ID): marked restricted.",
     "Gemini 4 Argon intro pricing ($2/$10 per 1M) ends 2026-11-30; cost per task will rise after that.",
     "openrouter_id is unknown offline (null). Live AA data fills it from openrouter_api_id."

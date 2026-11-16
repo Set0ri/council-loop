@@ -110,7 +110,35 @@ fn or_else<'a>(first: &'a Value, second: &'a Value) -> &'a Value {
     }
 }
 
+/// The folder a memory setting names, before anything is created.
+fn place(conf: &Value, root: &Path) -> PathBuf {
+    let text = |key: &str| {
+        if conf.truthy(key) {
+            conf.show(key)
+        } else {
+            String::new()
+        }
+    };
+    let under_root = |p: PathBuf| if p.is_absolute() { p } else { root.join(p) };
+    if conf.s("backend") == "obsidian" {
+        return under_root(py::path(&text("vault"))).join(py::path(&text("folder")));
+    }
+    under_root(py::path(&text("dir")))
+}
+
+/// Why a project's own settings were not followed.
+pub fn outside(place: &str) -> String {
+    format!(
+        "the project's settings (.council/config.yaml) point the shared memory outside the project ({place}). \
+         A project may only name a folder inside itself. To keep the memory somewhere else, say so in your own \
+         settings: council memory setup --files --dir \"<path>\", or --obsidian --vault \"<path>\""
+    )
+}
+
 /// Resolve where the memory lives and how notes link to each other.
+///
+/// The project's settings file travels with the repository, so it may only name a folder inside the
+/// project. A folder anywhere else must be named by your own settings or by the environment.
 pub fn settings(root: Option<&Path>) -> Value {
     let root = core::resolve(
         &root
@@ -120,6 +148,7 @@ pub fn settings(root: Option<&Path>) -> Value {
     let default_dir = root.join(".council").join("memory").display().to_string();
     let mut conf = json!({"backend": "files", "dir": default_dir});
     let mut source = "default";
+    let mut refused: Option<String> = None;
     let layers = [
         (
             "project",
@@ -131,13 +160,30 @@ pub fn settings(root: Option<&Path>) -> Value {
         if !py::truthy(layer) {
             continue;
         }
-        if layer.s("backend") == "obsidian" || layer.truthy("vault") {
-            conf = json!({"backend": "obsidian", "vault": or_else(layer.at("vault"), conf.at("vault")),
-                          "folder": or_else(layer.at("folder"), conf.at("folder"))});
+        // a path is text, or it is nothing
+        let layer: Value = Value::Object(
+            items(layer)
+                .filter(|(k, v)| k.as_str() == "backend" || v.is_string())
+                .map(|(k, v)| (k.clone(), v.clone()))
+                .collect(),
+        );
+        let new = if layer.s("backend") == "obsidian" || layer.truthy("vault") {
+            json!({"backend": "obsidian", "vault": or_else(layer.at("vault"), conf.at("vault")),
+                   "folder": or_else(layer.at("folder"), conf.at("folder"))})
         } else if layer.s("backend") == "files" || layer.truthy("dir") {
-            conf =
-                json!({"backend": "files", "dir": or_else(layer.at("dir"), &json!(default_dir))});
+            json!({"backend": "files", "dir": or_else(layer.at("dir"), &json!(default_dir))})
+        } else {
+            continue;
+        };
+        if *name == "project" && !crate::safe::within(&place(&new, &root), &root) {
+            // the project came with its settings: it may not send the memory somewhere else
+            refused = Some(outside(&py::to_str(or_else(
+                new.at("vault"),
+                new.at("dir"),
+            ))));
+            continue;
         }
+        conf = new;
         source = name;
     }
     let env = |name: &str| std::env::var(name).ok().filter(|v| !v.is_empty());
@@ -150,6 +196,9 @@ pub fn settings(root: Option<&Path>) -> Value {
     } else if let Some(dir) = env("COUNCIL_MEMORY_DIR") {
         conf = json!({"backend": "files", "dir": dir});
         source = "env";
+    }
+    if let Some(problem) = refused.filter(|_| source == "default") {
+        return json!({"backend": "files", "dir": default_dir, "links": "markdown", "source": "project", "ok": false, "problem": problem});
     }
     if conf.s("backend") == "obsidian" {
         let has_vault = conf.truthy("vault");
@@ -195,6 +244,48 @@ pub fn settings(root: Option<&Path>) -> Value {
     json!({"backend": "files", "dir": d.display().to_string(), "links": "markdown", "source": source, "ok": true, "problem": null})
 }
 
+/// `None` when this tool may use the folder in `conf` (a run's pinned settings), else why not. A run
+/// file lies in the project, and a project can come from anyone: a folder outside the project is
+/// used only when your own settings or the environment name the very same folder now.
+pub fn trusted(conf: &Value, root: Option<&Path>) -> Option<String> {
+    let root = core::resolve(
+        &root
+            .map(Path::to_path_buf)
+            .unwrap_or_else(core::project_root),
+    );
+    let Some(d) = conf.at("dir").as_str().filter(|d| !d.is_empty()) else {
+        return Some("this run names no memory folder".to_string());
+    };
+    let dir = Path::new(d);
+    if crate::safe::within(dir, &root) {
+        return None;
+    }
+    let live = settings(Some(&root));
+    if matches!(live.s("source"), "user" | "env")
+        && live.truthy("ok")
+        && crate::safe::real(Path::new(live.s("dir"))) == crate::safe::real(dir)
+    {
+        crate::safe::allow_root(dir);
+        return None;
+    }
+    if std::path::absolute(dir).is_ok_and(|plain| plain.starts_with(&root)) {
+        // named inside the project, but a link on the way leads out of it
+        return Some(format!(
+            "the shared memory folder {} leads out of the project through a symbolic link (to {}). Nothing is \
+             read from it or written to it. Remove the link, or keep the memory elsewhere through your own \
+             settings: council memory setup --files --dir \"<path>\"",
+            crate::safe::shown(d),
+            crate::safe::real(dir).display()
+        ));
+    }
+    Some(format!(
+        "this run keeps its shared memory in {}, which is outside the project and is not the folder your own \
+         settings name now. Nothing is read from it or written to it. Set the folder again \
+         (council memory setup ...) or start a new run",
+        crate::safe::shown(d)
+    ))
+}
+
 /// The memory folder, created on demand. `conf` is a run's pinned settings, when there is a run.
 pub fn store(conf: &Value) -> Result<PathBuf> {
     if conf.has("ok") && !conf.truthy("ok") {
@@ -204,9 +295,12 @@ pub fn store(conf: &Value) -> Result<PathBuf> {
             "the memory folder is not usable".to_string()
         });
     }
+    if let Some(why) = trusted(conf, None) {
+        return fail(why);
+    }
     let d = PathBuf::from(conf.s("dir"));
-    std::fs::create_dir_all(d.join("research"))?;
-    std::fs::create_dir_all(d.join("commons"))?;
+    crate::safe::make_dir(&d.join("research"))?;
+    crate::safe::make_dir(&d.join("commons"))?;
     Ok(d)
 }
 
@@ -395,7 +489,11 @@ fn md_files(dir: &Path) -> Vec<PathBuf> {
         .flatten()
         .flatten()
         .map(|e| e.path())
-        .filter(|p| p.extension().is_some_and(|e| e == "md") && p.is_file())
+        // a link could point at any file on the machine: a note is a plain file, or it is not read
+        .filter(|p| {
+            p.extension().is_some_and(|e| e == "md")
+                && crate::safe::plain_file(p, crate::safe::MAX_OUTPUT).is_some()
+        })
         .collect();
     out.sort();
     out
@@ -1253,12 +1351,17 @@ pub fn write_index(conf: &Value, map_path: Option<&str>) -> Result<PathBuf> {
         "Shared by every council run in this project. Written only by `council`; safe to read, link and tag.".to_string(),
         String::new(),
         format!(
-            "- **Research** ({} notes{}): one sourced fact per note, in `research/`.{}",
+            "- **Research** ({} note{}{}): one sourced fact per note, in `research/`.{}",
             notes.len(),
+            if notes.len() == 1 { "" } else { "s" },
             if n_every > notes.len() { format!(", plus {} retired", n_every - notes.len()) } else { String::new() },
             if obsidian { " As a table: open `Research.base`." } else { "" }
         ),
-        format!("- **Commons** ({} runs): what members said to each other, in `commons/`.", runs.len()),
+        format!(
+            "- **Commons** ({} run{}): what members said to each other, in `commons/`.",
+            runs.len(),
+            if runs.len() == 1 { "" } else { "s" }
+        ),
     ];
     if d.join("architecture.md").exists() {
         out.push(format!(
@@ -1450,6 +1553,33 @@ pub fn cmd_setup(
         }
     } else {
         return fail("say which: --obsidian --vault <path>, or --files [--dir <path>]");
+    }
+    let named = Value::Object(section_out.clone());
+    if named.truthy("vault") || named.truthy("dir") {
+        // the folder is made when the first fact is kept: it must be possible to make it
+        let folder = place(&named, &core::resolve(&root));
+        let blocked = folder
+            .ancestors()
+            .find(|p| p.symlink_metadata().is_ok())
+            .filter(|p| !p.is_dir());
+        if let Some(file) = blocked {
+            return fail(format!(
+                "the memory cannot live in {}: {} is a file, not a folder",
+                folder.display(),
+                file.display()
+            ));
+        }
+    }
+    if project
+        && (named.truthy("vault") || named.truthy("dir"))
+        && !crate::safe::within(&place(&named, &core::resolve(&root)), &root)
+    {
+        return fail(
+            outside(&py::to_str(or_else(named.at("vault"), named.at("dir")))).replace(
+                "the project's settings (.council/config.yaml) point",
+                "--project would point",
+            ),
+        );
     }
     let mut data = Map::new();
     if path.exists() {

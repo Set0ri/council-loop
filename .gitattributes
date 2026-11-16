@@ -1,5 +1,7 @@
 # One kind of line end in every checkout, so hashes and diffs agree across systems.
 * text=auto eol=lf
-*.cmd text eol=crlf
 *.png binary
 *.gif binary
+# Recorded scenarios: data, not prose to review line by line.
+tests/cassettes/*.json linguist-generated=true
+tests/fixtures/*.json linguist-generated=true

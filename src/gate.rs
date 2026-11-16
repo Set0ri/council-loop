@@ -15,10 +15,11 @@ use std::path::Path;
 pub struct GateArgs {
     /// `auto`, `direct`, `lite` or `full`.
     pub tier: String,
-    /// `solo`, `crosslab` or `fanout:<family>`; `None` = what `doctor` recommends.
+    /// `solo`, `crosslab` or `fanout:<family>`; `None` = your settings' default, else the cheapest
+    /// mode that can be reached from here.
     pub mode: Option<String>,
-    /// `max`, `balanced` or `efficient`.
-    pub profile: String,
+    /// `max`, `balanced` or `efficient`; `None` = your settings' default, else `efficient`.
+    pub profile: Option<String>,
     /// The loop cap, when the requester set one.
     pub loops: Option<i64>,
     /// Files the task will touch.
@@ -38,7 +39,7 @@ impl Default for GateArgs {
         GateArgs {
             tier: "auto".to_string(),
             mode: None,
-            profile: "balanced".to_string(),
+            profile: None,
             loops: None,
             paths: Vec::new(),
             stakes: None,
@@ -52,6 +53,86 @@ impl Default for GateArgs {
 fn on_path(name: &str) -> bool {
     which::which(name).is_ok()
 }
+
+/// Every mode that can be chosen, in the order ties are broken (a second lab's check first).
+pub const MODES: [&str; 7] = [
+    "crosslab",
+    "fanout:claude",
+    "fanout:openai",
+    "fanout:gemini",
+    "fanout:openrouter",
+    "fanout:mix",
+    "fanout:open",
+];
+
+/// The modes that can be reached from here (see [`doctor`]) with their relative cost for a profile,
+/// cheapest first. A mode the model data has no cost for is left out.
+pub fn mode_costs(env: &Value, profile: &str) -> Vec<(&'static str, f64)> {
+    let lab = |name: &str| env.at("labs_reachable").truthy(name);
+    let labs = ["Anthropic", "OpenAI", "Google"]
+        .iter()
+        .filter(|l| lab(l))
+        .count();
+    let mut out: Vec<(&'static str, f64)> = MODES
+        .iter()
+        .filter(|mode| match **mode {
+            "crosslab" => labs >= 2,
+            "fanout:claude" => lab("Anthropic"),
+            "fanout:openai" => lab("OpenAI"),
+            "fanout:gemini" => lab("Google"),
+            _ => env.truthy("openrouter_key"),
+        })
+        .filter_map(|mode| {
+            core::models_for(mode, profile)
+                .at("relative_cost")
+                .as_f64()
+                .map(|cost| (*mode, cost))
+        })
+        .collect();
+    out.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap_or(std::cmp::Ordering::Equal)); // stable: ties keep MODES order
+    out
+}
+
+/// The defaults you set for yourself in `~/.council/config.yaml` (`defaults: {mode, profile}`),
+/// and what was wrong with them. A project's settings file cannot set these: it travels with the
+/// repository, and what a run costs is yours to decide.
+pub fn own_defaults() -> (Option<String>, Option<String>, Vec<String>) {
+    let path = core::user_config_path();
+    let own = if path.exists() {
+        core::load_yaml(&path).unwrap_or(Value::Null)
+    } else {
+        Value::Null
+    };
+    let own = own.at("defaults");
+    let (mut mode, mut profile, mut problems) = (None, None, Vec::new());
+    if let Some(m) = own.at("mode").as_str() {
+        let family = m.strip_prefix("fanout:").unwrap_or("");
+        if m == "solo" || m == "crosslab" || core::FAMILIES.contains(&family) {
+            mode = Some(m.to_string());
+        } else {
+            problems.push(format!(
+                "defaults.mode in {} is not a mode (solo, crosslab or fanout:<{}>): ignored",
+                path.display(),
+                core::FAMILIES.join("|")
+            ));
+        }
+    }
+    if let Some(p) = own.at("profile").as_str() {
+        if core::PROFILES.contains(&p) {
+            profile = Some(p.to_string());
+        } else {
+            problems.push(format!(
+                "defaults.profile in {} is not a profile ({}): ignored",
+                path.display(),
+                core::PROFILES.join(", ")
+            ));
+        }
+    }
+    (mode, profile, problems)
+}
+
+/// The profile a run uses when nobody chose one: the cheapest.
+pub const DEFAULT_PROFILE: &str = "efficient";
 
 /// What can be called from here? Recommends a mode. Spends no tokens unless `probe` is set, which
 /// sends one tiny test prompt to each installed CLI (an installed CLI may still be logged out).
@@ -97,6 +178,7 @@ pub fn doctor(root: Option<&Path>, probe: bool) -> Value {
         }
     }
     let reachable = labs.iter().filter(|(_, ok)| *ok).count();
+    // the most independent review that can be reached: another lab's models where there is one
     let mode = if reachable >= 2 {
         "crosslab"
     } else if lab("Anthropic") {
@@ -211,6 +293,7 @@ pub fn doctor(root: Option<&Path>, probe: bool) -> Value {
     if probe {
         out.insert("probes".into(), Value::Object(probes));
     }
+    out.insert("git".into(), json!(on_path("git")));
     out.insert("openrouter_key".into(), json!(openrouter));
     out.insert("aa_key".into(), json!(env("AA_API_KEY").is_some()));
     out.insert(
@@ -222,7 +305,34 @@ pub fn doctor(root: Option<&Path>, probe: bool) -> Value {
     );
     out.insert("fresh_contexts".into(), json!(fresh));
     out.insert("lock".into(), lock);
-    out.insert("recommended_mode".into(), json!(mode));
+    // the default is the cheapest mode that can be reached; the strongest is one flag away
+    let reach = Value::Object(out.clone());
+    let costs = mode_costs(&reach, DEFAULT_PROFILE);
+    let cheapest = costs.first().map_or(mode, |(m, _)| *m);
+    if cheapest != mode {
+        let cost_of = |m: &str| {
+            costs
+                .iter()
+                .find(|(name, _)| *name == m)
+                .map(|(_, c)| format!(" (rel. cost {})", py::repr(&json!(c))))
+                .unwrap_or_default()
+        };
+        notes.push(format!(
+            "the default mode is the cheapest that can be reached: {cheapest}{}. For another lab's check of the finalists: --mode {mode}{}",
+            cost_of(cheapest),
+            cost_of(mode)
+        ));
+    }
+    out.insert("recommended_mode".into(), json!(cheapest));
+    out.insert("strongest_mode".into(), json!(mode));
+    out.insert(
+        "mode_costs".into(),
+        costs
+            .iter()
+            .map(|(m, c)| ((*m).to_string(), json!(c)))
+            .collect::<serde_json::Map<_, _>>()
+            .into(),
+    );
     out.insert("notes".into(), json!(notes));
     out.insert(
         "council".into(),
@@ -280,11 +390,25 @@ pub fn plan(task: &str, a: &GateArgs) -> Value {
         reason = format!("the requester: \"{words}\"");
     }
     let env = doctor(None, false);
-    let mode = a
-        .mode
-        .clone()
-        .filter(|m| !m.is_empty())
-        .unwrap_or_else(|| env.s("recommended_mode").to_string());
+    // who chose the mode and the profile: a flag, your own settings, or nobody (then the cheapest)
+    let (own_mode, own_profile, own_problems) = own_defaults();
+    let given = |flag: &Option<String>| flag.clone().filter(|v| !v.is_empty());
+    let (profile, profile_from) = match (given(&a.profile), own_profile) {
+        (Some(p), _) => (p, "flag"),
+        (None, Some(p)) => (p, "your settings"),
+        (None, None) => (DEFAULT_PROFILE.to_string(), "default"),
+    };
+    let (mode, mode_from) = match (given(&a.mode), own_mode) {
+        (Some(m), _) => (m, "flag"),
+        (None, Some(m)) => (m, "your settings"),
+        (None, None) => (
+            mode_costs(&env, &profile).first().map_or_else(
+                || env.s("recommended_mode").to_string(),
+                |(m, _)| (*m).to_string(),
+            ),
+            "default",
+        ),
+    };
     let mut shape = json!({});
     let mut n_loops = 0usize;
     if let Some(s) = core::shape(chosen) {
@@ -297,7 +421,7 @@ pub fn plan(task: &str, a: &GateArgs) -> Value {
         shape["loops"] = json!(n_loops);
         shape["schedule"] = json!(core::schedule_for(s.start, n_loops));
     }
-    let picks = core::models_for(&mode, &a.profile);
+    let picks = core::models_for(&mode, &profile);
     let mut support = core::members(&root, &a.flags);
     if core::shape(chosen).is_none() {
         // the researchers and the mapper sit with a council only
@@ -319,20 +443,39 @@ pub fn plan(task: &str, a: &GateArgs) -> Value {
     let n_res = support["research"].int("seats").unwrap_or(0).max(0) as usize;
     let due = support["map"].truthy("due");
     let calls = core::estimate_calls(chosen, n_loops, n_res, due);
-    let tokens = core::estimate_tokens(chosen, n_loops, &core::policy(), &a.profile, n_res, due);
+    let tokens = core::estimate_tokens(chosen, n_loops, &core::policy(), &profile, n_res, due);
     let shown_mode = picks
         .get("mode")
         .map(py::to_str)
         .unwrap_or_else(|| mode.clone());
     let gate = format!(
-        "GATE tier={chosen} mode={shown_mode} profile={} loops<={n_loops} calls~{calls} tokens~{} rel_cost={} ({reason})",
-        a.profile,
+        "GATE tier={chosen} mode={shown_mode} profile={profile} loops<={n_loops} calls~{calls} tokens~{} rel_cost={} ({reason})",
         core::short_tokens(tokens),
         picks.get("relative_cost").map(py::to_str).unwrap_or_else(|| "n/a".to_string())
     );
-    json!({"gate": gate, "tier": chosen, "reason": reason, "tripwires": hits, "mode": shown_mode, "profile": a.profile,
+    crate::diag!(Info, "gate", "tier={chosen} ({reason}); mode={shown_mode} ({mode_from}); profile={profile} ({profile_from})";
+                 "tripwires" => hits.clone(), "calls" => calls, "tokens" => tokens);
+    let mut notes: Vec<Value> = env.list("notes").to_vec();
+    notes.extend(own_problems.into_iter().map(Value::String));
+    if core::shape(chosen).is_some() && (mode_from == "default" || profile_from == "default") {
+        let what = match (mode_from, profile_from) {
+            ("default", "default") => format!("mode={shown_mode} and profile={profile} are the cheapest that work here (the default)"),
+            ("default", _) => format!("mode={shown_mode} is the cheapest that works here for profile={profile} (the default)"),
+            _ => format!("profile={profile} is the cheapest (the default)"),
+        };
+        let second_lab = if env.s("strongest_mode") == "crosslab" && shown_mode != "crosslab" {
+            ", --mode crosslab"
+        } else {
+            ""
+        };
+        notes.push(json!(format!(
+            "{what}. More rigour costs more: --profile balanced or max{second_lab}. Keep a choice: `defaults:` in your ~/.council/config.yaml"
+        )));
+    }
+    json!({"gate": gate, "tier": chosen, "reason": reason, "tripwires": hits, "mode": shown_mode, "profile": profile,
+           "chosen_by": {"mode": mode_from, "profile": profile_from},
            "shape": shape, "calls_estimate": calls, "tokens_estimate": tokens, "models": picks, "support": support,
-           "environment_notes": env.at("notes")})
+           "environment_notes": notes})
 }
 
 /// One line under the GATE line: who else sits at the table, and where the shared memory is.

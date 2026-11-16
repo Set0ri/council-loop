@@ -1,5 +1,84 @@
 # Changelog
 
+## 0.5.0 (2026-11-14)
+
+The pass before sharing it. The kit is now the Rust binary alone, with one API surface under every
+door, logs, a security review, a much larger test suite, and tutorials.
+
+- **Rust only.** The Python scripts, the launchers and `pyproject.toml` have left the kit. One
+  program, `council`, is the command line, the API, the MCP server and the hook, and it needs
+  nothing at run time. The Python implementation is frozen as a separate legacy package (0.4.1,
+  security fixes only): `docs/LEGACY.md`. What both implementations agreed on at 0.4 is kept as
+  recordings that every test run replays.
+- **Cheapest by default.** With no word from the requester, a run takes the cheapest mode this
+  machine can reach and the `efficient` profile (it was the strongest mode and `balanced`). The GATE
+  line shows the relative cost, `doctor` lists what each mode costs here, and `plan` says when a
+  stronger choice is in reach. More rigour is one flag away (`--profile balanced|max`,
+  `--mode crosslab`), or `defaults:` in your own `~/.council/config.yaml`. A project's settings file
+  cannot set these.
+- **One API surface.** 27 operations in one registry (`src/api.rs`), each with typed arguments, an
+  effect (`reads`, `writes`, `sends`) and one answer shape, the envelope `{ok, code, output, data,
+  run}`. `run` says where the run stands and which seats are owed, so a program can drive a council
+  from the answers alone. From a shell: `council api --list`, `--describe`,
+  `council api <operation> --args '{...}'`. Documents have addresses and one operation, `read`,
+  hands them out.
+- **The MCP server sits on the API.** Tools, their schemas and hints are generated from the
+  registry; resources are the API's documents; two prompts (`council_loop`, `council_resume`). New:
+  structured content, progress while seats are dispatched, MCP logging, workspace roots as the
+  default project and the fence. Configurable by flag, environment or your own settings:
+  `--project`, `--read-only`, `--no-dispatch`, `--toolsets`, `--tools`, `--deny-tools`,
+  `--output-schemas`. A fenced server refuses other projects, paths outside its project in any
+  argument, and changes to your own settings. `council_read` gives clients that only call tools the
+  skill and the reference pages. The default tool list is 22 tools, about 19 KB.
+- **Logs.** Diagnostics on standard error with levels (`-v`, `-vv`, `--log-level`, `COUNCIL_LOG`,
+  `COUNCIL_LOG_FILE`, `COUNCIL_LOG_FORMAT=json`), never mixed with a command's answer, keys and
+  tokens replaced. Every run keeps a diary (`events.jsonl`): each step taken, seat called and answer
+  rejected, with times. `council log` prints it.
+- **Time to value.** `council demo` plays a whole Lite council (or `--full`: three loops) on a
+  made-up question with a script in every seat: the real commands, no model, no cost, a tenth of a
+  second. The first command on a machine prints a five-line check of what can run here and the mode
+  a run would take; it costs about three milliseconds and appears once.
+- **Security review.** Every command, the server and the hook were attacked with hostile projects,
+  state and text. Fourteen findings, all fixed, each kept as a test: writes that a link led out of
+  the project, a project that moved the shared memory, run state believed unchecked, a repository
+  whose git settings ran a program, files that never end, a lock check that passed when it could not
+  look, patterns and YAML built to stall, control sequences in output, seats that could read both
+  the web and the code, and a fenced server that took paths outside its fence. What holds, what was
+  found and what stays open: `SECURITY.md`.
+- **Seats kept apart.** Researchers search the web and read nothing of the project but their
+  packet. A new seat kind, the historian, takes the beat "the project's own record": it reads the
+  project and has no web tools. Experts no longer search the web; a fact they want is a question
+  for the researchers. Facts reach other seats under a line that says they are claims, not
+  instructions.
+- **The hook.** Wired without a shell (`"command": "council", "args": ["hook"]`), so it is the same
+  on every system. Before a tool runs it denies edits of locked files, shell lines that plainly
+  change one, and locking again without the requester; it keeps council seats in their lane. After
+  a shell line it compares the locked files with their hashes and reports a change once.
+- **Tests.** 117, none of which calls a model: 67 unit tests; 19 scenarios through the real binary
+  (15 recordings, 427 commands, and 4 played live with stand-ins for the vendors' tools); 14
+  security tests; 10 tests of the API, the server, the hook, the demo and the logs; fuzzing with
+  40,000 damaged inputs from a fixed seed against every reader, every operation and the server;
+  speed limits; and a check that the licence notices match `Cargo.lock`. `docs/testing.md`.
+- **Faster.** The gate's built-in patterns and the model data are prepared once per process, which
+  makes `plan` twice as fast from a shell (15 ms to 7 ms on an empty project) and six times as fast
+  inside a server. The code is read on several threads. Every reader of project files is linear.
+  Figures and limits: `docs/operations.md`.
+- **Help.** Every option of every command now has help text.
+- **Documents.** Six tutorials with real output (`docs/tutorials/`), a command and API reference
+  compiled into the binary (`reference/commands.md`), `SECURITY.md`, `CONTRIBUTING.md`,
+  `docs/operations.md`, `docs/testing.md`, `llms.txt`, and `THIRD-PARTY-NOTICES.md` (123 crates,
+  all under permissive licences; `cargo audit` finds no advisory).
+
+Changed behaviour to know about when coming from 0.4:
+
+- The default mode and profile (above). `defaults: {profile: balanced}` in your own settings keeps
+  the old profile.
+- `plan` through the API or the server needs a project, like `init`.
+- A project's `.council/config.yaml` can no longer place the shared memory outside the project.
+  Name such a folder in your own settings: `council memory setup`.
+- The plugin's hook and MCP entry start `council` directly. It must be on the PATH.
+- Published run records in `docs/runs/` have machine paths and the requester's name replaced.
+
 ## 0.4.0 (2026-11-14)
 
 The kit in Rust. One binary, `council`, is the command line, the MCP server and the test-lock hook.

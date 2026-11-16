@@ -385,7 +385,16 @@ impl Json {
 
 /// `fnmatch.fnmatch(name, pattern)`: `*` any run (slashes too), `?` one character, `[seq]` a set.
 /// Names are compared as written on POSIX and without regard to case or slash direction on Windows.
+///
+/// The match takes time proportional to name x pattern at worst: after a mismatch it goes back to
+/// the last `*` only, so no pattern (they can come from a project's settings file) makes it slow.
 pub fn fnmatch(name: &str, pattern: &str) -> bool {
+    enum Tok {
+        Star,
+        Any,
+        Lit(char),
+        Set(bool, Vec<char>),
+    }
     fn norm(s: &str) -> Vec<char> {
         if cfg!(windows) {
             s.to_lowercase().replace('/', "\\").chars().collect()
@@ -393,13 +402,36 @@ pub fn fnmatch(name: &str, pattern: &str) -> bool {
             s.chars().collect()
         }
     }
-    fn go(n: &[char], p: &[char]) -> bool {
-        match p.first() {
-            None => n.is_empty(),
-            Some('*') => (0..=n.len()).any(|i| go(&n[i..], &p[1..])),
-            Some('?') => !n.is_empty() && go(&n[1..], &p[1..]),
-            Some('[') => {
-                let mut j = 1;
+    fn in_set(set: &[char], c: char) -> bool {
+        let (mut hit, mut i) = (false, 0);
+        while i < set.len() {
+            if i + 2 < set.len() && set[i + 1] == '-' {
+                hit |= set[i] <= c && c <= set[i + 2];
+                i += 3;
+            } else {
+                hit |= set[i] == c;
+                i += 1;
+            }
+        }
+        hit
+    }
+    let (n, p) = (norm(name), norm(pattern));
+    let mut toks: Vec<Tok> = Vec::new();
+    let mut i = 0;
+    while i < p.len() {
+        match p[i] {
+            '*' => {
+                if !matches!(toks.last(), Some(Tok::Star)) {
+                    toks.push(Tok::Star);
+                }
+                i += 1;
+            }
+            '?' => {
+                toks.push(Tok::Any);
+                i += 1;
+            }
+            '[' => {
+                let mut j = i + 1;
                 if p.get(j) == Some(&'!') {
                     j += 1;
                 }
@@ -410,30 +442,52 @@ pub fn fnmatch(name: &str, pattern: &str) -> bool {
                     j += 1;
                 }
                 if j >= p.len() {
-                    return !n.is_empty() && n[0] == '[' && go(&n[1..], &p[1..]);
+                    toks.push(Tok::Lit('[')); // no closing bracket: a plain character
+                    i += 1;
+                } else {
+                    let negate = p.get(i + 1) == Some(&'!');
+                    let from = if negate { i + 2 } else { i + 1 };
+                    toks.push(Tok::Set(negate, p[from..j].to_vec()));
+                    i = j + 1;
                 }
-                let Some(&c) = n.first() else { return false };
-                let (negate, set) = match p.get(1) {
-                    Some('!') => (true, &p[2..j]),
-                    _ => (false, &p[1..j]),
-                };
-                let mut hit = false;
-                let mut i = 0;
-                while i < set.len() {
-                    if i + 2 < set.len() && set[i + 1] == '-' {
-                        hit |= set[i] <= c && c <= set[i + 2];
-                        i += 3;
-                    } else {
-                        hit |= set[i] == c;
-                        i += 1;
-                    }
-                }
-                hit != negate && go(&n[1..], &p[j + 1..])
             }
-            Some(&c) => n.first() == Some(&c) && go(&n[1..], &p[1..]),
+            c => {
+                toks.push(Tok::Lit(c));
+                i += 1;
+            }
         }
     }
-    go(&norm(name), &norm(pattern))
+    let one = |tok: &Tok, c: char| match tok {
+        Tok::Any => true,
+        Tok::Lit(l) => *l == c,
+        Tok::Set(negate, set) => in_set(set, c) != *negate,
+        Tok::Star => false,
+    };
+    let (mut ni, mut ti) = (0, 0);
+    let mut back: Option<(usize, usize)> = None; // the last star, and the name position it has swallowed up to
+    while ni < n.len() {
+        match toks.get(ti) {
+            Some(Tok::Star) => {
+                back = Some((ti, ni));
+                ti += 1;
+            }
+            Some(tok) if one(tok, n[ni]) => {
+                ni += 1;
+                ti += 1;
+            }
+            _ => match back {
+                Some((star, at)) => {
+                    back = Some((star, at + 1));
+                    ni = at + 1;
+                    ti = star + 1;
+                }
+                None => return false,
+            },
+        }
+    }
+    toks[ti.min(toks.len())..]
+        .iter()
+        .all(|t| matches!(t, Tok::Star))
 }
 
 /// `zlib.crc32(bytes)`.
@@ -602,6 +656,17 @@ mod tests {
         assert!(fnmatch("Dockerfile.dev", "Dockerfile*"));
         assert!(!fnmatch("src/app.py", "*.tf"));
         assert!(fnmatch("x1", "x[0-9]") && !fnmatch("xa", "x[0-9]") && fnmatch("xa", "x[!0-9]"));
+        assert!(fnmatch("", "") && fnmatch("", "*") && !fnmatch("", "?") && fnmatch("abc", "a*c"));
+        assert!(fnmatch("a[b", "a[b") && fnmatch("a]", "a[]]") && !fnmatch("ab", "a[]]"));
+        assert!(fnmatch("abcabc", "*abc") && fnmatch("abXcd", "ab?cd") && !fnmatch("abc", "abcd"));
+        assert!(fnmatch("src/a/b.py", "src/*/*.py") && !fnmatch("src/b.py", "src/*/*.py"));
+        // a pattern made to backtrack: answered at once
+        let started = std::time::Instant::now();
+        assert!(!fnmatch(
+            &"a".repeat(5000),
+            &format!("{}b", "*a".repeat(40))
+        ));
+        assert!(started.elapsed().as_secs() < 2);
         assert_eq!(crc32(b"261113-183103-take-turn-review/1/vote"), 0x57E3_36D7);
         assert_eq!(crc32(b""), 0);
     }

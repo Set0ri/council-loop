@@ -98,22 +98,37 @@ pub(crate) fn scan_seats(run: &Value, d: &Path, check: &Check) -> Result<Scanned
             .file_name()
             .map(|n| n.to_string_lossy().into_owned())
             .unwrap_or_default();
-        if !f.out.exists() {
+        if !f.out.exists() && !crate::safe::is_link(&f.out) {
             sc.bad.insert(
                 f.seat,
                 (Owed::Missing, vec![format!("no output yet ({name})")]),
             );
             continue;
         }
+        // a seat writes this file: it must be a plain one (a link could point at any file on the
+        // machine, a device never ends) and of a sane size, or it is not read at all
+        if crate::safe::plain_file(&f.out, crate::safe::MAX_OUTPUT).is_none() {
+            let why = match std::fs::symlink_metadata(&f.out) {
+                Ok(meta) if meta.file_type().is_file() => format!(
+                    "the output is {} bytes; the limit is {}",
+                    py::commas(meta.len() as i64),
+                    py::commas(crate::safe::MAX_OUTPUT as i64)
+                ),
+                _ => "the output must be a plain file".to_string(),
+            };
+            sc.bad.insert(f.seat, (Owed::Invalid, vec![why]));
+            continue;
+        }
         let raw = core::read_text(&f.out)?;
         let document = name.ends_with(".md");
         let obj = if document {
             // a document: drop a code fence around the whole of it
-            let text = codemap::unfence(&raw);
+            let text = crate::safe::unfence(&raw);
+            let text = crate::safe::shown(&text);
             let text = py::strip(&text);
             (!text.is_empty()).then(|| json!({"markdown": text}))
         } else {
-            providers::parse_json(&raw)
+            providers::parse_json(&raw).map(crate::safe::cleaned)
         };
         let Some(obj) = obj else {
             let why = if document {
@@ -121,7 +136,7 @@ pub(crate) fn scan_seats(run: &Value, d: &Path, check: &Check) -> Result<Scanned
             } else {
                 format!(
                     "the output is not a JSON object (it starts: {})",
-                    py::str_repr(py::head(&py::squash(&raw), 120))
+                    py::str_repr(py::head(&py::squash(&crate::safe::shown(&raw)), 120))
                 )
             };
             sc.bad.insert(f.seat, (Owed::Invalid, vec![why]));
@@ -229,21 +244,26 @@ fn collect(
         let n = attempts(run, s) + 1;
         let key = attempt_key(run, s);
         run["attempts"][key] = json!(n);
+        crate::log::record(
+            d,
+            json!({"event": "seat_output", "seat": s, "step": run.at("phase"), "state": format!("rejected (attempt {n})"),
+                   "errors": errs.iter().take(8).collect::<Vec<_>>()}),
+        );
         let name = f
             .out
             .file_name()
             .map(|n| n.to_string_lossy().into_owned())
             .unwrap_or_default();
-        std::fs::rename(
+        crate::safe::rename(
             &f.out,
-            f.out
+            &f.out
                 .with_file_name(name.replace(".out.", &format!(".rejected-{n}."))),
         )?;
         if f.prompt.exists() {
             let listed: Vec<String> = errs.iter().map(|e| format!("- {e}")).collect();
             let retry = format!(
                 "{}\n\n## Your previous output was rejected\n{}\nWrite the whole output again so that it is valid.\n",
-                core::read_text(&f.prompt)?,
+                read_doc(&f.prompt)?,
                 listed.join("\n")
             );
             core::write_text(&retry_file(&f.prompt), &retry)?;
@@ -408,7 +428,7 @@ pub fn cmd_ingest(run_id: Option<&str>, drop: Option<&str>, reason: Option<&str>
     }
     say!();
     let id = run.s("id").to_string();
-    cmd_next(Some(&id), None)
+    steps::cmd_next(Some(&id), None)
 }
 
 fn ingest_direct(run: &mut Value) -> Result<Vec<String>> {
@@ -482,8 +502,8 @@ fn ingest_brief(run: &mut Value, d: &Path) -> Result<Vec<String>> {
     if !f.exists() {
         return fail("brief.yaml is missing. Run `council next`.");
     }
-    let loaded = match crate::yaml::load(&core::read_text(&f)?) {
-        Ok(value) => value,
+    let loaded = match crate::yaml::load(&read_doc(&f)?) {
+        Ok(value) => crate::safe::cleaned(value),
         Err(err) => return fail(format!("brief.yaml is not valid YAML: {err}")),
     };
     let mut b = if py::truthy(&loaded) {
@@ -694,8 +714,7 @@ fn ingest_research(
             "codebase map written: {rel}{}",
             note.map(|n| format!(" ({n})")).unwrap_or_default()
         ));
-        let copied = core::read_text(&path)
-            .map_err(anyhow::Error::from)
+        let copied = crate::safe::read_capped(&path, crate::safe::MAX_OUTPUT)
             .and_then(|text| memory::publish_map(&text, &rel, &conf))
             .and_then(|copy| memory::write_index(&conf, Some(&rel)).map(|_| copy));
         match copied {
@@ -793,11 +812,7 @@ fn ingest_ideate(
 
 /// A file the chair edits, as a JSON object. `None` when it is missing or holds no object.
 fn chair_file(path: &Path) -> Result<Option<Value>> {
-    Ok(if path.exists() {
-        providers::parse_json(&core::read_text(path)?)
-    } else {
-        None
-    })
+    Ok(read_out(path))
 }
 
 /// The fields of a card that the run keeps.
@@ -1358,7 +1373,7 @@ fn ingest_elders(
 /// A file the chair wrote, or nothing when it is not there.
 fn written(path: &Path) -> Result<String> {
     Ok(if path.exists() {
-        core::read_text(path)?
+        read_doc(path)?
     } else {
         String::new()
     })

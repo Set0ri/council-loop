@@ -1,0 +1,760 @@
+{
+ "name": "slashes",
+ "about": "Folders and files named with forward slashes, in the environment and on the command line. On",
+ "needs": [],
+ "steps": [
+  {
+   "mkdir": "<BASE>/vault"
+  },
+  {
+   "put": "<ROOT>/README.md",
+   "text": "# Shop\n\nA small shop.\n"
+  },
+  {
+   "put": "<ROOT>/config.yaml",
+   "text": "name: shop\n"
+  },
+  {
+   "put": "<ROOT>/db/schema.sql",
+   "text": "CREATE TABLE IF NOT EXISTS orders (\n  id INTEGER\n);\n"
+  },
+  {
+   "put": "<ROOT>/docs/notes.md",
+   "text": "Notes.\n"
+  },
+  {
+   "put": "<ROOT>/native/cart.c",
+   "text": "#include \"cart.h\"\n\nint total_items(struct cart *c)\n{\n    return 0;\n}\n\nint main(void) {\n    return total_items(0);\n}\n"
+  },
+  {
+   "put": "<ROOT>/native/cart.h",
+   "text": "struct cart {\n    int n;\n};\n"
+  },
+  {
+   "put": "<ROOT>/shop/__init__.py",
+   "text": "\"\"\"The shop package.\"\"\"\n"
+  },
+  {
+   "put": "<ROOT>/shop/cli.py",
+   "text": "import argparse\n\nfrom shop import core\n\n\ndef main():\n    ap = argparse.ArgumentParser()\n    sub = ap.add_subparsers()\n    sub.add_parser(\"bill\")\n    sub.add_parser(\"refund\")\n    core.bill(None)\n"
+  },
+  {
+   "put": "<ROOT>/shop/core.py",
+   "text": "\"\"\"Billing: charge an order.\"\"\"\nimport os\n\nfrom . import db\nfrom .queue import BillingQueue\n\n\ndef bill(order, retries: int = 2):\n    \"\"\"Charge it.\"\"\"\n    queue = BillingQueue(os.environ.get(\"QUEUE_URL\"))\n    queue.post_event(order)\n    return db.save(order)\n\n\ndef _private():\n    return 1\n\n\nif __name__ == \"__main__\":\n    bill(None)\n"
+  },
+  {
+   "put": "<ROOT>/shop/db.py",
+   "text": "\"\"\"Storage.\"\"\"\n\n\ndef save(order):\n    \"\"\"Write one order.\"\"\"\n    return order\n\n\nclass Ledger:\n    \"\"\"Every charge, once.\"\"\"\n\n    def post_entry(self, entry):\n        return entry\n\n    def _hidden(self):\n        return 0\n"
+  },
+  {
+   "put": "<ROOT>/shop/queue.py",
+   "text": "\"\"\"The queue of billing events.\"\"\"\n\n\nclass BillingQueue:\n    def __init__(self, url):\n        self.url = url\n\n    def post_event(self, event):\n        return event\n\n    def drain_events(self):\n        return []\n"
+  },
+  {
+   "put": "<ROOT>/svc/lib.rs",
+   "text": "use std::fs;\n\npub fn total_items(items: &[u32]) -> usize {\n    items.len()\n}\n\npub struct OrderBook;\n\n#[test]\nfn adds() {}\n"
+  },
+  {
+   "put": "<ROOT>/svc/server.go",
+   "text": "package main\n\nimport (\n\t\"fmt\"\n)\n\nfunc Total(items []int) int {\n\treturn len(items)\n}\n\ntype Order struct {\n}\n\nfunc main() {\n\tfmt.Println(Total(nil))\n}\n"
+  },
+  {
+   "put": "<ROOT>/tests/test_core.py",
+   "text": "from shop import core\n\n\ndef test_bill():\n    assert core.bill(1) == 1\n\n\ndef test_total():\n    assert True\n"
+  },
+  {
+   "put": "<ROOT>/web/cart.ts",
+   "text": "/** The cart. */\nimport { total } from './total';\nexport class Cart {}\nexport function addItem(cart: Cart) { return total([]); }\n"
+  },
+  {
+   "put": "<ROOT>/web/total.ts",
+   "text": "export function total(items: number[]) { return items.length; }\nexport const TAX_RATE = 0.2;\n"
+  },
+  {
+   "cmd": [
+    "config"
+   ],
+   "clock": 1,
+   "rc": 0,
+   "out": "# Support members (flags beat the project's .council/config.yaml, which beats your ~/.council/config.yaml)\nmembers.research.seats = 2    (default)\nmembers.research.budget.lite = 10    (default)\nmembers.research.budget.full = 15    (default)\nmembers.research.later_loops = on_request    (default)\nmembers.research.model = auto    (default)\nmembers.research.beats = built in    (default)\nmembers.map.when = stale    (default)\nmembers.map.model = chair    (default)\nmembers.map.focus_tokens = 700    (default)\nmembers.map.skeleton_lines = 420    (default)\nmembers.map.path = docs/ARCHITECTURE.md    (default)\nmembers.digest = 14    (default)\nbeats this would seat: Papers and primary research; Practice in the field\n\n# Shared memory (your own settings beat the project's here: a vault path is personal)\nmemory.backend = files    (default)\nmemory.dir = <ROOT>/.council/memory    (default)\n",
+   "err": "",
+   "env": {
+    "COUNCIL_HOME": "<HOME>/.council",
+    "COUNCIL_PRIVATE_DIR": "<BASE>/private"
+   }
+  },
+  {
+   "cmd": [
+    "memory",
+    "setup",
+    "--files",
+    "--dir",
+    "<ROOT>/notes/memory",
+    "--project"
+   ],
+   "clock": 2,
+   "rc": 0,
+   "out": "saved to <ROOT>/.council/config.yaml (this project)\nmemory: files at <ROOT>/notes/memory  (set by: project)\nresearch notes: 0 · runs with commons: 0 · links: markdown\n",
+   "err": "",
+   "env": {
+    "COUNCIL_HOME": "<HOME>/.council",
+    "COUNCIL_PRIVATE_DIR": "<BASE>/private"
+   }
+  },
+  {
+   "cmd": [
+    "memory",
+    "status"
+   ],
+   "clock": 3,
+   "rc": 0,
+   "out": "memory: files at <ROOT>/notes/memory  (set by: project)\nresearch notes: 0 · runs with commons: 0 · links: markdown\n",
+   "err": "",
+   "env": {
+    "COUNCIL_HOME": "<HOME>/.council",
+    "COUNCIL_PRIVATE_DIR": "<BASE>/private"
+   }
+  },
+  {
+   "cmd": [
+    "memory",
+    "add",
+    "--claim",
+    "Queue A keeps order within one partition only",
+    "--source",
+    "https://example.org/queue-a/ordering"
+   ],
+   "clock": 4,
+   "rc": 0,
+   "out": "added queue-keeps-order-within-one-partition\n",
+   "err": "",
+   "env": {
+    "COUNCIL_HOME": "<HOME>/.council",
+    "COUNCIL_PRIVATE_DIR": "<BASE>/private"
+   }
+  },
+  {
+   "cmd": [
+    "memory",
+    "add",
+    "--claim",
+    "The ledger posts each billing event once",
+    "--source",
+    "<ROOT>/shop/db.py:9",
+    "--kind",
+    "docs"
+   ],
+   "clock": 5,
+   "rc": 0,
+   "out": "added ledger-posts-billing-event-once\n",
+   "err": "",
+   "env": {
+    "COUNCIL_HOME": "<HOME>/.council",
+    "COUNCIL_PRIVATE_DIR": "<BASE>/private"
+   }
+  },
+  {
+   "cmd": [
+    "memory",
+    "search",
+    "queue order"
+   ],
+   "clock": 6,
+   "rc": 0,
+   "out": "- Queue A keeps order within one partition only (example.org, n.d.; medium)\n    https://example.org/queue-a/ordering  ·  <ROOT>/notes/memory/research/queue-keeps-order-within-one-partition.md\n",
+   "err": "",
+   "env": {
+    "COUNCIL_HOME": "<HOME>/.council",
+    "COUNCIL_PRIVATE_DIR": "<BASE>/private"
+   }
+  },
+  {
+   "cmd": [
+    "plan",
+    "Pick the queue technology for the billing pipeline",
+    "--stakes",
+    "medium"
+   ],
+   "clock": 7,
+   "rc": 0,
+   "out": "GATE tier=lite mode=fanout:claude profile=efficient loops<=1 calls~12 tokens~1.8M rel_cost=0.66 (chair: stakes=medium)\nMEMBERS researchers=2 (papers and primary research; practice in the field; about 10 searches each) mapper=yes (no map yet at docs/ARCHITECTURE.md) memory=files:notes/memory\n{\n \"tier\": \"lite\",\n \"reason\": \"chair: stakes=medium\",\n \"tripwires\": [],\n \"mode\": \"fanout:claude\",\n \"profile\": \"efficient\",\n \"chosen_by\": {\n  \"mode\": \"default\",\n  \"profile\": \"default\"\n },\n \"shape\": {\n  \"experts\": 3,\n  \"ideas_min\": 5,\n  \"keep\": 2,\n  \"elders\": 1,\n  \"start\": 3,\n  \"loops\": 1,\n  \"rubric\": [\n   3,\n   7\n  ],\n  \"schedule\": [\n   3,\n   1\n  ]\n },\n \"calls_estimate\": 12,\n \"tokens_estimate\": 1822000,\n \"models\": {\n  \"mode\": \"fanout:claude\",\n  \"profile\": \"efficient\",\n  \"data_collected\": \"2026-11-13\",\n  \"attribution\": \"Model data: Artificial Analysis (https://artificialanalysis.ai)\",\n  \"warnings\": [\n   \"fanout:openrouter: OpenRouter availability unknown in this snapshot; using all usable models. Run a live refresh to filter by openrouter_api_id.\"\n  ],\n  \"chair\": {\n   \"model\": \"Claude Fable 5.2 (low)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 54,\n   \"cost_per_task\": 3.1\n  },\n  \"experts\": [\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Fable 5.2 (low)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 54,\n    \"cost_per_task\": 3.1\n   }\n  ],\n  \"red_team\": {\n   \"model\": \"Claude Opus 5.5 (xhigh)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 57,\n   \"cost_per_task\": 6.05\n  },\n  \"elders\": [\n   {\n    \"model\": \"Claude Fable 5.2 (medium)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 56,\n    \"cost_per_task\": 3.8\n   },\n   {\n    \"model\": \"Claude Opus 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 57,\n    \"cost_per_task\": 6.05\n   },\n   {\n    \"model\": \"Claude Sonnet 5.5 (max)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 55,\n    \"cost_per_task\": 10.02\n   }\n  ],\n  \"verifier\": {\n   \"model\": \"Claude Opus 5.5 (low)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 35,\n   \"cost_per_task\": 0.98\n  },\n  \"relative_cost\": 0.66\n },\n \"support\": {\n  \"research\": {\n   \"budget\": {\n    \"lite\": 10,\n    \"full\": 15\n   },\n   \"seats\": 2,\n   \"later_loops\": \"on_request\",\n   \"model\": \"auto\",\n   \"beats\": []\n  },\n  \"map\": {\n   \"when\": \"stale\",\n   \"model\": \"chair\",\n   \"focus_tokens\": 700,\n   \"skeleton_lines\": 420,\n   \"path\": \"\",\n   \"due\": true,\n   \"reason\": \"no map yet at docs/ARCHITECTURE.md\"\n  },\n  \"digest\": 14,\n  \"origin\": {\n   \"research.seats\": \"default\",\n   \"research.budget.lite\": \"default\",\n   \"research.budget.full\": \"default\",\n   \"research.later_loops\": \"default\",\n   \"research.model\": \"default\",\n   \"research.beats\": \"default\",\n   \"map.when\": \"default\",\n   \"map.model\": \"default\",\n   \"map.focus_tokens\": \"default\",\n   \"map.skeleton_lines\": \"default\",\n   \"map.path\": \"default\",\n   \"digest\": \"default\"\n  },\n  \"problems\": []\n },\n \"environment_notes\": [\n  \"only one lab reachable: elders come from the same family (no cross-lab check). Install the codex / gemini CLIs or set OPENROUTER_API_KEY to get one\",\n  \"mode=fanout:claude and profile=efficient are the cheapest that work here (the default). More rigour costs more: --profile balanced or max. Keep a choice: `defaults:` in your ~/.council/config.yaml\"\n ]\n}\n",
+   "err": "",
+   "env": {
+    "COUNCIL_HOME": "<HOME>/.council",
+    "COUNCIL_PRIVATE_DIR": "<BASE>/private"
+   }
+  },
+  {
+   "cmd": [
+    "map",
+    "--out",
+    "<ROOT>/out/skeleton.md"
+   ],
+   "clock": 8,
+   "rc": 0,
+   "out": "skeleton: <ROOT>/out/skeleton.md  (19 files, 189 lines, 13 source files, 5 internal imports, 2 commands, 0 MCP entries)\nmap: docs/ARCHITECTURE.md: STALE: no map yet at docs/ARCHITECTURE.md\n",
+   "err": "",
+   "env": {
+    "COUNCIL_HOME": "<HOME>/.council",
+    "COUNCIL_PRIVATE_DIR": "<BASE>/private"
+   }
+  },
+  {
+   "cmd": [
+    "map",
+    "--packet"
+   ],
+   "clock": 9,
+   "rc": 0,
+   "out": "map: docs/ARCHITECTURE.md: no map yet at docs/ARCHITECTURE.md\nskeleton: 13 source files, 189 lines\nSPAWN one fresh-context agent (council-mapper). Its prompt is one line:\n  prompt: Read and follow <ROOT>/.council/map/MAP.prompt.md\nTHEN  council map --install <ROOT>/.council/map/MAP.out.md\n",
+   "err": "",
+   "env": {
+    "COUNCIL_HOME": "<HOME>/.council",
+    "COUNCIL_PRIVATE_DIR": "<BASE>/private"
+   }
+  },
+  {
+   "put": "<ROOT>/map.md",
+   "text": "# Architecture\n\n> ELI5: a small service that writes each billing event down once.\n\n## Purpose and philosophy\nA small billing service. replay snapshot snapshot shard backoff queue quorum fallback idempotent circuit fallback tenant circuit audit replay schema rollout throttle batch stream stream retries cache rollout shard budget batch replay metric ledger replica latency rollout batch batch retries shard stream rollout canary replica replay audit rollout replica queue metric fallback cache shard schema tenant tenant fallback fallback backoff queue snapshot stream backoff quorum replay tenant canary budget replica stream schema snapshot fallback rollout tenant batch shard snapshot quorum replay ledger queue metric batch backoff metric batch index shard fallback replica quorum canary circuit schema quorum schema tenant schema tenant batch metric cache canary batch snapshot replay queue audit replica shard retries stream rollout retries cache retries backoff quorum schema shard snapshot replica canary rollout ledger circuit budget snapshot fallback queue canary audit quorum replay replay index retries replay budget tenant audit index backoff queue circuit shard audit cache idempotent schema idempotent fallback retries queue circuit retries shard stream rollout quorum fallback cache batch batch latency audit audit batch cache index fallback quorum audit tenant batch budget queue idempotent cache queue replay tenant rollout audit quorum metric rollout shard retries audit budget backoff budget batch audit backoff queue idempotent backoff canary metric replica\n\n## Bird's-eye view\n```mermaid\nflowchart LR\n  api --> queue --> ledger\n```\nRequests enter, wait, and are written down.\n\n## Code map\n- `shop/cli.py`: one job, and it must not reach around the queue.\n- `shop/core.py`: one job, and it must not reach around the queue.\n- `shop/queue.py`: one job, and it must not reach around the queue.\n- `shop/core.py`: one job, and it must not reach around the queue.\n- `shop/db.py`: one job, and it must not reach around the queue.\n- `shop/cli.py`: one job, and it must not reach around the queue.\n\n## Interfaces\n- The command line and the HTTP routes the skeleton lists.\n\n## Data and control flow\nAn event arrives, is queued, and is written to the ledger once.\n\n## Invariants\n- An event is never written twice.\n\n## Extending it\n- A new consumer registers with the queue and nothing else changes.\n\n## Performance and cost\n- The ledger write is the slow step.\n\n## Where to change what\n| To do this | Start in |\n| --- | --- |\n| add a consumer | `shop/cli.py` |\n"
+  },
+  {
+   "cmd": [
+    "map",
+    "--install",
+    "<ROOT>/map.md"
+   ],
+   "clock": 10,
+   "rc": 0,
+   "out": "map installed: docs/ARCHITECTURE.md\n",
+   "err": "",
+   "env": {
+    "COUNCIL_HOME": "<HOME>/.council",
+    "COUNCIL_PRIVATE_DIR": "<BASE>/private"
+   }
+  },
+  {
+   "cmd": [
+    "map",
+    "--check"
+   ],
+   "clock": 11,
+   "rc": 0,
+   "out": "skeleton: <ROOT>/.council/map/skeleton.md  (21 files, 272 lines, 13 source files, 5 internal imports, 2 commands, 0 MCP entries)\nmap: docs/ARCHITECTURE.md: the structure is as mapped on 2026-11-13\n",
+   "err": "",
+   "env": {
+    "COUNCIL_HOME": "<HOME>/.council",
+    "COUNCIL_PRIVATE_DIR": "<BASE>/private"
+   }
+  },
+  {
+   "put": "<ROOT>/cards.json",
+   "text": "[{\"id\": \"c0\", \"title\": \"Idea 0\", \"body\": \"word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\", \"eli5\": \"simple 0\", \"author\": \"L1\"}, {\"id\": \"c1\", \"title\": \"Idea 1\", \"body\": \"word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\", \"eli5\": \"simple 1\", \"author\": \"L2\"}, {\"id\": \"c2\", \"title\": \"Idea 2\", \"body\": \"word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\", \"eli5\": \"simple 2\", \"author\": \"L3\"}]"
+  },
+  {
+   "cmd": [
+    "blind",
+    "<ROOT>/cards.json",
+    "--seed",
+    "7",
+    "--out",
+    "<ROOT>/out/packet.md"
+   ],
+   "clock": 12,
+   "rc": 0,
+   "out": "packet -> <ROOT>/out/packet.md; mapping (keep away from judges) -> <ROOT>/out/packet.md.mapping.json\n",
+   "err": "",
+   "env": {
+    "COUNCIL_HOME": "<HOME>/.council",
+    "COUNCIL_PRIVATE_DIR": "<BASE>/private"
+   }
+  },
+  {
+   "put": "<ROOT>/tests/test_a.py",
+   "text": "def test_a():\n    assert True\n"
+  },
+  {
+   "cmd": [
+    "lock-tests",
+    "<ROOT>/tests"
+   ],
+   "clock": 13,
+   "rc": 0,
+   "out": "{\"locked\": 2, \"file\": \"<ROOT>/.council/locks.json\"}\n",
+   "err": "",
+   "env": {
+    "COUNCIL_HOME": "<HOME>/.council",
+    "COUNCIL_PRIVATE_DIR": "<BASE>/private"
+   }
+  },
+  {
+   "cmd": [
+    "verify-locks"
+   ],
+   "clock": 14,
+   "rc": 0,
+   "out": "{\"ok\": true, \"changed\": []}\n",
+   "err": "",
+   "env": {
+    "COUNCIL_HOME": "<HOME>/.council",
+    "COUNCIL_PRIVATE_DIR": "<BASE>/private"
+   }
+  },
+  {
+   "cmd": [
+    "memory",
+    "status"
+   ],
+   "clock": 15,
+   "rc": 0,
+   "out": "memory: files at <BASE>/vault/plain  (set by: env)\nresearch notes: 0 · runs with commons: 0 · links: markdown\n",
+   "err": "",
+   "env": {
+    "COUNCIL_HOME": "<HOME>/.council",
+    "COUNCIL_PRIVATE_DIR": "<BASE>/private",
+    "COUNCIL_MEMORY_DIR": "<BASE>/vault/plain"
+   }
+  },
+  {
+   "cmd": [
+    "memory",
+    "setup",
+    "--obsidian",
+    "--vault",
+    "<BASE>/vault/",
+    "--folder",
+    "Council/Shop"
+   ],
+   "clock": 16,
+   "rc": 0,
+   "out": "saved to <HOME>/.council/config.yaml (your user settings: every project on this machine)\nmemory: obsidian at <BASE>/vault/Council/Shop  (set by: user)\nresearch notes: 0 · runs with commons: 0 · links: wikilinks\nIn Obsidian: open the vault, then the folder \"Council/Shop\". Start at index.\n",
+   "err": "",
+   "env": {
+    "COUNCIL_HOME": "<HOME>/.council",
+    "COUNCIL_PRIVATE_DIR": "<BASE>/private"
+   }
+  },
+  {
+   "cmd": [
+    "memory",
+    "import",
+    "--from",
+    "<ROOT>/notes/memory"
+   ],
+   "clock": 17,
+   "rc": 0,
+   "out": "imported: 2 added, 0 already held, 0 refused\n",
+   "err": "",
+   "env": {
+    "COUNCIL_HOME": "<HOME>/.council",
+    "COUNCIL_PRIVATE_DIR": "<BASE>/private"
+   }
+  },
+  {
+   "cmd": [
+    "config"
+   ],
+   "clock": 18,
+   "rc": 0,
+   "out": "# Support members (flags beat the project's .council/config.yaml, which beats your ~/.council/config.yaml)\nmembers.research.seats = 2    (default)\nmembers.research.budget.lite = 10    (default)\nmembers.research.budget.full = 15    (default)\nmembers.research.later_loops = on_request    (default)\nmembers.research.model = auto    (default)\nmembers.research.beats = built in    (default)\nmembers.map.when = stale    (default)\nmembers.map.model = chair    (default)\nmembers.map.focus_tokens = 700    (default)\nmembers.map.skeleton_lines = 420    (default)\nmembers.map.path = docs/ARCHITECTURE.md    (default)\nmembers.digest = 14    (default)\nbeats this would seat: Papers and primary research; Practice in the field\n\n# Shared memory (your own settings beat the project's here: a vault path is personal)\nmemory.backend = obsidian    (your settings)\nmemory.dir = <BASE>/vault/Council/Shop    (your settings)\n",
+   "err": "",
+   "env": {
+    "COUNCIL_HOME": "<HOME>/.council",
+    "COUNCIL_PRIVATE_DIR": "<BASE>/private"
+   }
+  },
+  {
+   "cmd": [
+    "init",
+    "Pick the queue technology for the billing pipeline",
+    "--stakes",
+    "medium",
+    "--reversible",
+    "yes"
+   ],
+   "clock": 19,
+   "rc": 0,
+   "out": "GATE tier=lite mode=fanout:claude profile=efficient loops<=1 calls~12 tokens~1.8M rel_cost=0.66 (chair: stakes=medium)\nMEMBERS researchers=2 (papers and primary research; practice in the field; about 10 searches each) mapper=yes (1 file(s) changed in structure since the map of 2026-11-13: tests/test_a.py) memory=obsidian:Council/Shop\nrun: <ROOT>/.council/runs/261113-120019-pick-queue-technology\nnote: only one lab reachable: elders come from the same family (no cross-lab check). Install the codex / gemini CLIs or set OPENROUTER_API_KEY to get one\nnote: mode=fanout:claude and profile=efficient are the cheapest that work here (the default). More rigour costs more: --profile balanced or max. Keep a choice: `defaults:` in your ~/.council/config.yaml\n\n[261113-120019-pick-queue-technology] tier=lite phase=brief\nWrite the intent brief: <ROOT>/.council/runs/261113-120019-pick-queue-technology/brief.yaml\n  Rubric first, before any ideas. Lenses by objective + constraint + method, not job titles.\n  research_questions: what the 2 researchers should find out before anyone has ideas (6 at most; name things in full, no acronyms).\n  If the requester is here, show them the brief (one screen) and set approved_by to their name (or \"requester\"). Otherwise: unattended.\nTHEN  council ingest\n",
+   "err": "",
+   "env": {
+    "COUNCIL_HOME": "<HOME>/.council",
+    "COUNCIL_PRIVATE_DIR": "<BASE>/private"
+   }
+  },
+  {
+   "cmd": [
+    "next"
+   ],
+   "clock": 20,
+   "rc": 0,
+   "out": "[261113-120019-pick-queue-technology] tier=lite phase=brief\nWrite the intent brief: <ROOT>/.council/runs/261113-120019-pick-queue-technology/brief.yaml\n  Rubric first, before any ideas. Lenses by objective + constraint + method, not job titles.\n  research_questions: what the 2 researchers should find out before anyone has ideas (6 at most; name things in full, no acronyms).\n  If the requester is here, show them the brief (one screen) and set approved_by to their name (or \"requester\"). Otherwise: unattended.\nTHEN  council ingest\n",
+   "err": "",
+   "env": {
+    "COUNCIL_HOME": "<HOME>/.council",
+    "COUNCIL_PRIVATE_DIR": "<BASE>/private"
+   }
+  },
+  {
+   "cmd": [
+    "status"
+   ],
+   "clock": 21,
+   "rc": 0,
+   "out": "GATE tier=lite mode=fanout:claude profile=efficient loops<=1 calls~12 tokens~1.8M rel_cost=0.66 (chair: stakes=medium)\nrun 261113-120019-pick-queue-technology · phase brief\nask: Pick the queue technology for the billing pipeline\nshared memory: obsidian at <BASE>/vault/Council/Shop · this run: 0 fact(s) added, 0 note(s), 0 question(s) waiting for the researchers\ncalls so far: 0 (estimate 12)\nthis step is yours (brief).\nnext: council next        # prints the exact commands for this step; safe to run again\n",
+   "err": "",
+   "env": {
+    "COUNCIL_HOME": "<HOME>/.council",
+    "COUNCIL_PRIVATE_DIR": "<BASE>/private"
+   }
+  },
+  {
+   "cmd": [
+    "doctor"
+   ],
+   "clock": 22,
+   "rc": 0,
+   "out": "recommended mode: fanout:claude · fresh contexts via: subagents\nnote: only one lab reachable: elders come from the same family (no cross-lab check). Install the codex / gemini CLIs or set OPENROUTER_API_KEY to get one\n{\n \"claude_code\": true,\n \"cli\": {\n  \"claude\": true,\n  \"codex\": false,\n  \"gemini\": false\n },\n \"git\": true,\n \"openrouter_key\": false,\n \"aa_key\": false,\n \"labs_reachable\": {\n  \"Anthropic\": true,\n  \"OpenAI\": false,\n  \"Google\": false\n },\n \"fresh_contexts\": \"subagents\",\n \"lock\": {\n  \"exists\": true,\n  \"age_days\": 0,\n  \"stale\": false,\n  \"collected\": \"2026-11-13\"\n },\n \"recommended_mode\": \"fanout:claude\",\n \"strongest_mode\": \"fanout:claude\",\n \"mode_costs\": {\n  \"fanout:claude\": 0.66\n },\n \"notes\": [\n  \"only one lab reachable: elders come from the same family (no cross-lab check). Install the codex / gemini CLIs or set OPENROUTER_API_KEY to get one\"\n ],\n \"memory\": {\n  \"backend\": \"obsidian\",\n  \"dir\": \"<BASE>/vault/Council/Shop\",\n  \"source\": \"user\",\n  \"ok\": true\n }\n}\n",
+   "err": "",
+   "env": {
+    "COUNCIL_HOME": "<HOME>/.council",
+    "COUNCIL_PRIVATE_DIR": "<BASE>/private"
+   }
+  }
+ ],
+ "final": {
+  "<ROOT>/.council/config.yaml": {
+   "text": "memory:\n  backend: files\n  dir: <ROOT>/notes/memory\n"
+  },
+  "<ROOT>/.council/locks.json": {
+   "json": {
+    "tests/test_a.py": "d64dd4bae169e8af6330efb864bf5fa7b825fa80e0c63c74c8e57d9a70f4fe42",
+    "tests/test_core.py": "99ef226d8a0cd8636a7804a3c2768469973386c9aca65b6afce0a14576cd01bf"
+   }
+  },
+  "<ROOT>/.council/map/MAP.prompt.md": {
+   "text": "# Council packet · run none (stand-alone) · loop - · CODEBASE MAP · seat MAP\n\nYou are the council's cartographer. You do not propose solutions and you do not vote. Your job is\none document: a map of this codebase that lets a newcomer, a person or an AI, find their way and\nchange it safely.\n\n## The ask the council is working on (for context only)\n> (no council run: keep the codebase map current)\n\n## What you have\n- A skeleton made by a script: `<ROOT>/.council/map/skeleton.md`. It lists every file, what each defines, who imports\n  whom, the commands and interfaces it could find, and which files everything else leans on. Trust\n  it for names and counts. It cannot tell you why anything is the way it is.\n- There is no map yet. Yours will be saved as `docs/ARCHITECTURE.md`.\n- The repository. Read the files the skeleton ranks highest, then whatever you need to explain the\n  design. Do not read everything. \n\n## Write the map\nMarkdown, 600 to 2,000 words, plain language. Start with a `# ` title and, under it, one line\n`> ELI5: ...` (25 words at most: what this code is, for someone who has never seen it). Then these\nsections, with exactly these `## ` headings, in this order:\n\n1. `## Purpose and philosophy`: what this code is for, and the few ideas that shape every decision in it.\n2. `## Bird's-eye view`: one Mermaid diagram of the main parts and how data moves between them, then\n   a short paragraph that reads it.\n3. `## Code map`: each directory and key file: what it does, and what it must not do.\n4. `## Interfaces`: every way in or out: commands, APIs, tools, file formats, configuration,\n   environment variables.\n5. `## Data and control flow`: what happens, step by step, in the one or two most important operations.\n6. `## Invariants`: the rules that hold everywhere and must keep holding.\n7. `## Extending it`: where a new feature, language, provider or command plugs in.\n8. `## Performance and cost`: what is slow or expensive, and what keeps it fast.\n9. `## Where to change what`: a short table, \"to do this, start in that file\".\n10. `## Open questions`: what you could not work out (leave it out if there is nothing).\n\nRules:\n- Name files and symbols exactly as they are, in backticks. The tool checks that every path you name\n  exists, and sends the map back if several do not. Do not invent names.\n- Describe what is there. Proposals belong to the experts, not in the map.\n- Prefer what will stay true. A map that restates the code line by line is out of date tomorrow.\n- Every claim about behaviour comes from a file you read. Mark a guess as a guess.\n\n## Output\nWrite ONLY the Markdown document to the file `<ROOT>/.council/map/MAP.out.md` (create it; overwrite it if it exists). Then reply with one line: done MAP.out.md\n"
+  },
+  "<ROOT>/.council/map/skeleton.md": {
+   "text": "# Codebase skeleton: proj\n\nMade by `council map` on 2026-11-13. A script wrote this. It lists what is there, not why: trust it for names and counts, and read the code for intent.\n\n21 files, 272 lines; 13 are source code.\n\n## Size\n\n| Language | Files | Lines |\n| --- | ---: | ---: |\n| Markdown | 7 | 154 |\n| Python | 6 | 69 |\n| Go | 1 | 16 |\n| C | 2 | 13 |\n| Rust | 1 | 10 |\n| TypeScript | 2 | 6 |\n| SQL | 1 | 3 |\n| YAML | 1 | 1 |\n\n## Directories\n\n- `./` 3 files, 45 lines (Markdown, YAML)\n- `db/` 1 files, 3 lines (SQL)\n- `docs/` 2 files, 43 lines (Markdown)\n- `native/` 2 files, 13 lines (C)\n- `notes/memory/` 1 files, 23 lines (Markdown)\n- `notes/memory/research/` 2 files, 44 lines (Markdown)\n- `shop/` 5 files, 60 lines (Python)\n- `svc/` 2 files, 26 lines (Go, Rust)\n- `tests/` 1 files, 9 lines (Python)\n- `web/` 2 files, 6 lines (TypeScript)\n\n## Interfaces found\n\nFound by pattern matching, so the lists can be incomplete: confirm in the code.\n\n- Commands in `shop/cli.py`: bill, refund\n- Environment variables read: `QUEUE_URL`\n- Runnable files (entry points): `native/cart.c`, `shop/core.py`, `svc/server.go`\n\n## Key files, ranked by how much other code leans on them\n\nRanked the way aider's repo map does it: a file scores when other files use the names it defines or import it. Within a file, the names other files use most come first. Symbols read by: built-in readers.\n\n### 1. `shop/queue.py` · Python · 12 lines · imported by 1\n\"The queue of billing events.\"\n- `class BillingQueue` (methods: post_event, drain_events) · used in 1 other file\n\n### 2. `shop/core.py` · Python · 20 lines · imported by 2\n\"Billing: charge an order.\"\n- `bill(order, retries: int=2)` · used in 2 other files: Charge it.\n\n### 3. `native/cart.h` · C · 3 lines · imported by 0\n- `struct cart` · used in 2 other files\n\n### 4. `web/total.ts` · TypeScript · 2 lines · imported by 1\n- `export const TAX_RATE`\n- `export function total` · used in 1 other file\n\n### 5. `shop/db.py` · Python · 16 lines · imported by 1\n\"Storage.\"\n- `class Ledger` (methods: post_entry): Every charge, once.\n- `save(order)` · used in 1 other file: Write one order.\n\n### 6. `native/cart.c` · C · 10 lines · imported by 0\n- `int main(void) {` · used in 1 other file\n- `int total_items(struct cart *c) {`\n\n### 7. `shop/cli.py` · Python · 11 lines · imported by 0\n- `main()` · used in 1 other file\n\n### 8. `db/schema.sql` · SQL · 3 lines · imported by 0\n- `CREATE TABLE IF NOT EXISTS orders`\n\n### 9. `shop/__init__.py` · Python · 1 lines · imported by 0\n\"The shop package.\"\n\n### 10. `svc/lib.rs` · Rust · 10 lines · imported by 0\n- `pub fn total_items`\n- `pub struct OrderBook`\n\n### 11. `svc/server.go` · Go · 16 lines · imported by 0\n- `func Total(`\n- `type Order struct`\n\n### 12. `tests/test_core.py` · Python · 9 lines · imported by 0\n- `test_bill()`\n- `test_total()`\n\n### 13. `web/cart.ts` · TypeScript · 4 lines · imported by 0\n\"The cart.\"\n- `export class Cart`\n- `export function addItem`\n\n## Who imports whom (inside this repository)\n\n- `shop/cli.py` → `shop/core.py`\n- `shop/core.py` → `shop/db.py`, `shop/queue.py`\n- `tests/test_core.py` → `shop/core.py`\n- `web/cart.ts` → `web/total.ts`\n\n## Outside dependencies (imported names, with the number of files that use them)\n\nfmt (1), std::fs (1)\n\n## Tests\n\n3 test functions in 2 files: `svc/lib.rs` (1), `tests/test_core.py` (2)\n\n## Changed in structure since the last accepted map\n\n- nothing: the structure is as mapped\n"
+  },
+  "<ROOT>/.council/map/state.json": {
+   "json": {
+    "mapped": "2026-11-13",
+    "run": null,
+    "map": "docs/ARCHITECTURE.md",
+    "structure": {
+     "db/schema.sql": "a23cf89396f11895",
+     "native/cart.c": "1f95607ef8f0f35d",
+     "native/cart.h": "12b77c1f4112ed96",
+     "shop/__init__.py": "a2b51f0f3666fe31",
+     "shop/cli.py": "1e0e031d7b17a481",
+     "shop/core.py": "d5f807d5631692d6",
+     "shop/db.py": "9050ee5b1ca6effe",
+     "shop/queue.py": "29c2c66820da487f",
+     "svc/lib.rs": "86ff9dddb841707d",
+     "svc/server.go": "13e7145d5891348a",
+     "tests/test_core.py": "ef742d2ea6faca87",
+     "web/cart.ts": "a6698d98185a7581",
+     "web/total.ts": "8a41b9a3cfabd466"
+    }
+   }
+  },
+  "<ROOT>/.council/runs/261113-120019-pick-queue-technology/brief.yaml": {
+   "text": "# Intent brief for run 261113-120019-pick-queue-technology. Fill every field, then run:  council ingest\n#\n# The ask (verbatim; kept in run.json, do not retype it):\n#   Pick the queue technology for the billing pipeline\n#\n# Write the rubric BEFORE anyone has ideas. It is frozen for the run.\n\nrestated: \"\"        # 3 lines at most: what is being decided, in plain words\neli5: \"\"            # 20 words at most\n\nrubric:             # 3 to 7 criteria; weights sum to 100; check = machine | source | judgment\n  - {id: R1, name: \"\", weight: 0, check: judgment}\n\nevidence_plan: []   # the tests, data or sources that can check the criteria\n\nresearch_questions: []  # 6 at most: what the two researchers should find out before anyone has ideas.\n                        # Ask what would change the decision. Write each so that a stranger could research\n                        # it: name the thing, no acronyms. Left empty, they get one question per criterion.\n\nlenses:             # exactly these ids. Define each by what it maximises, what it must respect and how\n                    # it works, not by a job title. If two lenses would produce the same ideas, change one.\n  - {id: L1, name: \"\", maximize: \"\", respect: \"\", method: \"\", evidence: \"\"}\n  - {id: L2, name: \"\", maximize: \"\", respect: \"\", method: \"\", evidence: \"\"}\n  - {id: L3, name: \"\", maximize: \"\", respect: \"\", method: \"\", evidence: \"\"}\n\nfacts: \"\"           # optional, 400 words at most: numbers, quotes and paths the seats need, verbatim.\n                    # Longer material: put it in facts.md next to this file.\n\nlessons_applied: [] # ids from docs/lessons.md that shaped this brief (look first; may be empty)\napproved_by: \"\"     # the name of the person who approved this brief (or \"requester\"), otherwise \"unattended\"\n"
+  },
+  "<ROOT>/.council/runs/261113-120019-pick-queue-technology/events.jsonl": {
+   "text": "{\"t\": \"2026-11-13T12:00:19\", \"event\": \"verb\", \"verb\": \"init\", \"ok\": true, \"code\": 0, \"ms\": 0, \"phase\": [null, \"brief\"], \"loop\": [null, 0], \"error\": null}\n{\"t\": \"2026-11-13T12:00:20\", \"event\": \"verb\", \"verb\": \"next\", \"ok\": true, \"code\": 0, \"ms\": 0, \"phase\": [\"brief\", \"brief\"], \"loop\": [0, 0], \"error\": null}\n"
+  },
+  "<ROOT>/.council/runs/261113-120019-pick-queue-technology/run.json": {
+   "json": {
+    "id": "261113-120019-pick-queue-technology",
+    "created": "2026-11-13T12:00:19",
+    "ask": "Pick the queue technology for the billing pipeline",
+    "paths": [],
+    "gate": "GATE tier=lite mode=fanout:claude profile=efficient loops<=1 calls~12 tokens~1.8M rel_cost=0.66 (chair: stakes=medium)",
+    "tier": "lite",
+    "mode": "fanout:claude",
+    "profile": "efficient",
+    "tripwires": [],
+    "gate_reason": "chair: stakes=medium",
+    "calls_estimate": 12,
+    "deviations": [],
+    "friction": [],
+    "calls": {},
+    "loops": [],
+    "shape": {
+     "experts": 3,
+     "ideas_min": 5,
+     "keep": 2,
+     "elders": 1,
+     "start": 3,
+     "loops": 1,
+     "rubric": [
+      3,
+      7
+     ],
+     "schedule": [
+      3,
+      1
+     ]
+    },
+    "max_loops": 1,
+    "schedule": [
+     3,
+     1
+    ],
+    "chair": {
+     "model": "Claude Fable 5.2 (low)",
+     "creator": "Anthropic",
+     "quality": 54,
+     "cost_per_task": 3.1
+    },
+    "support": {
+     "research": {
+      "budget": {
+       "lite": 10,
+       "full": 15
+      },
+      "seats": 2,
+      "later_loops": "on_request",
+      "model": "auto",
+      "beats": []
+     },
+     "map": {
+      "when": "stale",
+      "model": "chair",
+      "focus_tokens": 700,
+      "skeleton_lines": 420,
+      "path": "",
+      "due": true,
+      "reason": "1 file(s) changed in structure since the map of 2026-11-13: tests/test_a.py"
+     },
+     "digest": 14,
+     "origin": {
+      "research.seats": "default",
+      "research.budget.lite": "default",
+      "research.budget.full": "default",
+      "research.later_loops": "default",
+      "research.model": "default",
+      "research.beats": "default",
+      "map.when": "default",
+      "map.model": "default",
+      "map.focus_tokens": "default",
+      "map.skeleton_lines": "default",
+      "map.path": "default",
+      "digest": "default"
+     },
+     "problems": []
+    },
+    "memory": {
+     "backend": "obsidian",
+     "vault": "<BASE>/vault",
+     "folder": "Council/Shop",
+     "dir": "<BASE>/vault/Council/Shop",
+     "links": "wikilinks",
+     "source": "user",
+     "ok": true,
+     "problem": null
+    },
+    "commons": [],
+    "seats": {
+     "L1": {
+      "role": "expert",
+      "model": "Claude Haiku 5.5 (xhigh)",
+      "creator": "Anthropic",
+      "effort": "xhigh",
+      "via": "subagent",
+      "alias": "haiku"
+     },
+     "L2": {
+      "role": "expert",
+      "model": "Claude Fable 5.2 (low)",
+      "creator": "Anthropic",
+      "effort": "low",
+      "via": "subagent",
+      "alias": "fable"
+     },
+     "L3": {
+      "role": "expert",
+      "model": "Claude Haiku 5.5 (xhigh)",
+      "creator": "Anthropic",
+      "effort": "xhigh",
+      "via": "subagent",
+      "alias": "haiku"
+     },
+     "RT": {
+      "role": "red_team",
+      "model": "Claude Opus 5.5 (xhigh)",
+      "creator": "Anthropic",
+      "effort": "xhigh",
+      "via": "subagent",
+      "alias": "opus"
+     },
+     "EA": {
+      "role": "elder",
+      "model": "Claude Opus 5.5 (xhigh)",
+      "creator": "Anthropic",
+      "effort": "xhigh",
+      "via": "subagent",
+      "alias": "opus"
+     },
+     "CTRL": {
+      "role": "control",
+      "model": "Claude Fable 5.2 (low)",
+      "creator": "Anthropic",
+      "effort": "low",
+      "via": "subagent",
+      "alias": "fable"
+     },
+     "RA": {
+      "role": "researcher",
+      "beat": "Papers and primary research",
+      "beat_text": "Peer-reviewed papers and preprints (arXiv, ACL Anthology, OpenReview, Semantic Scholar), benchmarks and their leaderboards, replications, surveys and standards. Find what was measured, on what data, and whether it held up when others tried it.",
+      "model": "Claude Fable 5.2 (low)",
+      "creator": "Anthropic",
+      "effort": "low",
+      "via": "subagent",
+      "alias": "fable",
+      "web": "yes"
+     },
+     "RB": {
+      "role": "researcher",
+      "beat": "Practice in the field",
+      "beat_text": "How teams really do it: engineering blogs and architecture write-ups from companies, postmortems, official documentation and changelogs, conference talks, and open-source repositories. Find what runs in production, what broke, and what it cost.",
+      "model": "Claude Haiku 5.5 (xhigh)",
+      "creator": "Anthropic",
+      "effort": "xhigh",
+      "via": "subagent",
+      "alias": "haiku",
+      "web": "yes"
+     },
+     "MAP": {
+      "role": "mapper",
+      "model": "Claude Fable 5.2 (low)",
+      "creator": "Anthropic",
+      "effort": "low",
+      "via": "subagent",
+      "alias": "fable"
+     }
+    },
+    "loop": 0,
+    "phase": "brief",
+    "updated": "2026-11-13T12:00:20"
+   }
+  },
+  "<ROOT>/.council/runs/CURRENT": {
+   "text": "261113-120019-pick-queue-technology\n"
+  },
+  "<ROOT>/README.md": {
+   "as_put": true
+  },
+  "<ROOT>/cards.json": {
+   "as_put": true
+  },
+  "<ROOT>/config.yaml": {
+   "as_put": true
+  },
+  "<ROOT>/db/schema.sql": {
+   "as_put": true
+  },
+  "<ROOT>/docs/ARCHITECTURE.md": {
+   "text": "<!-- council-loop:map · written by hand (council map --install) on 2026-11-13 · checked against 13 source files · regenerate: council map -->\n# Architecture\n\n> ELI5: a small service that writes each billing event down once.\n\n## Purpose and philosophy\nA small billing service. replay snapshot snapshot shard backoff queue quorum fallback idempotent circuit fallback tenant circuit audit replay schema rollout throttle batch stream stream retries cache rollout shard budget batch replay metric ledger replica latency rollout batch batch retries shard stream rollout canary replica replay audit rollout replica queue metric fallback cache shard schema tenant tenant fallback fallback backoff queue snapshot stream backoff quorum replay tenant canary budget replica stream schema snapshot fallback rollout tenant batch shard snapshot quorum replay ledger queue metric batch backoff metric batch index shard fallback replica quorum canary circuit schema quorum schema tenant schema tenant batch metric cache canary batch snapshot replay queue audit replica shard retries stream rollout retries cache retries backoff quorum schema shard snapshot replica canary rollout ledger circuit budget snapshot fallback queue canary audit quorum replay replay index retries replay budget tenant audit index backoff queue circuit shard audit cache idempotent schema idempotent fallback retries queue circuit retries shard stream rollout quorum fallback cache batch batch latency audit audit batch cache index fallback quorum audit tenant batch budget queue idempotent cache queue replay tenant rollout audit quorum metric rollout shard retries audit budget backoff budget batch audit backoff queue idempotent backoff canary metric replica\n\n## Bird's-eye view\n```mermaid\nflowchart LR\n  api --> queue --> ledger\n```\nRequests enter, wait, and are written down.\n\n## Code map\n- `shop/cli.py`: one job, and it must not reach around the queue.\n- `shop/core.py`: one job, and it must not reach around the queue.\n- `shop/queue.py`: one job, and it must not reach around the queue.\n- `shop/core.py`: one job, and it must not reach around the queue.\n- `shop/db.py`: one job, and it must not reach around the queue.\n- `shop/cli.py`: one job, and it must not reach around the queue.\n\n## Interfaces\n- The command line and the HTTP routes the skeleton lists.\n\n## Data and control flow\nAn event arrives, is queued, and is written to the ledger once.\n\n## Invariants\n- An event is never written twice.\n\n## Extending it\n- A new consumer registers with the queue and nothing else changes.\n\n## Performance and cost\n- The ledger write is the slow step.\n\n## Where to change what\n| To do this | Start in |\n| --- | --- |\n| add a consumer | `shop/cli.py` |\n"
+  },
+  "<ROOT>/docs/notes.md": {
+   "as_put": true
+  },
+  "<ROOT>/map.md": {
+   "as_put": true
+  },
+  "<ROOT>/native/cart.c": {
+   "as_put": true
+  },
+  "<ROOT>/native/cart.h": {
+   "as_put": true
+  },
+  "<ROOT>/notes/memory/index.md": {
+   "text": "---\ntype: \"index\"\ntags: [\"council/index\"]\nupdated: \"2026-11-13\"\n---\n\n# Council memory\n\nShared by every council run in this project. Written only by `council`; safe to read, link and tag.\n\n- **Research** (2 notes): one sourced fact per note, in `research/`.\n- **Commons** (0 runs): what members said to each other, in `commons/`.\n\n## Newest research\n\n- [Queue A keeps order within one partition only](research/queue-keeps-order-within-one-partition.md) (medium, n.d.)\n- [The ledger posts each billing event once](research/ledger-posts-billing-event-once.md) (medium, n.d.)\n\n## Use it\n\n- Find: `council memory search \"<words>\"`\n- Add by hand: `council memory add --claim \"…\" --source <url or file> --quote \"…\"`\n- Where this folder lives: `council memory status`\n"
+  },
+  "<ROOT>/notes/memory/research/ledger-posts-billing-event-once.md": {
+   "text": "---\ntype: \"research\"\ntitle: \"The ledger posts each billing event once\"\nsource: \"<ROOT>/shop/db.py:9\"\nsource_date: \"n.d.\"\nkind: \"docs\"\nconfidence: \"medium\"\nchecked: true\nadded: \"2026-11-13\"\nby: \"chair\"\nrole: \"by hand\"\ntags: [\"council/research\"]\n---\n# The ledger posts each billing event once\n\nSource: `<ROOT>/shop/db.py:9` (n.d.). Kind: docs. Confidence: medium. Opened when it was added.\n\n## Observations\n\n- [fact] The ledger posts each billing event once (medium confidence; <ROOT>/shop/db.py:9, n.d.)\n\nAdded 2026-11-13 by chair (by hand).\n"
+  },
+  "<ROOT>/notes/memory/research/queue-keeps-order-within-one-partition.md": {
+   "text": "---\ntype: \"research\"\ntitle: \"Queue A keeps order within one partition only\"\nsource: \"https://example.org/queue-a/ordering\"\nsource_date: \"n.d.\"\nkind: \"other\"\nconfidence: \"medium\"\nchecked: true\nadded: \"2026-11-13\"\nby: \"chair\"\nrole: \"by hand\"\ntags: [\"council/research\"]\n---\n# Queue A keeps order within one partition only\n\nSource: [example.org](https://example.org/queue-a/ordering) (n.d.). Kind: other. Confidence: medium. Opened when it was added.\n\n## Observations\n\n- [fact] Queue A keeps order within one partition only (medium confidence; example.org, n.d.)\n\nAdded 2026-11-13 by chair (by hand).\n"
+  },
+  "<ROOT>/out/packet.md": {
+   "text": "### Candidate A: Idea 2\nword word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\nELI5: simple 2\n\n### Candidate B: Idea 0\nword word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\nELI5: simple 0\n\n### Candidate C: Idea 1\nword word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\nELI5: simple 1"
+  },
+  "<ROOT>/out/packet.md.mapping.json": {
+   "json": {
+    "A": {
+     "id": "c2",
+     "authors": [
+      "L3"
+     ]
+    },
+    "B": {
+     "id": "c0",
+     "authors": [
+      "L1"
+     ]
+    },
+    "C": {
+     "id": "c1",
+     "authors": [
+      "L2"
+     ]
+    }
+   }
+  },
+  "<ROOT>/out/skeleton.md": {
+   "text": "# Codebase skeleton: proj\n\nMade by `council map` on 2026-11-13. A script wrote this. It lists what is there, not why: trust it for names and counts, and read the code for intent.\n\n19 files, 189 lines; 13 are source code.\n\n## Size\n\n| Language | Files | Lines |\n| --- | ---: | ---: |\n| Markdown | 5 | 71 |\n| Python | 6 | 69 |\n| Go | 1 | 16 |\n| C | 2 | 13 |\n| Rust | 1 | 10 |\n| TypeScript | 2 | 6 |\n| SQL | 1 | 3 |\n| YAML | 1 | 1 |\n\n## Directories\n\n- `./` 2 files, 4 lines (Markdown, YAML)\n- `db/` 1 files, 3 lines (SQL)\n- `docs/` 1 files, 1 lines (Markdown)\n- `native/` 2 files, 13 lines (C)\n- `notes/memory/` 1 files, 23 lines (Markdown)\n- `notes/memory/research/` 2 files, 44 lines (Markdown)\n- `shop/` 5 files, 60 lines (Python)\n- `svc/` 2 files, 26 lines (Go, Rust)\n- `tests/` 1 files, 9 lines (Python)\n- `web/` 2 files, 6 lines (TypeScript)\n\n## Interfaces found\n\nFound by pattern matching, so the lists can be incomplete: confirm in the code.\n\n- Commands in `shop/cli.py`: bill, refund\n- Environment variables read: `QUEUE_URL`\n- Runnable files (entry points): `native/cart.c`, `shop/core.py`, `svc/server.go`\n\n## Key files, ranked by how much other code leans on them\n\nRanked the way aider's repo map does it: a file scores when other files use the names it defines or import it. Within a file, the names other files use most come first. Symbols read by: built-in readers.\n\n### 1. `shop/queue.py` · Python · 12 lines · imported by 1\n\"The queue of billing events.\"\n- `class BillingQueue` (methods: post_event, drain_events) · used in 1 other file\n\n### 2. `shop/core.py` · Python · 20 lines · imported by 2\n\"Billing: charge an order.\"\n- `bill(order, retries: int=2)` · used in 2 other files: Charge it.\n\n### 3. `native/cart.h` · C · 3 lines · imported by 0\n- `struct cart` · used in 2 other files\n\n### 4. `web/total.ts` · TypeScript · 2 lines · imported by 1\n- `export const TAX_RATE`\n- `export function total` · used in 1 other file\n\n### 5. `shop/db.py` · Python · 16 lines · imported by 1\n\"Storage.\"\n- `class Ledger` (methods: post_entry): Every charge, once.\n- `save(order)` · used in 1 other file: Write one order.\n\n### 6. `native/cart.c` · C · 10 lines · imported by 0\n- `int main(void) {` · used in 1 other file\n- `int total_items(struct cart *c) {`\n\n### 7. `shop/cli.py` · Python · 11 lines · imported by 0\n- `main()` · used in 1 other file\n\n### 8. `db/schema.sql` · SQL · 3 lines · imported by 0\n- `CREATE TABLE IF NOT EXISTS orders`\n\n### 9. `shop/__init__.py` · Python · 1 lines · imported by 0\n\"The shop package.\"\n\n### 10. `svc/lib.rs` · Rust · 10 lines · imported by 0\n- `pub fn total_items`\n- `pub struct OrderBook`\n\n### 11. `svc/server.go` · Go · 16 lines · imported by 0\n- `func Total(`\n- `type Order struct`\n\n### 12. `tests/test_core.py` · Python · 9 lines · imported by 0\n- `test_bill()`\n- `test_total()`\n\n### 13. `web/cart.ts` · TypeScript · 4 lines · imported by 0\n\"The cart.\"\n- `export class Cart`\n- `export function addItem`\n\n## Who imports whom (inside this repository)\n\n- `shop/cli.py` → `shop/core.py`\n- `shop/core.py` → `shop/db.py`, `shop/queue.py`\n- `tests/test_core.py` → `shop/core.py`\n- `web/cart.ts` → `web/total.ts`\n\n## Outside dependencies (imported names, with the number of files that use them)\n\nfmt (1), std::fs (1)\n\n## Tests\n\n3 test functions in 2 files: `svc/lib.rs` (1), `tests/test_core.py` (2)\n\n## Changed in structure since the last accepted map\n\n- no map yet at docs/ARCHITECTURE.md: map all of it\n"
+  },
+  "<ROOT>/shop/__init__.py": {
+   "as_put": true
+  },
+  "<ROOT>/shop/cli.py": {
+   "as_put": true
+  },
+  "<ROOT>/shop/core.py": {
+   "as_put": true
+  },
+  "<ROOT>/shop/db.py": {
+   "as_put": true
+  },
+  "<ROOT>/shop/queue.py": {
+   "as_put": true
+  },
+  "<ROOT>/svc/lib.rs": {
+   "as_put": true
+  },
+  "<ROOT>/svc/server.go": {
+   "as_put": true
+  },
+  "<ROOT>/tests/test_a.py": {
+   "as_put": true
+  },
+  "<ROOT>/tests/test_core.py": {
+   "as_put": true
+  },
+  "<ROOT>/web/cart.ts": {
+   "as_put": true
+  },
+  "<ROOT>/web/total.ts": {
+   "as_put": true
+  },
+  "<HOME>/.council/config.yaml": {
+   "text": "memory:\n  backend: obsidian\n  vault: <BASE>/vault\n  folder: Council/Shop\n"
+  },
+  "<BASE>/vault/Council/Shop/Research.base": {
+   "text": "filters:\n  and:\n    - 'file.inFolder(\"Council/Shop/research\")'\n    - 'type == \"research\"'\nproperties:\n  title:\n    displayName: Fact\n  source_date:\n    displayName: Published\n  checked:\n    displayName: Opened\nviews:\n  - type: table\n    name: \"Facts held\"\n    filters:\n      and:\n        - 'status != \"retired\"'\n    order:\n      - title\n      - confidence\n      - kind\n      - source_date\n      - source\n      - run\n      - checked\n    groupBy:\n      property: confidence\n      direction: ASC\n  - type: table\n    name: \"By run\"\n    order:\n      - title\n      - confidence\n      - source\n      - added\n    groupBy:\n      property: run\n      direction: DESC\n  - type: table\n    name: \"Re-check these\"\n    filters:\n      or:\n        - 'checked == false'\n        - 'confidence == \"low\"'\n    order:\n      - title\n      - source\n      - added\n  - type: table\n    name: \"Retired\"\n    filters:\n      and:\n        - 'status == \"retired\"'\n    order:\n      - title\n      - retired\n      - retired_because\n      - superseded_by\n"
+  },
+  "<BASE>/vault/Council/Shop/index.md": {
+   "text": "---\ntype: \"index\"\ntags: [\"council/index\"]\nupdated: \"2026-11-13\"\n---\n\n# Council memory\n\nShared by every council run in this project. Written only by `council`; safe to read, link and tag.\n\n- **Research** (2 notes): one sourced fact per note, in `research/`. As a table: open `Research.base`.\n- **Commons** (0 runs): what members said to each other, in `commons/`.\n\n## Newest research\n\n- [[Council/Shop/research/queue-keeps-order-within-one-partition|Queue A keeps order within one partition only]] (medium, n.d.)\n- [[Council/Shop/research/ledger-posts-billing-event-once|The ledger posts each billing event once]] (medium, n.d.)\n\n## Use it\n\n- Find: `council memory search \"<words>\"`\n- Add by hand: `council memory add --claim \"…\" --source <url or file> --quote \"…\"`\n- Where this folder lives: `council memory status`\n"
+  },
+  "<BASE>/vault/Council/Shop/research/ledger-posts-billing-event-once.md": {
+   "text": "---\ntype: \"research\"\ntitle: \"The ledger posts each billing event once\"\nsource: \"<ROOT>/shop/db.py:9\"\nsource_date: \"n.d.\"\nkind: \"docs\"\nconfidence: \"medium\"\nchecked: true\nadded: \"2026-11-13\"\nby: \"chair\"\nrole: \"by hand\"\ntags: [\"council/research\"]\n---\n# The ledger posts each billing event once\n\nSource: `<ROOT>/shop/db.py:9` (n.d.). Kind: docs. Confidence: medium. Opened when it was added.\n\n## Observations\n\n- [fact] The ledger posts each billing event once (medium confidence; <ROOT>/shop/db.py:9, n.d.)\n\nAdded 2026-11-13 by chair (by hand).\n"
+  },
+  "<BASE>/vault/Council/Shop/research/queue-keeps-order-within-one-partition.md": {
+   "text": "---\ntype: \"research\"\ntitle: \"Queue A keeps order within one partition only\"\nsource: \"https://example.org/queue-a/ordering\"\nsource_date: \"n.d.\"\nkind: \"other\"\nconfidence: \"medium\"\nchecked: true\nadded: \"2026-11-13\"\nby: \"chair\"\nrole: \"by hand\"\ntags: [\"council/research\"]\n---\n# Queue A keeps order within one partition only\n\nSource: [example.org](https://example.org/queue-a/ordering) (n.d.). Kind: other. Confidence: medium. Opened when it was added.\n\n## Observations\n\n- [fact] Queue A keeps order within one partition only (medium confidence; example.org, n.d.)\n\nAdded 2026-11-13 by chair (by hand).\n"
+  }
+ }
+}

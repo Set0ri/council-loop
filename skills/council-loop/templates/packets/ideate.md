@@ -32,8 +32,9 @@ $facts_block$memory_block$survivors_block
    - evidence: where the support comes from (file path, number, source). Write "unverified" for a
      claim you could not check. Never claim a check you did not run.
    - eli5: 20 words at most.
-3. You may read project files or search the web for evidence. If you have a shell, you may run
-   code in a scratch copy to check a claim. Do not edit any project file.
+3. You may read project files for evidence. Facts from outside the project are the researchers'
+   to bring: ask for one in `notes` with "to": "research". If you have a shell, you may run code
+   in a scratch copy to check a claim. Do not edit any project file.
 4. $share_rule
 
 ## Output

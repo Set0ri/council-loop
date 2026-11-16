@@ -35,6 +35,9 @@ fn main() {
     files.push(skill.join("SKILL.md"));
     println!("cargo:rerun-if-changed=skills/council-loop/SKILL.md");
     println!("cargo:rerun-if-changed=build.rs");
+    if env::var("CARGO_CFG_TARGET_ENV").as_deref() == Ok("msvc") {
+        println!("cargo:rustc-link-arg=/STACK:8388608");
+    }
 
     let mut code = String::from("/// Every embedded file: its path inside the skill folder, and its text.\npub static FILES: &[(&str, &str)] = &[\n");
     for file in files.iter().filter(|f| f.is_file()) {

@@ -23,11 +23,15 @@ fn find_skill_dir() -> Option<PathBuf> {
             return Some(dir);
         }
     }
+    // beside the executable, when it runs from a checkout of the repository (target/release/council)
+    // or from inside the plugin. Any other folder that merely happens to hold skills/council-loop
+    // above the executable is not looked at: templates decide what every seat is told.
     let exe = std::env::current_exe().ok()?;
     let exe = exe.canonicalize().unwrap_or(exe);
     exe.ancestors()
         .skip(1)
         .take(4)
+        .filter(|dir| dir.join("Cargo.toml").is_file() || dir.join(".claude-plugin").is_dir())
         .map(|dir| dir.join("skills").join("council-loop"))
         .find(|dir| is_skill(dir))
 }
@@ -35,7 +39,24 @@ fn find_skill_dir() -> Option<PathBuf> {
 /// The skill folder on disk, when there is one.
 pub fn skill_dir() -> Option<&'static Path> {
     static DIR: OnceLock<Option<PathBuf>> = OnceLock::new();
-    DIR.get_or_init(find_skill_dir).as_deref()
+    DIR.get_or_init(|| {
+        let found = find_skill_dir();
+        match &found {
+            Some(dir) => crate::diag!(
+                Debug,
+                "assets",
+                "templates and model data are read from {}",
+                dir.display()
+            ),
+            None => crate::diag!(
+                Debug,
+                "assets",
+                "templates and model data are the ones built into council {VERSION}"
+            ),
+        }
+        found
+    })
+    .as_deref()
 }
 
 /// The text of a skill file such as `templates/packets/vote.md`: from disk when a skill folder is

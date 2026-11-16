@@ -1,0 +1,413 @@
+{
+ "name": "map",
+ "about": "",
+ "needs": [],
+ "steps": [
+  {
+   "put": "<ROOT>/README.md",
+   "text": "# Shop\n\nA small shop.\n"
+  },
+  {
+   "put": "<ROOT>/config.yaml",
+   "text": "name: shop\n"
+  },
+  {
+   "put": "<ROOT>/db/schema.sql",
+   "text": "CREATE TABLE IF NOT EXISTS orders (\n  id INTEGER\n);\n"
+  },
+  {
+   "put": "<ROOT>/docs/notes.md",
+   "text": "Notes.\n"
+  },
+  {
+   "put": "<ROOT>/native/cart.c",
+   "text": "#include \"cart.h\"\n\nint total_items(struct cart *c)\n{\n    return 0;\n}\n\nint main(void) {\n    return total_items(0);\n}\n"
+  },
+  {
+   "put": "<ROOT>/native/cart.h",
+   "text": "struct cart {\n    int n;\n};\n"
+  },
+  {
+   "put": "<ROOT>/shop/__init__.py",
+   "text": "\"\"\"The shop package.\"\"\"\n"
+  },
+  {
+   "put": "<ROOT>/shop/cli.py",
+   "text": "import argparse\n\nfrom shop import core\n\n\ndef main():\n    ap = argparse.ArgumentParser()\n    sub = ap.add_subparsers()\n    sub.add_parser(\"bill\")\n    sub.add_parser(\"refund\")\n    core.bill(None)\n"
+  },
+  {
+   "put": "<ROOT>/shop/core.py",
+   "text": "\"\"\"Billing: charge an order.\"\"\"\nimport os\n\nfrom . import db\nfrom .queue import BillingQueue\n\n\ndef bill(order, retries: int = 2):\n    \"\"\"Charge it.\"\"\"\n    queue = BillingQueue(os.environ.get(\"QUEUE_URL\"))\n    queue.post_event(order)\n    return db.save(order)\n\n\ndef _private():\n    return 1\n\n\nif __name__ == \"__main__\":\n    bill(None)\n"
+  },
+  {
+   "put": "<ROOT>/shop/db.py",
+   "text": "\"\"\"Storage.\"\"\"\n\n\ndef save(order):\n    \"\"\"Write one order.\"\"\"\n    return order\n\n\nclass Ledger:\n    \"\"\"Every charge, once.\"\"\"\n\n    def post_entry(self, entry):\n        return entry\n\n    def _hidden(self):\n        return 0\n"
+  },
+  {
+   "put": "<ROOT>/shop/queue.py",
+   "text": "\"\"\"The queue of billing events.\"\"\"\n\n\nclass BillingQueue:\n    def __init__(self, url):\n        self.url = url\n\n    def post_event(self, event):\n        return event\n\n    def drain_events(self):\n        return []\n"
+  },
+  {
+   "put": "<ROOT>/svc/lib.rs",
+   "text": "use std::fs;\n\npub fn total_items(items: &[u32]) -> usize {\n    items.len()\n}\n\npub struct OrderBook;\n\n#[test]\nfn adds() {}\n"
+  },
+  {
+   "put": "<ROOT>/svc/server.go",
+   "text": "package main\n\nimport (\n\t\"fmt\"\n)\n\nfunc Total(items []int) int {\n\treturn len(items)\n}\n\ntype Order struct {\n}\n\nfunc main() {\n\tfmt.Println(Total(nil))\n}\n"
+  },
+  {
+   "put": "<ROOT>/tests/test_core.py",
+   "text": "from shop import core\n\n\ndef test_bill():\n    assert core.bill(1) == 1\n\n\ndef test_total():\n    assert True\n"
+  },
+  {
+   "put": "<ROOT>/web/cart.ts",
+   "text": "/** The cart. */\nimport { total } from './total';\nexport class Cart {}\nexport function addItem(cart: Cart) { return total([]); }\n"
+  },
+  {
+   "put": "<ROOT>/web/total.ts",
+   "text": "export function total(items: number[]) { return items.length; }\nexport const TAX_RATE = 0.2;\n"
+  },
+  {
+   "cmd": [
+    "map"
+   ],
+   "clock": 1,
+   "rc": 0,
+   "out": "skeleton: <ROOT>/.council/map/skeleton.md  (16 files, 122 lines, 13 source files, 5 internal imports, 2 commands, 0 MCP entries)\nmap: docs/ARCHITECTURE.md: STALE: no map yet at docs/ARCHITECTURE.md\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "map",
+    "--check"
+   ],
+   "clock": 2,
+   "rc": 1,
+   "out": "skeleton: <ROOT>/.council/map/skeleton.md  (16 files, 122 lines, 13 source files, 5 internal imports, 2 commands, 0 MCP entries)\nmap: docs/ARCHITECTURE.md: STALE: no map yet at docs/ARCHITECTURE.md\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "map",
+    "--validate"
+   ],
+   "clock": 3,
+   "rc": 1,
+   "out": "no map at docs/ARCHITECTURE.md\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "map",
+    "--accept"
+   ],
+   "clock": 4,
+   "rc": 1,
+   "out": "no map at docs/ARCHITECTURE.md to accept\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "map",
+    "--focus",
+    "Why does bill in shop/core.py post_event twice to the BillingQueue?"
+   ],
+   "clock": 5,
+   "rc": 0,
+   "out": "- `shop/core.py` (named in the ask)\n  - `bill(order, retries: int=2)` · used in 2 other files: Charge it.\n- `shop/queue.py`\n  - `class BillingQueue` · used in 1 other file\n- `shop/db.py`\n  - `class Ledger`: Every charge, once.\n  - `save(order)` · used in 1 other file: Write one order.\n- `shop/cli.py`\n  - `main()` · used in 1 other file\n- `db/schema.sql`\n  - `CREATE TABLE IF NOT EXISTS orders`\n- `native/cart.c`\n  - `int main(void) {` · used in 1 other file\n  - `int total_items(struct cart *c) {`\n- `native/cart.h`\n  - `struct cart` · used in 2 other files\n- `svc/lib.rs`\n  - `pub struct OrderBook`\n  - `pub fn total_items`\n- `svc/server.go`\n  - `type Order struct`\n  - `func Total(`\n- `tests/test_core.py`\n  - `test_bill()`\n  - `test_total()`\n- `web/cart.ts`\n  - `export class Cart`\n  - `export function addItem`\n- `web/total.ts`\n  - `export const TAX_RATE`\n  - `export function total` · used in 1 other file\n\n(about 228 tokens; names the text mentions: BillingQueue, bill, core, post_event, shop)\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "map",
+    "--focus",
+    "nothing that this repository knows about"
+   ],
+   "clock": 6,
+   "rc": 0,
+   "out": "- `shop/queue.py`\n  - `class BillingQueue` · used in 1 other file\n- `shop/core.py`\n  - `bill(order, retries: int=2)` · used in 2 other files: Charge it.\n- `native/cart.h`\n  - `struct cart` · used in 2 other files\n- `web/total.ts`\n  - `export const TAX_RATE`\n  - `export function total` · used in 1 other file\n- `shop/db.py`\n  - `class Ledger`: Every charge, once.\n  - `save(order)` · used in 1 other file: Write one order.\n- `native/cart.c`\n  - `int main(void) {` · used in 1 other file\n  - `int total_items(struct cart *c) {`\n- `shop/cli.py`\n  - `main()` · used in 1 other file\n- `db/schema.sql`\n  - `CREATE TABLE IF NOT EXISTS orders`\n- `svc/lib.rs`\n  - `pub struct OrderBook`\n  - `pub fn total_items`\n- `svc/server.go`\n  - `type Order struct`\n  - `func Total(`\n- `tests/test_core.py`\n  - `test_bill()`\n  - `test_total()`\n- `web/cart.ts`\n  - `export class Cart`\n  - `export function addItem`\n\n(about 223 tokens; names the text mentions: none)\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "map",
+    "--budget",
+    "30",
+    "--out",
+    "skel-30.md"
+   ],
+   "clock": 7,
+   "rc": 0,
+   "out": "skeleton: skel-30.md  (16 files, 122 lines, 13 source files, 5 internal imports, 2 commands, 0 MCP entries)\nmap: docs/ARCHITECTURE.md: STALE: no map yet at docs/ARCHITECTURE.md\n",
+   "err": ""
+  },
+  {
+   "put": "<ROOT>/thin.md",
+   "text": "# Map\n\nToo thin.\n"
+  },
+  {
+   "cmd": [
+    "map",
+    "--install",
+    "thin.md"
+   ],
+   "clock": 8,
+   "rc": 1,
+   "out": "warning: no section: ## Data and control flow\nwarning: no section: ## Performance and cost\nwarning: no section: ## Where to change what\nwarning: no Mermaid diagram in the bird's-eye view\nwarning: no ELI5 line under the title\nerror: the map is 4 words: too thin to find one's way by\nerror: missing section: ## Purpose and philosophy\nerror: missing section: ## Bird's-eye view\nerror: missing section: ## Code map\nerror: missing section: ## Interfaces\nerror: missing section: ## Invariants\nerror: missing section: ## Extending it\nnot installed: 7 problem(s)\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "map",
+    "--install",
+    "missing.md"
+   ],
+   "clock": 9,
+   "rc": 1,
+   "out": "no file at missing.md\n",
+   "err": ""
+  },
+  {
+   "put": "<ROOT>/map.md",
+   "text": "# Architecture\n\n> ELI5: a small service that writes each billing event down once.\n\n## Purpose and philosophy\nA small billing service. replay snapshot snapshot shard backoff queue quorum fallback idempotent circuit fallback tenant circuit audit replay schema rollout throttle batch stream stream retries cache rollout shard budget batch replay metric ledger replica latency rollout batch batch retries shard stream rollout canary replica replay audit rollout replica queue metric fallback cache shard schema tenant tenant fallback fallback backoff queue snapshot stream backoff quorum replay tenant canary budget replica stream schema snapshot fallback rollout tenant batch shard snapshot quorum replay ledger queue metric batch backoff metric batch index shard fallback replica quorum canary circuit schema quorum schema tenant schema tenant batch metric cache canary batch snapshot replay queue audit replica shard retries stream rollout retries cache retries backoff quorum schema shard snapshot replica canary rollout ledger circuit budget snapshot fallback queue canary audit quorum replay replay index retries replay budget tenant audit index backoff queue circuit shard audit cache idempotent schema idempotent fallback retries queue circuit retries shard stream rollout quorum fallback cache batch batch latency audit audit batch cache index fallback quorum audit tenant batch budget queue idempotent cache queue replay tenant rollout audit quorum metric rollout shard retries audit budget backoff budget batch audit backoff queue idempotent backoff canary metric replica\n\n## Bird's-eye view\n```mermaid\nflowchart LR\n  api --> queue --> ledger\n```\nRequests enter, wait, and are written down.\n\n## Code map\n- `shop/cli.py`: one job, and it must not reach around the queue.\n- `shop/core.py`: one job, and it must not reach around the queue.\n- `shop/queue.py`: one job, and it must not reach around the queue.\n- `shop/core.py`: one job, and it must not reach around the queue.\n- `shop/db.py`: one job, and it must not reach around the queue.\n- `shop/cli.py`: one job, and it must not reach around the queue.\n\n## Interfaces\n- The command line and the HTTP routes the skeleton lists.\n\n## Data and control flow\nAn event arrives, is queued, and is written to the ledger once.\n\n## Invariants\n- An event is never written twice.\n\n## Extending it\n- A new consumer registers with the queue and nothing else changes.\n\n## Performance and cost\n- The ledger write is the slow step.\n\n## Where to change what\n| To do this | Start in |\n| --- | --- |\n| add a consumer | `shop/cli.py` |\n"
+  },
+  {
+   "cmd": [
+    "map",
+    "--install",
+    "map.md"
+   ],
+   "clock": 10,
+   "rc": 0,
+   "out": "map installed: docs/ARCHITECTURE.md\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "map",
+    "--check"
+   ],
+   "clock": 11,
+   "rc": 0,
+   "out": "skeleton: <ROOT>/.council/map/skeleton.md  (20 files, 240 lines, 13 source files, 5 internal imports, 2 commands, 0 MCP entries)\nmap: docs/ARCHITECTURE.md: the structure is as mapped on 2026-11-13\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "map",
+    "--validate"
+   ],
+   "clock": 12,
+   "rc": 0,
+   "out": "map: ok\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "map"
+   ],
+   "clock": 13,
+   "rc": 0,
+   "out": "skeleton: <ROOT>/.council/map/skeleton.md  (20 files, 240 lines, 13 source files, 5 internal imports, 2 commands, 0 MCP entries)\nmap: docs/ARCHITECTURE.md: the structure is as mapped on 2026-11-13\n",
+   "err": ""
+  },
+  {
+   "put": "<ROOT>/shop/core.py",
+   "text": "\"\"\"Billing: charge an order.\"\"\"\nimport os\n\nfrom . import db\nfrom .queue import BillingQueue\n\n\ndef bill(order, retries: int = 2):\n    \"\"\"Charge it.\"\"\"\n    queue = BillingQueue(os.environ.get(\"QUEUE_URL\"))\n    queue.post_event(order)\n    x = 1\n    return db.save(order)\n\n\ndef _private():\n    return 1\n\n\nif __name__ == \"__main__\":\n    bill(None)\n"
+  },
+  {
+   "cmd": [
+    "map",
+    "--check"
+   ],
+   "clock": 14,
+   "rc": 0,
+   "out": "skeleton: <ROOT>/.council/map/skeleton.md  (20 files, 241 lines, 13 source files, 5 internal imports, 2 commands, 0 MCP entries)\nmap: docs/ARCHITECTURE.md: the structure is as mapped on 2026-11-13\n",
+   "err": ""
+  },
+  {
+   "rm": "<ROOT>/native/cart.h"
+  },
+  {
+   "put": "<ROOT>/shop/core.py",
+   "text": "\"\"\"Billing: charge an order.\"\"\"\nimport os\n\nfrom . import db\nfrom .queue import BillingQueue\n\n\ndef bill(order, retries: int = 2, dry_run: bool = False):\n    \"\"\"Charge it.\"\"\"\n    queue = BillingQueue(os.environ.get(\"QUEUE_URL\"))\n    queue.post_event(order)\n    x = 1\n    return db.save(order)\n\n\ndef _private():\n    return 1\n\n\nif __name__ == \"__main__\":\n    bill(None)\n"
+  },
+  {
+   "put": "<ROOT>/shop/refunds.py",
+   "text": "def refund(order):\n    return 0\n"
+  },
+  {
+   "put": "<ROOT>/tests/test_core.py",
+   "text": "from shop import core\n\n\ndef test_bill():\n    assert core.bill(1) == 1\n\n\ndef test_total():\n    assert True\n\n\ndef test_refund():\n    assert True\n"
+  },
+  {
+   "cmd": [
+    "map",
+    "--check"
+   ],
+   "clock": 15,
+   "rc": 1,
+   "out": "skeleton: <ROOT>/.council/map/skeleton.md  (20 files, 244 lines, 13 source files, 5 internal imports, 2 commands, 0 MCP entries)\nmap: docs/ARCHITECTURE.md: STALE: 3 file(s) changed in structure since the map of 2026-11-13: shop/core.py, shop/refunds.py, native/cart.h\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "map"
+   ],
+   "clock": 16,
+   "rc": 0,
+   "out": "skeleton: <ROOT>/.council/map/skeleton.md  (20 files, 244 lines, 13 source files, 5 internal imports, 2 commands, 0 MCP entries)\nmap: docs/ARCHITECTURE.md: STALE: 3 file(s) changed in structure since the map of 2026-11-13: shop/core.py, shop/refunds.py, native/cart.h\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "map",
+    "--accept"
+   ],
+   "clock": 17,
+   "rc": 0,
+   "out": "recorded: docs/ARCHITECTURE.md describes the code as it is today\n",
+   "err": ""
+  },
+  {
+   "cmd": [
+    "map",
+    "--check"
+   ],
+   "clock": 18,
+   "rc": 0,
+   "out": "skeleton: <ROOT>/.council/map/skeleton.md  (20 files, 244 lines, 13 source files, 5 internal imports, 2 commands, 0 MCP entries)\nmap: docs/ARCHITECTURE.md: the structure is as mapped on 2026-11-13\n",
+   "err": ""
+  },
+  {
+   "put": "<ROOT>/docs/ARCHITECTURE.md",
+   "text": "# Our own map\n\nWritten by hand.\n"
+  },
+  {
+   "put": "<ROOT>/map2.md",
+   "text": "```markdown\n# Architecture\n\n> ELI5: a small service that writes each billing event down once.\n\n## Purpose and philosophy\nA small billing service. replay snapshot snapshot shard backoff queue quorum fallback idempotent circuit fallback tenant circuit audit replay schema rollout throttle batch stream stream retries cache rollout shard budget batch replay metric ledger replica latency rollout batch batch retries shard stream rollout canary replica replay audit rollout replica queue metric fallback cache shard schema tenant tenant fallback fallback backoff queue snapshot stream backoff quorum replay tenant canary budget replica stream schema snapshot fallback rollout tenant batch shard snapshot quorum replay ledger queue metric batch backoff metric batch index shard fallback replica quorum canary circuit schema quorum schema tenant schema tenant batch metric cache canary batch snapshot replay queue audit replica shard retries stream rollout retries cache retries backoff quorum schema shard snapshot replica canary rollout ledger circuit budget snapshot fallback queue canary audit quorum replay replay index retries replay budget tenant audit index backoff queue circuit shard audit cache idempotent schema idempotent fallback retries queue circuit retries shard stream rollout quorum fallback cache batch batch latency audit audit batch cache index fallback quorum audit tenant batch budget queue idempotent cache queue replay tenant rollout audit quorum metric rollout shard retries audit budget backoff budget batch audit backoff queue idempotent backoff canary metric replica\n\n## Bird's-eye view\n```mermaid\nflowchart LR\n  api --> queue --> ledger\n```\nRequests enter, wait, and are written down.\n\n## Code map\n- `shop/cli.py`: one job, and it must not reach around the queue.\n- `shop/core.py`: one job, and it must not reach around the queue.\n- `shop/queue.py`: one job, and it must not reach around the queue.\n- `shop/core.py`: one job, and it must not reach around the queue.\n- `shop/db.py`: one job, and it must not reach around the queue.\n- `shop/cli.py`: one job, and it must not reach around the queue.\n\n## Interfaces\n- The command line and the HTTP routes the skeleton lists.\n\n## Data and control flow\nAn event arrives, is queued, and is written to the ledger once.\n\n## Invariants\n- An event is never written twice.\n\n## Extending it\n- A new consumer registers with the queue and nothing else changes.\n\n## Performance and cost\n- The ledger write is the slow step.\n\n## Where to change what\n| To do this | Start in |\n| --- | --- |\n| add a consumer | `shop/cli.py` |\n\n```\n"
+  },
+  {
+   "cmd": [
+    "map",
+    "--install",
+    "map2.md"
+   ],
+   "clock": 19,
+   "rc": 0,
+   "out": "map installed: docs/ARCHITECTURE.council.md (docs/ARCHITECTURE.md was written by hand, so it was left alone)\n",
+   "err": ""
+  },
+  {
+   "put": "<ROOT>/bad-map.md",
+   "text": "# Architecture\n\n> ELI5: a small service that writes each billing event down once.\n\n## Purpose and philosophy\nA small billing service. replay snapshot snapshot shard backoff queue quorum fallback idempotent circuit fallback tenant circuit audit replay schema rollout throttle batch stream stream retries cache rollout shard budget batch replay metric ledger replica latency rollout batch batch retries shard stream rollout canary replica replay audit rollout replica queue metric fallback cache shard schema tenant tenant fallback fallback backoff queue snapshot stream backoff quorum replay tenant canary budget replica stream schema snapshot fallback rollout tenant batch shard snapshot quorum replay ledger queue metric batch backoff metric batch index shard fallback replica quorum canary circuit schema quorum schema tenant schema tenant batch metric cache canary batch snapshot replay queue audit replica shard retries stream rollout retries cache retries backoff quorum schema shard snapshot replica canary rollout ledger circuit budget snapshot fallback queue canary audit quorum replay replay index retries replay budget tenant audit index backoff queue circuit shard audit cache idempotent schema idempotent fallback retries queue circuit retries shard stream rollout quorum fallback cache batch batch latency audit audit batch cache index fallback quorum audit tenant batch budget queue idempotent cache queue replay tenant rollout audit quorum metric rollout shard retries audit budget backoff budget batch audit backoff queue idempotent backoff canary metric replica\n\n## Bird's-eye view\n```mermaid\nflowchart LR\n  api --> queue --> ledger\n```\nRequests enter, wait, and are written down.\n\n## Code map\n- `src/ghost.py`: one job, and it must not reach around the queue.\n- `lib/phantom.py`: one job, and it must not reach around the queue.\n- `core/unicorn.py`: one job, and it must not reach around the queue.\n- `api/nothing.py`: one job, and it must not reach around the queue.\n\n## Interfaces\n- The command line and the HTTP routes the skeleton lists.\n\n## Data and control flow\nAn event arrives, is queued, and is written to the ledger once.\n\n## Invariants\n- An event is never written twice.\n\n## Extending it\n- A new consumer registers with the queue and nothing else changes.\n\n## Performance and cost\n- The ledger write is the slow step.\n\n## Where to change what\n| To do this | Start in |\n| --- | --- |\n| add a consumer | `src/ghost.py` |\n"
+  },
+  {
+   "cmd": [
+    "map",
+    "--install",
+    "bad-map.md"
+   ],
+   "clock": 20,
+   "rc": 1,
+   "out": "error: these paths are named in the map but do not exist: api/nothing.py, core/unicorn.py, lib/phantom.py, src/ghost.py\nnot installed: 1 problem(s)\n",
+   "err": ""
+  }
+ ],
+ "final": {
+  "<ROOT>/.council/map/skeleton.md": {
+   "text": "# Codebase skeleton: proj\n\nMade by `council map` on 2026-11-13. A script wrote this. It lists what is there, not why: trust it for names and counts, and read the code for intent.\n\n20 files, 244 lines; 13 are source code.\n\n## Size\n\n| Language | Files | Lines |\n| --- | ---: | ---: |\n| Markdown | 6 | 122 |\n| Python | 7 | 76 |\n| Go | 1 | 16 |\n| C | 1 | 10 |\n| Rust | 1 | 10 |\n| TypeScript | 2 | 6 |\n| SQL | 1 | 3 |\n| YAML | 1 | 1 |\n\n## Directories\n\n- `./` 5 files, 80 lines (Markdown, YAML)\n- `db/` 1 files, 3 lines (SQL)\n- `docs/` 2 files, 43 lines (Markdown)\n- `native/` 1 files, 10 lines (C)\n- `shop/` 6 files, 63 lines (Python)\n- `svc/` 2 files, 26 lines (Go, Rust)\n- `tests/` 1 files, 13 lines (Python)\n- `web/` 2 files, 6 lines (TypeScript)\n\n## Interfaces found\n\nFound by pattern matching, so the lists can be incomplete: confirm in the code.\n\n- Commands in `shop/cli.py`: bill, refund\n- Environment variables read: `QUEUE_URL`\n- Runnable files (entry points): `native/cart.c`, `shop/core.py`, `svc/server.go`\n\n## Key files, ranked by how much other code leans on them\n\nRanked the way aider's repo map does it: a file scores when other files use the names it defines or import it. Within a file, the names other files use most come first. Symbols read by: built-in readers.\n\n### 1. `shop/queue.py` · Python · 12 lines · imported by 1\n\"The queue of billing events.\"\n- `class BillingQueue` (methods: post_event, drain_events) · used in 1 other file\n\n### 2. `shop/core.py` · Python · 21 lines · imported by 2\n\"Billing: charge an order.\"\n- `bill(order, retries: int=2, dry_run: bool=False)` · used in 2 other files: Charge it.\n\n### 3. `web/total.ts` · TypeScript · 2 lines · imported by 1\n- `export const TAX_RATE`\n- `export function total` · used in 1 other file\n\n### 4. `shop/db.py` · Python · 16 lines · imported by 1\n\"Storage.\"\n- `class Ledger` (methods: post_entry): Every charge, once.\n- `save(order)` · used in 1 other file: Write one order.\n\n### 5. `native/cart.c` · C · 10 lines · imported by 0\n- `int total_items(struct cart *c) {`\n- `int main(void) {` · used in 1 other file\n\n### 6. `shop/cli.py` · Python · 11 lines · imported by 0\n- `main()` · used in 1 other file\n\n### 7. `db/schema.sql` · SQL · 3 lines · imported by 0\n- `CREATE TABLE IF NOT EXISTS orders`\n\n### 8. `shop/__init__.py` · Python · 1 lines · imported by 0\n\"The shop package.\"\n\n### 9. `shop/refunds.py` · Python · 2 lines · imported by 0\n- `refund(order)`\n\n### 10. `svc/lib.rs` · Rust · 10 lines · imported by 0\n- `pub fn total_items`\n- `pub struct OrderBook`\n\n### 11. `svc/server.go` · Go · 16 lines · imported by 0\n- `func Total(`\n- `type Order struct`\n\n### 12. `tests/test_core.py` · Python · 13 lines · imported by 0\n- `test_bill()`\n- `test_total()`\n- `test_refund()`\n\n### 13. `web/cart.ts` · TypeScript · 4 lines · imported by 0\n\"The cart.\"\n- `export class Cart`\n- `export function addItem`\n\n## Who imports whom (inside this repository)\n\n- `shop/cli.py` → `shop/core.py`\n- `shop/core.py` → `shop/db.py`, `shop/queue.py`\n- `tests/test_core.py` → `shop/core.py`\n- `web/cart.ts` → `web/total.ts`\n\n## Outside dependencies (imported names, with the number of files that use them)\n\nfmt (1), std::fs (1)\n\n## Tests\n\n4 test functions in 2 files: `svc/lib.rs` (1), `tests/test_core.py` (3)\n\n## Changed in structure since the last accepted map\n\n- nothing: the structure is as mapped\n"
+  },
+  "<ROOT>/.council/map/state.json": {
+   "json": {
+    "mapped": "2026-11-13",
+    "run": null,
+    "map": "docs/ARCHITECTURE.md",
+    "structure": {
+     "db/schema.sql": "a23cf89396f11895",
+     "native/cart.c": "1f95607ef8f0f35d",
+     "shop/__init__.py": "a2b51f0f3666fe31",
+     "shop/cli.py": "1e0e031d7b17a481",
+     "shop/core.py": "9c51078099557b3e",
+     "shop/db.py": "9050ee5b1ca6effe",
+     "shop/queue.py": "29c2c66820da487f",
+     "shop/refunds.py": "9479041d07f72cf3",
+     "svc/lib.rs": "86ff9dddb841707d",
+     "svc/server.go": "13e7145d5891348a",
+     "tests/test_core.py": "ef742d2ea6faca87",
+     "web/cart.ts": "a6698d98185a7581",
+     "web/total.ts": "8a41b9a3cfabd466"
+    }
+   }
+  },
+  "<ROOT>/README.md": {
+   "as_put": true
+  },
+  "<ROOT>/bad-map.md": {
+   "as_put": true
+  },
+  "<ROOT>/config.yaml": {
+   "as_put": true
+  },
+  "<ROOT>/db/schema.sql": {
+   "as_put": true
+  },
+  "<ROOT>/docs/ARCHITECTURE.council.md": {
+   "text": "<!-- council-loop:map · written by hand (council map --install) on 2026-11-13 · checked against 13 source files · regenerate: council map -->\n# Architecture\n\n> ELI5: a small service that writes each billing event down once.\n\n## Purpose and philosophy\nA small billing service. replay snapshot snapshot shard backoff queue quorum fallback idempotent circuit fallback tenant circuit audit replay schema rollout throttle batch stream stream retries cache rollout shard budget batch replay metric ledger replica latency rollout batch batch retries shard stream rollout canary replica replay audit rollout replica queue metric fallback cache shard schema tenant tenant fallback fallback backoff queue snapshot stream backoff quorum replay tenant canary budget replica stream schema snapshot fallback rollout tenant batch shard snapshot quorum replay ledger queue metric batch backoff metric batch index shard fallback replica quorum canary circuit schema quorum schema tenant schema tenant batch metric cache canary batch snapshot replay queue audit replica shard retries stream rollout retries cache retries backoff quorum schema shard snapshot replica canary rollout ledger circuit budget snapshot fallback queue canary audit quorum replay replay index retries replay budget tenant audit index backoff queue circuit shard audit cache idempotent schema idempotent fallback retries queue circuit retries shard stream rollout quorum fallback cache batch batch latency audit audit batch cache index fallback quorum audit tenant batch budget queue idempotent cache queue replay tenant rollout audit quorum metric rollout shard retries audit budget backoff budget batch audit backoff queue idempotent backoff canary metric replica\n\n## Bird's-eye view\n```mermaid\nflowchart LR\n  api --> queue --> ledger\n```\nRequests enter, wait, and are written down.\n\n## Code map\n- `shop/cli.py`: one job, and it must not reach around the queue.\n- `shop/core.py`: one job, and it must not reach around the queue.\n- `shop/queue.py`: one job, and it must not reach around the queue.\n- `shop/core.py`: one job, and it must not reach around the queue.\n- `shop/db.py`: one job, and it must not reach around the queue.\n- `shop/cli.py`: one job, and it must not reach around the queue.\n\n## Interfaces\n- The command line and the HTTP routes the skeleton lists.\n\n## Data and control flow\nAn event arrives, is queued, and is written to the ledger once.\n\n## Invariants\n- An event is never written twice.\n\n## Extending it\n- A new consumer registers with the queue and nothing else changes.\n\n## Performance and cost\n- The ledger write is the slow step.\n\n## Where to change what\n| To do this | Start in |\n| --- | --- |\n| add a consumer | `shop/cli.py` |\n"
+  },
+  "<ROOT>/docs/ARCHITECTURE.md": {
+   "as_put": true
+  },
+  "<ROOT>/docs/notes.md": {
+   "as_put": true
+  },
+  "<ROOT>/map.md": {
+   "as_put": true
+  },
+  "<ROOT>/map2.md": {
+   "as_put": true
+  },
+  "<ROOT>/native/cart.c": {
+   "as_put": true
+  },
+  "<ROOT>/shop/__init__.py": {
+   "as_put": true
+  },
+  "<ROOT>/shop/cli.py": {
+   "as_put": true
+  },
+  "<ROOT>/shop/core.py": {
+   "as_put": true
+  },
+  "<ROOT>/shop/db.py": {
+   "as_put": true
+  },
+  "<ROOT>/shop/queue.py": {
+   "as_put": true
+  },
+  "<ROOT>/shop/refunds.py": {
+   "as_put": true
+  },
+  "<ROOT>/skel-30.md": {
+   "text": "# Codebase skeleton: proj\n\nMade by `council map` on 2026-11-13. A script wrote this. It lists what is there, not why: trust it for names and counts, and read the code for intent.\n\n16 files, 122 lines; 13 are source code.\n\n## Size\n\n| Language | Files | Lines |\n| --- | ---: | ---: |\n| Python | 6 | 69 |\n| Go | 1 | 16 |\n| C | 2 | 13 |\n| Rust | 1 | 10 |\n| TypeScript | 2 | 6 |\n| Markdown | 2 | 4 |\n| SQL | 1 | 3 |\n| YAML | 1 | 1 |\n\n## Directories\n\n- `./` 2 files, 4 lines (Markdown, YAML)\n- `db/` 1 files, 3 lines (SQL)\n- `docs/` 1 files, 1 lines (Markdown)\n- `native/` 2 files, 13 lines (C)\n- `shop/` 5 files, 60 lines (Python)\n- `svc/` 2 files, 26 lines (Go, Rust)\n- `tests/` 1 files, 9 lines (Python)\n- `web/` 2 files, 6 lines (TypeScript)\n\n\n(cut at 30 lines to save context; run `council map --budget N` for more)\n"
+  },
+  "<ROOT>/svc/lib.rs": {
+   "as_put": true
+  },
+  "<ROOT>/svc/server.go": {
+   "as_put": true
+  },
+  "<ROOT>/tests/test_core.py": {
+   "as_put": true
+  },
+  "<ROOT>/thin.md": {
+   "as_put": true
+  },
+  "<ROOT>/web/cart.ts": {
+   "as_put": true
+  },
+  "<ROOT>/web/total.ts": {
+   "as_put": true
+  }
+ }
+}

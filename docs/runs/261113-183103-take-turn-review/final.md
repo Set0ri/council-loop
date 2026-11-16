@@ -1,6 +1,6 @@
 # Ship the mid-size fix package: five proven defects plus four changes that take work off the chair
 
-> Decided unattended. Logan was not asked at the one judgment point (an elder S1 was open). The safer
+> Decided unattended. The requester was not asked at the one judgment point (an elder S1 was open). The safer
 > option was taken: build the winner with the elder's fix grafted in. Nothing is released yet, so every
 > step can be undone.
 
@@ -69,7 +69,7 @@ lean no-tool path (largest cost lever found, but untestable in this sandbox).
 | Elder S1: a head-to-head nobody could judge counted as even, so a favourite could be cut unseen | S1 | Stake-weighted count plus the guard: such cards stay on the shortlist and go to the elders; a deviation is logged | Chair, this release |
 | Elder S2: the control card was blind-checked too late, and a lost private store dropped it silently | S2 | The control arm is sealed (checked at ingest, hashed, read back from disk) | Chair, this release |
 | Elder S2: retry counts grew with every ingest call | S2 | Rejected outputs are moved aside and counted once each | Chair, this release |
-| The codex and gemini adapters have still never run against the real CLIs | S2 | Not fixed here. A fake CLI on PATH now tests dispatch, parse and retry; the live paths stay labelled untested | Logan (needs the CLIs installed) |
+| The codex and gemini adapters have still never run against the real CLIs | S2 | Not fixed here. A fake CLI on PATH now tests dispatch, parse and retry; the live paths stay labelled untested | the requester (needs the CLIs installed) |
 
 ## Dissent (recorded, not averaged away)
 - No elder preferred another option. The elder's verdict on the winner was "revise", not "ship": it is
@@ -92,7 +92,7 @@ lean no-tool path (largest cost lever found, but untestable in this sandbox).
 - [ ] Build changes 1 to 9 and the three grafts, one test each.
 - [ ] Re-count this run's ballots with the final counter and record the result.
 - [ ] Add the run's measured cost to the docs: 9 agent calls, about 1.27 million tokens.
-- [ ] Logan: install the codex and gemini CLIs once and run `council.py doctor --probe`.
+- [ ] The requester: install the codex and gemini CLIs once and run `council.py doctor --probe`.
 
 ## Run facts
 - GATE tier=lite mode=fanout:claude profile=balanced loops<=1 calls~9 rel_cost=1.86 (chair: stakes=medium)
@@ -100,4 +100,4 @@ lean no-tool path (largest cost lever found, but untestable in this sandbox).
 - Control arm (one-shot baseline, judged blind by the elders): the council's answer was preferred by 1 of 1 elder(s)
 - Seats: CTRL=Claude Fable 5.2 (high); EA=Claude Opus 5.5 (max); L1=Claude Fable 5.2 (low); L2=Claude Opus 5.5 (high); L3=Claude Sonnet 5.5 (xhigh); RT=Claude Opus 5.5 (max)
 - Measured: 9 agent calls, 1,269,206 tokens (ideate 442,477; control 150,811; red team 241,663; rank vote 192,926; elder 241,329). A blind vote costs about 64,000 tokens here, almost all of it start-up overhead.
-- Deviations: (1) the vote counter was replaced before any ballot was cast, after red-team finding 1; (2) the chair opened the elder packet and so saw the blinded control arm before the elder review; no candidate was edited afterwards; (3) an S1 was open at the cut and Logan could not be asked, so the safer option was taken.
+- Deviations: (1) the vote counter was replaced before any ballot was cast, after red-team finding 1; (2) the chair opened the elder packet and so saw the blinded control arm before the elder review; no candidate was edited afterwards; (3) an S1 was open at the cut and the requester could not be asked, so the safer option was taken.

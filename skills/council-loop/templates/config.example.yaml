@@ -4,7 +4,9 @@
 #   <project>/.council/config.yaml    for one project (commit it)
 #   ~/.council/config.yaml            your own defaults on this machine
 # Who wins: a command-line flag, then the project's file, then your own file, then the defaults
-# shown here. The one exception is `memory:` where your own file wins, because a vault path is personal.
+# shown here. One exception: for `memory:` your own file wins, because a vault path is personal, and
+# a project's file may only name a folder inside the project. Two sections at the end belong to one
+# file only.
 # See what is in force, and who set it:  council config
 
 members:
@@ -34,4 +36,21 @@ memory:                      # set with: council memory setup --obsidian --vault
   # vault: /path/to/your/vault         # for obsidian (put this in YOUR file, not the project's)
   # folder: Council Loop/<project>     # folder inside the vault
 
-# tripwires:                 # extra words or path globs that force the Full tier (see reference/protocol.md)
+# --- the project's file only -------------------------------------------------------------------
+# tripwires:                 # a name and a pattern: an ask that matches is raised to the Full tier
+#   billing: "\\bbilling\\b|\\binvoices?\\b"       # letter case is ignored; no look-around, no back-references, 200 characters at most
+# tripwire_paths:            # a name and globs: touching such a file (--paths) raises the tier too
+#   billing: ["billing/*", "*/ledger/*"]
+
+# --- your own file only (~/.council/config.yaml) ------------------------------------------------
+# A project's file cannot set these: what a run costs and what a server offers are yours to decide.
+# defaults:
+#   profile: efficient       # efficient (the default, cheapest) | balanced | max
+#   mode: fanout:claude      # default: the cheapest mode this machine can reach (council doctor shows it)
+# mcp:                       # the MCP server (council mcp); a flag or a COUNCIL_MCP_* variable beats these
+#   project: /path/to/project   # serve this one project and refuse others
+#   read_only: false         # true: offer only the operations that change nothing
+#   dispatch: true           # false: never offer an operation that sends prompts to model vendors
+#   toolsets: [run, memory, map]   # groups of tools: run, memory, map, blocks, or all
+#   deny_tools: []           # operations never to offer, e.g. [memory_setup]
+#   output_schemas: false    # true: list every tool's output schema too (a larger tool list)

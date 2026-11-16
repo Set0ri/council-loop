@@ -1,0 +1,1091 @@
+{
+ "name": "refresh",
+ "about": "Model picks from model data: the lock file both write must be the same file, byte for byte.",
+ "needs": [],
+ "steps": [
+  {
+   "copy_skill": "<BASE>/skill"
+  },
+  {
+   "mkdir": "<ROOT>"
+  },
+  {
+   "cmd": [
+    "refresh",
+    "--check"
+   ],
+   "clock": 1,
+   "rc": 0,
+   "out": "model data is 0 days old (limit 30)\n",
+   "err": "",
+   "env": {
+    "COUNCIL_SKILL_DIR": "<BASE>/skill"
+   }
+  },
+  {
+   "cmd": [
+    "refresh",
+    "--check"
+   ],
+   "clock": 2,
+   "rc": 1,
+   "out": "model data is 68 days old (limit 30)\n",
+   "err": "",
+   "env": {
+    "COUNCIL_SKILL_DIR": "<BASE>/skill",
+    "COUNCIL_NOW": "2027-01-20T08:00:00"
+   }
+  },
+  {
+   "cmd": [
+    "doctor"
+   ],
+   "clock": 3,
+   "rc": 0,
+   "out": "recommended mode: fanout:claude · fresh contexts via: subagents\nnote: only one lab reachable: elders come from the same family (no cross-lab check). Install the codex / gemini CLIs or set OPENROUTER_API_KEY to get one\nnote: model data is 68 days old: run `council refresh`\n{\n \"claude_code\": true,\n \"cli\": {\n  \"claude\": true,\n  \"codex\": false,\n  \"gemini\": false\n },\n \"git\": true,\n \"openrouter_key\": false,\n \"aa_key\": false,\n \"labs_reachable\": {\n  \"Anthropic\": true,\n  \"OpenAI\": false,\n  \"Google\": false\n },\n \"fresh_contexts\": \"subagents\",\n \"lock\": {\n  \"exists\": true,\n  \"age_days\": 68,\n  \"stale\": true,\n  \"collected\": \"2026-11-13\"\n },\n \"recommended_mode\": \"fanout:claude\",\n \"strongest_mode\": \"fanout:claude\",\n \"mode_costs\": {\n  \"fanout:claude\": 0.66\n },\n \"notes\": [\n  \"only one lab reachable: elders come from the same family (no cross-lab check). Install the codex / gemini CLIs or set OPENROUTER_API_KEY to get one\",\n  \"model data is 68 days old: run `council refresh`\"\n ],\n \"memory\": {\n  \"backend\": \"files\",\n  \"dir\": \"<ROOT>/.council/memory\",\n  \"source\": \"default\",\n  \"ok\": true\n }\n}\n",
+   "err": "",
+   "env": {
+    "COUNCIL_SKILL_DIR": "<BASE>/skill",
+    "COUNCIL_NOW": "2027-01-20T08:00:00"
+   }
+  },
+  {
+   "cmd": [
+    "refresh",
+    "--offline",
+    "<BASE>/skill/models/snapshot-2026-11-13.json",
+    "--out",
+    "<ROOT>/lock.yaml",
+    "--table",
+    "max"
+   ],
+   "clock": 4,
+   "rc": 0,
+   "out": "wrote <ROOT>/lock.yaml (120 picks, 120 changed)\nwarning: fanout:openrouter: OpenRouter availability unknown in this snapshot; using all usable models. Run a live refresh to filter by openrouter_api_id.\n| Mode | Chair | Experts (7 seats) | Red team | Elders | Rel. cost |\n| --- | --- | --- | --- | --- | --- |\n| fanout:claude | Claude Fable 5.2 (max) | 6x Claude Fable 5.2 (high) + 1x Claude Opus 5.5 (max) | Claude Opus 5.5 (max) | Claude Fable 5.2 (max), Claude Opus 5.5 (max), Claude Sonnet 5.5 (max) | 4.48 |\n| fanout:openai | GPT-6 Astra (max) | 5x GPT-6.1 Sol (max) + 1x GPT-6 Astra (high) + 1x GPT-6.1 Terra (max) | GPT-6.1 Sol (max) | GPT-6 Astra (max), GPT-6.1 Sol (max), GPT-6.1 Terra (max) | 0.8 |\n| fanout:gemini | Gemini 4 Argon (high) | 7x Gemini 4 Argon (high) | Gemini 4 Argon (high) | Gemini 4 Argon (high), Gemini 4 Argon (high), Gemini 4 Argon (high) | 1.96 |\n| fanout:open | Kimi K3.1 Pro | 7x Kimi K3.1 Pro | Kimi K3.1 Pro | Kimi K3.1 Pro, Kimi K3.1 Pro, Kimi K3.1 Pro | 1.45 |\n| fanout:openrouter | Claude Fable 5.2 (max) | 6x Claude Fable 5.2 (high) + 1x GPT-6 Astra (max) | GPT-6 Astra (max) | Claude Fable 5.2 (max), Claude Opus 5.5 (max), GPT-6 Astra (max) | 4.19 |\n| fanout:mix | Claude Fable 5.2 (max) | 6x Claude Fable 5.2 (high) + 1x GPT-6 Astra (max) | GPT-6 Astra (max) | Claude Fable 5.2 (max), Claude Opus 5.5 (max), GPT-6 Astra (max) | 4.19 |\n| crosslab | Claude Fable 5.2 (max) | 6x Claude Fable 5.2 (high) + 1x GPT-6 Astra (max) | GPT-6 Astra (max) | Claude Fable 5.2 (max), GPT-6 Astra (max), Gemini 4 Argon (high) | 4.14 |\n| solo | current model @ max | current model @ high | current model @ high | current model @ max | n/a |\n",
+   "err": "",
+   "env": {
+    "COUNCIL_SKILL_DIR": "<BASE>/skill"
+   }
+  },
+  {
+   "cmd": [
+    "refresh",
+    "--offline",
+    "<BASE>/skill/models/snapshot-2026-11-13.json",
+    "--table",
+    "efficient"
+   ],
+   "clock": 5,
+   "rc": 0,
+   "out": "wrote <BASE>/skill/models/lock.yaml (120 picks, 0 changed)\nwarning: fanout:openrouter: OpenRouter availability unknown in this snapshot; using all usable models. Run a live refresh to filter by openrouter_api_id.\n| Mode | Chair | Experts (7 seats) | Red team | Elders | Rel. cost |\n| --- | --- | --- | --- | --- | --- |\n| fanout:claude | Claude Fable 5.2 (low) | 6x Claude Haiku 5.5 (xhigh) + 1x Claude Fable 5.2 (low) | Claude Opus 5.5 (xhigh) | Claude Fable 5.2 (medium), Claude Opus 5.5 (xhigh), Claude Sonnet 5.5 (max) | 0.66 |\n| fanout:openai | GPT-6.1 Sol (medium) | 5x GPT-6.1 Terra (low) + 1x GPT-6.1 Sol (medium) + 1x GPT-6 Luna (max) | GPT-6.1 Terra (high) | GPT-6.1 Sol (medium), GPT-6.1 Terra (max), GPT-6 Astra (high) | 0.11 |\n| fanout:gemini | Gemini 4 Argon (high) | 7x Gemini 4 Argon (high) | Gemini 4 Argon (high) | Gemini 4 Argon (high), Gemini 4 Argon (high), Gemini 4 Argon (high) | 1.96 |\n| fanout:open | Kimi K3.1 Pro | 6x DeepSeek V4.1 Flash 1017 (max) + 1x Kimi K3.1 Pro | DeepSeek V4.1 Flash 1017 (max) | Kimi K3.1 Pro, Kimi K3.1 Pro, Kimi K3.1 Pro | 0.58 |\n| fanout:openrouter | GPT-6.1 Sol (xhigh) | 6x GPT-6.1 Terra (medium) + 1x Claude Haiku 5.5 (xhigh) | Claude Fable 5.2 (medium) | GPT-6.1 Sol (xhigh), GPT-6 Astra (high), Claude Fable 5.2 (medium) | 0.25 |\n| fanout:mix | GPT-6.1 Sol (xhigh) | 6x GPT-6.1 Terra (medium) + 1x Claude Haiku 5.5 (xhigh) | Claude Fable 5.2 (medium) | GPT-6.1 Sol (xhigh), GPT-6 Astra (high), Claude Fable 5.2 (medium) | 0.25 |\n| crosslab | GPT-6.1 Sol (xhigh) | 5x GPT-6.1 Terra (medium) + 1x Claude Haiku 5.5 (xhigh) + 1x Gemini 4 Argon (high) | Claude Fable 5.2 (medium) | Claude Fable 5.2 (low), GPT-6.1 Sol (medium), Gemini 4 Argon (high) | 0.46 |\n| solo | current model @ medium | current model @ low | current model @ medium | current model @ medium | n/a |\n",
+   "err": "",
+   "env": {
+    "COUNCIL_SKILL_DIR": "<BASE>/skill"
+   }
+  },
+  {
+   "cmd": [
+    "refresh",
+    "--offline",
+    "<ROOT>/missing.json"
+   ],
+   "clock": 6,
+   "rc": 1,
+   "out": "",
+   "err": "",
+   "env": {
+    "COUNCIL_SKILL_DIR": "<BASE>/skill"
+   },
+   "loose": true
+  },
+  {
+   "cmd": [
+    "refresh"
+   ],
+   "clock": 7,
+   "rc": 1,
+   "out": "",
+   "err": "Set AA_API_KEY (free key from artificialanalysis.ai) or pass --offline SNAPSHOT.json\n",
+   "env": {
+    "COUNCIL_SKILL_DIR": "<BASE>/skill"
+   }
+  },
+  {
+   "put": "<BASE>/skill/models/policy.yaml",
+   "text": "version: 1\ndata:\n  provider: artificial_analysis\n  api_url: https://artificialanalysis.ai/api/v2/language/models\n  quality: intelligence_index\n  cost: cost_per_task\n  stale_after_days: 30\nprofiles:\n  max:\n    chair:\n      k: 0\n    experts:\n      k: 2\n      floor: 0.85\n      diversity_seats: 2\n      diversity_margin: 12\n    red_team:\n      k: 0\n      other_family: true\n      floor: 0.8\n    elders:\n      k: 0\n      floor: 0.8\n    verifier:\n      k: 2\n      max_minutes: 5\n      min_quality: 30\n  balanced:\n    chair:\n      k: 2\n    experts:\n      k: 6\n      floor: 0.75\n      diversity_seats: 2\n      diversity_margin: 12\n    red_team:\n      k: 2\n      other_family: true\n      floor: 0.75\n    elders:\n      k: 2\n      floor: 0.8\n    verifier:\n      k: 6\n      max_minutes: 5\n      min_quality: 30\n  efficient:\n    chair:\n      k: 6\n      floor_vs_best: 0.8\n    experts:\n      k: 8\n      floor: 0.6\n      diversity_seats: 2\n      diversity_margin: 12\n    red_team:\n      k: 5\n      other_family: true\n      floor: 0.7\n    elders:\n      k: 6\n      floor: 0.8\n    verifier:\n      k: 10\n      max_minutes: 5\n      min_quality: 30\ntie_break:\n  within_points: 0.5\n  prefer: faster\nsolo_efforts:\n  max:\n    chair: max\n    experts: high\n    red_team: high\n    elders: max\n    verifier: medium\n  balanced:\n    chair: high\n    experts: medium\n    red_team: high\n    elders: high\n    verifier: low\n  efficient:\n    chair: medium\n    experts: low\n    red_team: medium\n    elders: medium\n    verifier: low\nfamilies:\n  claude:\n    creators:\n    - Anthropic\n  openai:\n    creators:\n    - OpenAI\n  gemini:\n    creators:\n    - Google\n  open:\n    open_weights_only: true\n  openrouter:\n    requires: openrouter_id\n  mix:\n    creators: any\nmodes:\n  solo: One model plays every role. Elders are fresh contexts of that model (no cross-lab\n    check).\n  fanout: Strong chair + cheaper workhorse experts, limited to one family. Elders\n    come from the same family.\n  crosslab: Experts from the mix family with one seat per lab that clears the quality\n    floor; elders are one flagship each from Anthropic, OpenAI and Google.\ncrosslab_labs:\n- Anthropic\n- OpenAI\n- Google\ncost_model:\n  loops: 3\n  expert_passes_per_loop: 2.0\n  red_team_passes_per_loop: 1.0\n  elder_passes_per_loop: 0.5\n  chair_passes_per_loop: 1.0\n  final_chair_passes: 2.0\nmeasured_tokens_per_call:\n  source: 'run 261113-183103-take-turn-review (13 Nov 2026): 9 seat calls, 1,269,206\n    tokens'\n  ideate: 150000\n  control: 150000\n  vote: 64000\n  rank: 64000\n  redteam: 240000\n  elders: 64000\n  elders_verify: 240000\nassumed_tokens_per_call:\n  research: 200000\n  map: 150000\naccess:\n  Gemini 4 Carbon:\n    has_access: false\nnative_ids:\n  Claude Fable 5.2: claude-fable-5-2\n  Claude Opus 5.5: claude-opus-5-5\n  GPT-6.1 Sol: gpt-6.1-sol\n  Gemini 4 Argon: gemini-4-argon\npins:\n  balanced/crosslab/chair: Claude Haiku 5.5 (low)\n  max/fanout:claude/elders: Claude Fable 5.2 (xhigh)\n  max/crosslab/elders/Google: Gemini 3.5 Flash-Lite\n  max/crosslab/experts/Claude: Claude Fable 5.2 (high)\n  max/nowhere/chair: Claude Fable 5.2 (max)\n  balanced/crosslab/red_team: No Such Model\nbans:\n- GPT-6 Astra\n"
+  },
+  {
+   "cmd": [
+    "refresh",
+    "--offline",
+    "<BASE>/skill/models/snapshot-2026-11-13.json",
+    "--table",
+    "balanced"
+   ],
+   "clock": 8,
+   "rc": 0,
+   "out": "wrote <BASE>/skill/models/lock.yaml (120 picks, 21 changed)\nchanges since last lock:\n  balanced/crosslab/chair: Claude Fable 5.2 (high) -> Claude Haiku 5.5 (low)\n  balanced/fanout:openai/elders: GPT-6 Astra (max), GPT-6.1 Sol (max), GPT-6.1 Terra (max) -> GPT-6.1 Sol (max), GPT-6.1 Terra (max)\n  balanced/fanout:openai/experts: GPT-6 Astra (high), GPT-6.1 Sol (medium), GPT-6.1 Terra (high) -> GPT-6.1 Sol (medium), GPT-6.1 Terra (high)\n  balanced/fanout:openai/red_team: GPT-6 Astra (high) -> GPT-6.1 Terra (max)\n  efficient/fanout:mix/elders: Claude Fable 5.2 (medium), GPT-6 Astra (high), GPT-6.1 Sol (xhigh) -> Claude Fable 5.2 (medium), Claude Opus 5.5 (xhigh), GPT-6.1 Sol (xhigh)\n  efficient/fanout:openai/elders: GPT-6 Astra (high), GPT-6.1 Sol (medium), GPT-6.1 Terra (max) -> GPT-6.1 Sol (medium), GPT-6.1 Terra (xhigh)\n  efficient/fanout:openrouter/elders: Claude Fable 5.2 (medium), GPT-6 Astra (high), GPT-6.1 Sol (xhigh) -> Claude Fable 5.2 (medium), Claude Opus 5.5 (xhigh), GPT-6.1 Sol (xhigh)\n  max/crosslab/elders: Claude Fable 5.2 (max), GPT-6 Astra (max), Gemini 4 Argon (high) -> Claude Fable 5.2 (max), GPT-6.1 Sol (max), Gemini 3.5 Flash-Lite\n  max/crosslab/experts: Claude Fable 5.2 (high), GPT-6 Astra (max) -> Claude Fable 5.2 (high)\n  max/crosslab/red_team: GPT-6 Astra (max) -> GPT-6.1 Sol (max)\n  max/fanout:claude/elders: Claude Fable 5.2 (max), Claude Opus 5.5 (max), Claude Sonnet 5.5 (max) -> Claude Fable 5.2 (xhigh)\n  max/fanout:mix/elders: Claude Fable 5.2 (max), Claude Opus 5.5 (max), GPT-6 Astra (max) -> Claude Fable 5.2 (max), Claude Opus 5.5 (max), Claude Sonnet 5.5 (max)\n  max/fanout:mix/experts: Claude Fable 5.2 (high), GPT-6 Astra (max) -> Claude Fable 5.2 (high), Claude Opus 5.5 (max)\n  max/fanout:mix/red_team: GPT-6 Astra (max) -> GPT-6.1 Sol (max)\n  max/fanout:openai/chair: GPT-6 Astra (max) -> GPT-6.1 Sol (max)\n  max/fanout:openai/elders: GPT-6 Astra (max), GPT-6.1 Sol (max), GPT-6.1 Terra (max) -> GPT-6.1 Sol (max), GPT-6.1 Terra (max)\n  max/fanout:openai/experts: GPT-6 Astra (high), GPT-6.1 Sol (max), GPT-6.1 Terra (max) -> GPT-6.1 Sol (max), GPT-6.1 Terra (max)\n  max/fanout:openai/red_team: GPT-6.1 Sol (max) -> GPT-6.1 Terra (max)\n  max/fanout:openrouter/elders: Claude Fable 5.2 (max), Claude Opus 5.5 (max), GPT-6 Astra (max) -> Claude Fable 5.2 (max), Claude Opus 5.5 (max), Claude Sonnet 5.5 (max)\n  max/fanout:openrouter/experts: Claude Fable 5.2 (high), GPT-6 Astra (max) -> Claude Fable 5.2 (high), Claude Opus 5.5 (max)\n  max/fanout:openrouter/red_team: GPT-6 Astra (max) -> GPT-6.1 Sol (max)\nwarning: fanout:openrouter: OpenRouter availability unknown in this snapshot; using all usable models. Run a live refresh to filter by openrouter_api_id.\n| Mode | Chair | Experts (7 seats) | Red team | Elders | Rel. cost |\n| --- | --- | --- | --- | --- | --- |\n| fanout:claude | Claude Fable 5.2 (high) | 5x Claude Fable 5.2 (low) + 1x Claude Opus 5.5 (high) + 1x Claude Sonnet 5.5 (xhigh) | Claude Opus 5.5 (max) | Claude Fable 5.2 (high), Claude Opus 5.5 (max), Claude Sonnet 5.5 (max) | 1.86 |\n| fanout:openai | GPT-6.1 Sol (max) | 6x GPT-6.1 Sol (medium) + 1x GPT-6.1 Terra (high) | GPT-6.1 Terra (max) | GPT-6.1 Sol (max), GPT-6.1 Terra (max), GPT-6.1 Sol (max) | 0.21 |\n| fanout:gemini | Gemini 4 Argon (high) | 7x Gemini 4 Argon (high) | Gemini 4 Argon (high) | Gemini 4 Argon (high), Gemini 4 Argon (high), Gemini 4 Argon (high) | 1.96 |\n| fanout:open | Kimi K3.1 Pro | 7x Kimi K3.1 Pro | Kimi K3.1 Pro | Kimi K3.1 Pro, Kimi K3.1 Pro, Kimi K3.1 Pro | 1.45 |\n| fanout:openrouter | Claude Fable 5.2 (high) | 6x GPT-6.1 Sol (high) + 1x Claude Fable 5.2 (low) | GPT-6.1 Sol (max) | Claude Fable 5.2 (high), GPT-6.1 Sol (max), Claude Opus 5.5 (max) | 0.86 |\n| fanout:mix | Claude Fable 5.2 (high) | 6x GPT-6.1 Sol (high) + 1x Claude Fable 5.2 (low) | GPT-6.1 Sol (max) | Claude Fable 5.2 (high), GPT-6.1 Sol (max), Claude Opus 5.5 (max) | 0.86 |\n| crosslab | Claude Haiku 5.5 (low) | 5x GPT-6.1 Sol (high) + 1x Claude Fable 5.2 (low) + 1x Gemini 4 Argon (high) | GPT-6.1 Sol (max) | Claude Fable 5.2 (high), GPT-6.1 Sol (max), Gemini 4 Argon (high) | 1.0 |\n| solo | current model @ high | current model @ medium | current model @ high | current model @ high | n/a |\n",
+   "err": "warning: pin max/nowhere/chair -> Claude Fable 5.2 (max) not applied\nwarning: pin balanced/crosslab/red_team -> No Such Model not applied\n",
+   "env": {
+    "COUNCIL_SKILL_DIR": "<BASE>/skill"
+   }
+  },
+  {
+   "cmd": [
+    "models",
+    "--mode",
+    "crosslab"
+   ],
+   "clock": 9,
+   "rc": 0,
+   "out": "{\n \"mode\": \"crosslab\",\n \"profile\": \"efficient\",\n \"data_collected\": \"2026-11-13\",\n \"attribution\": \"Model data: Artificial Analysis (https://artificialanalysis.ai)\",\n \"warnings\": [\n  \"fanout:openrouter: OpenRouter availability unknown in this snapshot; using all usable models. Run a live refresh to filter by openrouter_api_id.\"\n ],\n \"chair\": {\n  \"model\": \"GPT-6.1 Sol (xhigh)\",\n  \"creator\": \"OpenAI\",\n  \"quality\": 52,\n  \"cost_per_task\": 0.76\n },\n \"experts\": [\n  {\n   \"model\": \"GPT-6.1 Terra (medium)\",\n   \"creator\": \"OpenAI\",\n   \"quality\": 38,\n   \"cost_per_task\": 0.17\n  },\n  {\n   \"model\": \"GPT-6.1 Terra (medium)\",\n   \"creator\": \"OpenAI\",\n   \"quality\": 38,\n   \"cost_per_task\": 0.17\n  },\n  {\n   \"model\": \"GPT-6.1 Terra (medium)\",\n   \"creator\": \"OpenAI\",\n   \"quality\": 38,\n   \"cost_per_task\": 0.17\n  },\n  {\n   \"model\": \"GPT-6.1 Terra (medium)\",\n   \"creator\": \"OpenAI\",\n   \"quality\": 38,\n   \"cost_per_task\": 0.17\n  },\n  {\n   \"model\": \"GPT-6.1 Terra (medium)\",\n   \"creator\": \"OpenAI\",\n   \"quality\": 38,\n   \"cost_per_task\": 0.17\n  },\n  {\n   \"model\": \"Claude Haiku 5.5 (xhigh)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 35,\n   \"cost_per_task\": 0.25\n  },\n  {\n   \"model\": \"Gemini 4 Argon (high)\",\n   \"creator\": \"Google\",\n   \"quality\": 50,\n   \"cost_per_task\": 4.97\n  }\n ],\n \"red_team\": {\n  \"model\": \"Claude Fable 5.2 (medium)\",\n  \"creator\": \"Anthropic\",\n  \"quality\": 56,\n  \"cost_per_task\": 3.8\n },\n \"elders\": [\n  {\n   \"model\": \"Claude Fable 5.2 (low)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 54,\n   \"cost_per_task\": 3.1\n  },\n  {\n   \"model\": \"GPT-6.1 Sol (medium)\",\n   \"creator\": \"OpenAI\",\n   \"quality\": 46,\n   \"cost_per_task\": 0.36\n  },\n  {\n   \"model\": \"Gemini 4 Argon (high)\",\n   \"creator\": \"Google\",\n   \"quality\": 50,\n   \"cost_per_task\": 4.97\n  }\n ],\n \"verifier\": {\n  \"model\": \"GPT-6.1 Terra (medium)\",\n  \"creator\": \"OpenAI\",\n  \"quality\": 38,\n  \"cost_per_task\": 0.17\n },\n \"relative_cost\": 0.46\n}\n",
+   "err": "",
+   "env": {
+    "COUNCIL_SKILL_DIR": "<BASE>/skill"
+   }
+  },
+  {
+   "cmd": [
+    "plan",
+    "Pick the queue technology for the billing pipeline",
+    "--tier",
+    "lite"
+   ],
+   "clock": 10,
+   "rc": 0,
+   "out": "GATE tier=lite mode=fanout:claude profile=efficient loops<=1 calls~11 tokens~1.7M rel_cost=0.66 (explicit)\nMEMBERS researchers=2 (papers and primary research; practice in the field; about 10 searches each) mapper=not needed (no source code found in this project) memory=files:.council/memory\n{\n \"tier\": \"lite\",\n \"reason\": \"explicit\",\n \"tripwires\": [],\n \"mode\": \"fanout:claude\",\n \"profile\": \"efficient\",\n \"chosen_by\": {\n  \"mode\": \"default\",\n  \"profile\": \"default\"\n },\n \"shape\": {\n  \"experts\": 3,\n  \"ideas_min\": 5,\n  \"keep\": 2,\n  \"elders\": 1,\n  \"start\": 3,\n  \"loops\": 1,\n  \"rubric\": [\n   3,\n   7\n  ],\n  \"schedule\": [\n   3,\n   1\n  ]\n },\n \"calls_estimate\": 11,\n \"tokens_estimate\": 1672000,\n \"models\": {\n  \"mode\": \"fanout:claude\",\n  \"profile\": \"efficient\",\n  \"data_collected\": \"2026-11-13\",\n  \"attribution\": \"Model data: Artificial Analysis (https://artificialanalysis.ai)\",\n  \"warnings\": [\n   \"fanout:openrouter: OpenRouter availability unknown in this snapshot; using all usable models. Run a live refresh to filter by openrouter_api_id.\"\n  ],\n  \"chair\": {\n   \"model\": \"Claude Fable 5.2 (low)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 54,\n   \"cost_per_task\": 3.1\n  },\n  \"experts\": [\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Haiku 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 35,\n    \"cost_per_task\": 0.25\n   },\n   {\n    \"model\": \"Claude Fable 5.2 (low)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 54,\n    \"cost_per_task\": 3.1\n   }\n  ],\n  \"red_team\": {\n   \"model\": \"Claude Opus 5.5 (xhigh)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 57,\n   \"cost_per_task\": 6.05\n  },\n  \"elders\": [\n   {\n    \"model\": \"Claude Fable 5.2 (medium)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 56,\n    \"cost_per_task\": 3.8\n   },\n   {\n    \"model\": \"Claude Opus 5.5 (xhigh)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 57,\n    \"cost_per_task\": 6.05\n   },\n   {\n    \"model\": \"Claude Sonnet 5.5 (max)\",\n    \"creator\": \"Anthropic\",\n    \"quality\": 55,\n    \"cost_per_task\": 10.02\n   }\n  ],\n  \"verifier\": {\n   \"model\": \"Claude Opus 5.5 (low)\",\n   \"creator\": \"Anthropic\",\n   \"quality\": 35,\n   \"cost_per_task\": 0.98\n  },\n  \"relative_cost\": 0.66\n },\n \"support\": {\n  \"research\": {\n   \"budget\": {\n    \"lite\": 10,\n    \"full\": 15\n   },\n   \"seats\": 2,\n   \"later_loops\": \"on_request\",\n   \"model\": \"auto\",\n   \"beats\": []\n  },\n  \"map\": {\n   \"when\": \"stale\",\n   \"model\": \"chair\",\n   \"focus_tokens\": 700,\n   \"skeleton_lines\": 420,\n   \"path\": \"\",\n   \"due\": false,\n   \"reason\": \"no source code found in this project\"\n  },\n  \"digest\": 14,\n  \"origin\": {\n   \"research.seats\": \"default\",\n   \"research.budget.lite\": \"default\",\n   \"research.budget.full\": \"default\",\n   \"research.later_loops\": \"default\",\n   \"research.model\": \"default\",\n   \"research.beats\": \"default\",\n   \"map.when\": \"default\",\n   \"map.model\": \"default\",\n   \"map.focus_tokens\": \"default\",\n   \"map.skeleton_lines\": \"default\",\n   \"map.path\": \"default\",\n   \"digest\": \"default\"\n  },\n  \"problems\": []\n },\n \"environment_notes\": [\n  \"only one lab reachable: elders come from the same family (no cross-lab check). Install the codex / gemini CLIs or set OPENROUTER_API_KEY to get one\",\n  \"mode=fanout:claude and profile=efficient are the cheapest that work here (the default). More rigour costs more: --profile balanced or max. Keep a choice: `defaults:` in your ~/.council/config.yaml\"\n ]\n}\n",
+   "err": "",
+   "env": {
+    "COUNCIL_SKILL_DIR": "<BASE>/skill"
+   }
+  },
+  {
+   "put": "<ROOT>/gaps.json",
+   "text": "{\"source\": \"Artificial Analysis (https://artificialanalysis.ai) - attribution required\", \"pages\": [\"https://artificialanalysis.ai/leaderboards/models/\", \"https://artificialanalysis.ai/models/open-source\", \"https://artificialanalysis.ai/models/comparisons/claude-haiku-5-5-medium-vs-gemini-3-8-flash-medium\"], \"collected\": \"2026-11-13\", \"index\": \"Artificial Analysis Intelligence Index v5.0.1 (0-100)\", \"cost_metric\": \"AA cost per task, USD (accounts for how many tokens a model actually spends)\", \"notes\": [\"Hand-copied snapshot for offline use and tests. Run refresh_models.py with AA_API_KEY for live data.\", \"Gemini 4 Carbon is limited to Google's Fairwind Program (no public model ID): marked restricted.\", \"Gemini 4 Argon intro pricing ($2/$10 per 1M) ends 2026-11-30; cost per task will rise after that.\", \"openrouter_id is unknown offline (null). Live AA data fills it from openrouter_api_id.\"], \"models\": [{\"name\": \"Claude Fable 5.2 (max)\", \"creator\": \"Anthropic\", \"quality\": 65, \"cost_per_task\": 26.54, \"minutes\": 46.1, \"restricted\": true}, {\"name\": \"Claude Fable 5.2 (xhigh)\", \"creator\": \"Anthropic\", \"quality\": 62, \"cost_per_task\": null, \"minutes\": 27.5}, {\"name\": \"Claude Fable 5.2 (high)\", \"creator\": \"Anthropic\", \"quality\": null, \"cost_per_task\": 9.08, \"minutes\": 16.7}, {\"name\": \"Claude Fable 5.2 (medium)\", \"creator\": \"Anthropic\", \"quality\": 56, \"cost_per_task\": 0, \"minutes\": 8.0}, {\"name\": \"Claude Fable 5.2 (low)\", \"creator\": \"Anthropic\", \"quality\": 54, \"cost_per_task\": 3.1, \"minutes\": 6.0, \"open_weights\": true}, {\"name\": \"Claude Opus 5.5 (max)\", \"creator\": \"Anthropic\", \"quality\": 59, \"cost_per_task\": 10.04, \"minutes\": 25.1, \"openrouter_id\": \"lab/claude-opus-5.5-(max)\"}, {\"name\": \"Claude Opus 5.5 (xhigh)\", \"creator\": \"Anthropic\", \"quality\": 57, \"cost_per_task\": 6.05, \"minutes\": 16.0}, {\"name\": \"Claude Opus 5.5 (high)\", \"creator\": \"Anthropic\", \"quality\": 52, \"cost_per_task\": 3.46, \"minutes\": 9.5, \"openrouter_id\": \"lab/claude-opus-5.5-(high)\"}, {\"name\": \"Claude Opus 5.5 (medium)\", \"creator\": \"Anthropic\", \"quality\": 48, \"cost_per_task\": 2.45, \"minutes\": 7.1}, {\"name\": \"Claude Opus 5.5 (low)\", \"creator\": \"Anthropic\", \"quality\": 35, \"cost_per_task\": 0.98, \"minutes\": 3.0, \"openrouter_id\": \"lab/claude-opus-5.5-(low)\", \"open_weights\": true}, {\"name\": \"Claude Sonnet 5.5 (max)\", \"creator\": \"Anthropic\", \"quality\": 55, \"cost_per_task\": 10.02, \"minutes\": 34.0}, {\"name\": \"Claude Sonnet 5.5 (xhigh)\", \"creator\": \"Anthropic\", \"quality\": 50, \"cost_per_task\": 4.09, \"minutes\": 14.6, \"openrouter_id\": \"lab/claude-sonnet-5.5-(xhigh)\"}, {\"name\": \"Claude Sonnet 5.5 (high)\", \"creator\": \"Anthropic\", \"quality\": 42, \"cost_per_task\": 1.64, \"minutes\": 6.8}, {\"name\": \"Claude Sonnet 5.5 (medium)\", \"creator\": \"Anthropic\", \"quality\": 31, \"cost_per_task\": 0.78, \"minutes\": 4.0, \"openrouter_id\": \"lab/claude-sonnet-5.5-(medium)\"}, {\"name\": \"Claude Sonnet 5.5 (low)\", \"creator\": \"Anthropic\", \"quality\": 26, \"cost_per_task\": 0.51, \"minutes\": 2.5, \"open_weights\": true}, {\"name\": \"Claude Haiku 5.5 (max)\", \"creator\": \"Anthropic\", \"quality\": 36, \"cost_per_task\": 0.41, \"minutes\": 14.8, \"openrouter_id\": \"lab/claude-haiku-5.5-(max)\"}, {\"name\": \"Claude Haiku 5.5 (xhigh)\", \"creator\": \"Anthropic\", \"quality\": 35, \"cost_per_task\": 0.25, \"minutes\": 9.8}, {\"name\": \"Claude Haiku 5.5 (high)\", \"creator\": \"Anthropic\", \"quality\": 30, \"cost_per_task\": 0.16, \"minutes\": 6.5, \"openrouter_id\": \"lab/claude-haiku-5.5-(high)\"}, {\"name\": \"Claude Haiku 5.5 (medium)\", \"creator\": \"Anthropic\", \"quality\": 25, \"cost_per_task\": 0.0918, \"minutes\": 4.1}, {\"name\": \"Claude Haiku 5.5 (low)\", \"creator\": \"Anthropic\", \"quality\": 19, \"cost_per_task\": 0.0438, \"minutes\": 2.2, \"openrouter_id\": \"lab/claude-haiku-5.5-(low)\", \"open_weights\": true}, {\"name\": \"GPT-6 Astra (max)\", \"creator\": \"OpenAI\", \"quality\": 57, \"cost_per_task\": 6.24, \"minutes\": 23.8}, {\"name\": \"GPT-6 Astra (xhigh)\", \"creator\": \"OpenAI\", \"quality\": 55, \"cost_per_task\": 3.66, \"minutes\": 12.1, \"openrouter_id\": \"lab/gpt-6-astra-(xhigh)\"}, {\"name\": \"GPT-6 Astra (high)\", \"creator\": \"OpenAI\", \"quality\": 55, \"cost_per_task\": 3.24, \"minutes\": 9.7}, {\"name\": \"GPT-6 Astra (medium)\", \"creator\": \"OpenAI\", \"quality\": 52, \"cost_per_task\": 2.73, \"minutes\": 7.5, \"openrouter_id\": \"lab/gpt-6-astra-(medium)\"}, {\"name\": \"GPT-6 Astra (low)\", \"creator\": \"OpenAI\", \"quality\": 43, \"cost_per_task\": 1.42, \"minutes\": 4.0, \"open_weights\": true}, {\"name\": \"GPT-6.1 Sol (max)\", \"creator\": \"OpenAI\", \"quality\": 55, \"cost_per_task\": 1.27, \"minutes\": 23.2, \"openrouter_id\": \"lab/gpt-6.1-sol-(max)\"}, {\"name\": \"GPT-6.1 Sol (xhigh)\", \"creator\": \"OpenAI\", \"quality\": 52, \"cost_per_task\": 0.76, \"minutes\": 10.5}, {\"name\": \"GPT-6.1 Sol (high)\", \"creator\": \"OpenAI\", \"quality\": 50, \"cost_per_task\": 0.59, \"minutes\": 7.7, \"openrouter_id\": \"lab/gpt-6.1-sol-(high)\"}, {\"name\": \"GPT-6.1 Sol (medium)\", \"creator\": \"OpenAI\", \"quality\": 46, \"cost_per_task\": 0.36, \"minutes\": 4.5}, {\"name\": \"GPT-6.1 Sol (low)\", \"creator\": \"OpenAI\", \"quality\": 35, \"cost_per_task\": 0.16, \"minutes\": 2.0, \"openrouter_id\": \"lab/gpt-6.1-sol-(low)\", \"open_weights\": true}, {\"name\": \"GPT-6.1 Terra (max)\", \"creator\": \"OpenAI\", \"quality\": 51, \"cost_per_task\": 0.96, \"minutes\": 14.7}, {\"name\": \"GPT-6.1 Terra (xhigh)\", \"creator\": \"OpenAI\", \"quality\": 45, \"cost_per_task\": 0.4, \"minutes\": 6.6, \"openrouter_id\": \"lab/gpt-6.1-terra-(xhigh)\"}, {\"name\": \"GPT-6.1 Terra (high)\", \"creator\": \"OpenAI\", \"quality\": 42, \"cost_per_task\": 0.26, \"minutes\": 4.3}, {\"name\": \"GPT-6.1 Terra (medium)\", \"creator\": \"OpenAI\", \"quality\": 38, \"cost_per_task\": 0.17, \"minutes\": 2.9, \"openrouter_id\": \"lab/gpt-6.1-terra-(medium)\"}, {\"name\": \"GPT-6.1 Terra (low)\", \"creator\": \"OpenAI\", \"quality\": 29, \"cost_per_task\": 0.0713, \"minutes\": 1.2, \"open_weights\": true}, {\"name\": \"GPT-6 Luna (max)\", \"creator\": \"OpenAI\", \"quality\": 28, \"cost_per_task\": 0.15, \"minutes\": 11.8, \"openrouter_id\": \"lab/gpt-6-luna-(max)\"}, {\"name\": \"GPT-6 Luna (xhigh)\", \"creator\": \"OpenAI\", \"quality\": 23, \"cost_per_task\": 0.1, \"minutes\": 7.4}, {\"name\": \"GPT-6 Luna (high)\", \"creator\": \"OpenAI\", \"quality\": 21, \"cost_per_task\": 0.0729, \"minutes\": 5.7, \"openrouter_id\": \"lab/gpt-6-luna-(high)\"}, {\"name\": \"GPT-6 Luna (medium)\", \"creator\": \"OpenAI\", \"quality\": 18, \"cost_per_task\": 0.0422, \"minutes\": 3.5}, {\"name\": \"GPT-6 Luna (low)\", \"creator\": \"OpenAI\", \"quality\": 10, \"cost_per_task\": 0.0051, \"minutes\": 0.6, \"openrouter_id\": \"lab/gpt-6-luna-(low)\", \"open_weights\": true}, {\"name\": \"gpt-oss-120b (high)\", \"creator\": \"OpenAI\", \"quality\": 4, \"cost_per_task\": 0.35, \"minutes\": 7.9, \"open_weights\": true}, {\"name\": \"Gemini 4 Carbon (high)\", \"creator\": \"Google\", \"quality\": 60, \"cost_per_task\": 5.48, \"minutes\": 28.6, \"restricted\": true, \"openrouter_id\": \"lab/gemini-4-carbon-(high)\"}, {\"name\": \"Gemini 4 Carbon (medium)\", \"creator\": \"Google\", \"quality\": 58, \"cost_per_task\": 4.68, \"minutes\": 25.3, \"restricted\": true}, {\"name\": \"Gemini 4 Carbon (low)\", \"creator\": \"Google\", \"quality\": 54, \"cost_per_task\": 5.22, \"minutes\": 24.9, \"restricted\": true, \"openrouter_id\": \"lab/gemini-4-carbon-(low)\"}, {\"name\": \"Gemini 4 Argon (high)\", \"creator\": \"Google\", \"quality\": 50, \"cost_per_task\": 4.97, \"minutes\": 30.1, \"open_weights\": true}, {\"name\": \"Gemini 3.8 Flash (high)\", \"creator\": \"Google\", \"quality\": 31, \"cost_per_task\": 7.77, \"minutes\": 14.9, \"openrouter_id\": \"lab/gemini-3.8-flash-(high)\"}, {\"name\": \"Gemini 3.8 Flash (medium)\", \"creator\": \"Google\", \"quality\": 30, \"cost_per_task\": 6.26, \"minutes\": 12.9}, {\"name\": \"Gemini 3.8 Flash (low)\", \"creator\": \"Google\", \"quality\": 23, \"cost_per_task\": null, \"minutes\": null, \"openrouter_id\": \"lab/gemini-3.8-flash-(low)\"}, {\"name\": \"Gemini 3.5 Flash-Lite\", \"creator\": \"Google\", \"quality\": 12, \"cost_per_task\": 0.69, \"minutes\": 1.7}, {\"name\": \"Grok 4.7 (xhigh)\", \"creator\": \"xAI\", \"quality\": 35, \"cost_per_task\": 7.77, \"minutes\": 26.9, \"openrouter_id\": \"lab/grok-4.7-(xhigh)\", \"open_weights\": true}, {\"name\": \"Grok 4.7 (high)\", \"creator\": \"xAI\", \"quality\": 35, \"cost_per_task\": 6.18, \"minutes\": 21.9}, {\"name\": \"Grok 4.7 (low)\", \"creator\": \"xAI\", \"quality\": 31, \"cost_per_task\": 2.92, \"minutes\": 11.1, \"openrouter_id\": \"lab/grok-4.7-(low)\"}, {\"name\": \"Kimi K3.1 Pro\", \"creator\": \"Moonshot\", \"quality\": 46, \"cost_per_task\": 3.68, \"minutes\": 39.0, \"open_weights\": true}, {\"name\": \"DeepSeek V4.1 Flash 1017 (max)\", \"creator\": \"DeepSeek\", \"quality\": 33, \"cost_per_task\": 0.6, \"minutes\": 14.6, \"open_weights\": true, \"openrouter_id\": \"lab/deepseek-v4.1-flash-1017-(max)\"}, {\"name\": \"DeepSeek V4.1 Flash 1017 (high)\", \"creator\": \"DeepSeek\", \"quality\": 29, \"cost_per_task\": 0.46, \"minutes\": 11.5, \"open_weights\": true}, {\"name\": \"GLM-5.3 (max)\", \"creator\": \"Z AI\", \"quality\": 32, \"cost_per_task\": 5.01, \"minutes\": 27.6, \"open_weights\": true, \"openrouter_id\": \"lab/glm-5.3-(max)\"}, {\"name\": \"Inkling 2 Small\", \"creator\": \"Thinking Machines\", \"quality\": 31, \"cost_per_task\": null, \"minutes\": null, \"open_weights\": true}, {\"name\": \"MiMo-V2.6-Pro\", \"creator\": \"Xiaomi\", \"quality\": 30, \"cost_per_task\": null, \"minutes\": null, \"open_weights\": true, \"openrouter_id\": \"lab/mimo-v2.6-pro\"}, {\"name\": \"Mistral Large 4 (high)\", \"creator\": \"Mistral\", \"quality\": 26, \"cost_per_task\": 2.06, \"minutes\": 12.3, \"open_weights\": true}, {\"name\": \"Muse Spark Open (xhigh)\", \"creator\": \"Meta\", \"quality\": 25, \"cost_per_task\": 2.02, \"minutes\": 7.8, \"open_weights\": true, \"openrouter_id\": \"lab/muse-spark-open-(xhigh)\"}, {\"name\": \"Qwen3.8 27B (xhigh)\", \"creator\": \"Alibaba\", \"quality\": 20, \"cost_per_task\": 3.53, \"minutes\": 44.0, \"open_weights\": true}, {\"name\": \"MiniMax-M3.1-Flash\", \"creator\": \"MiniMax\", \"quality\": 29, \"cost_per_task\": 0.49, \"minutes\": 16.3, \"openrouter_id\": \"lab/minimax-m3.1-flash\"}, {\"name\": \"Qwen3.8 Max (0902)\", \"creator\": \"Alibaba\", \"quality\": 34, \"cost_per_task\": 10.02, \"minutes\": 51.2}, {\"name\": \"Odd One (high)\", \"creator\": \"Nobody\", \"quality\": 41.5, \"cost_per_task\": 0.75}]}"
+  },
+  {
+   "cmd": [
+    "refresh",
+    "--offline",
+    "gaps.json",
+    "--table",
+    "balanced"
+   ],
+   "clock": 11,
+   "rc": 0,
+   "out": "wrote <BASE>/skill/models/lock.yaml (120 picks, 55 changed)\nchanges since last lock:\n  balanced/crosslab/elders: Claude Fable 5.2 (high), GPT-6.1 Sol (max), Gemini 4 Argon (high) -> Claude Opus 5.5 (max), GPT-6.1 Sol (max), Gemini 4 Argon (high)\n  balanced/crosslab/experts: Claude Fable 5.2 (low), GPT-6.1 Sol (high), Gemini 4 Argon (high) -> Claude Fable 5.2 (low), GPT-6.1 Sol (medium), Gemini 4 Argon (high)\n  balanced/crosslab/red_team: GPT-6.1 Sol (max) -> Claude Opus 5.5 (max)\n  balanced/fanout:claude/chair: Claude Fable 5.2 (high) -> Claude Opus 5.5 (max)\n  balanced/fanout:claude/elders: Claude Fable 5.2 (high), Claude Opus 5.5 (max), Claude Sonnet 5.5 (max) -> Claude Fable 5.2 (low), Claude Opus 5.5 (max), Claude Sonnet 5.5 (max)\n  balanced/fanout:claude/red_team: Claude Opus 5.5 (max) -> Claude Fable 5.2 (low)\n  balanced/fanout:mix/chair: Claude Fable 5.2 (high) -> GPT-6.1 Sol (max)\n  balanced/fanout:mix/elders: Claude Fable 5.2 (high), Claude Opus 5.5 (max), GPT-6.1 Sol (max) -> Claude Opus 5.5 (max), GPT-6.1 Sol (max), GPT-6.1 Terra (max)\n  balanced/fanout:mix/experts: Claude Fable 5.2 (low), GPT-6.1 Sol (high) -> Claude Fable 5.2 (low), GPT-6.1 Sol (medium), Odd One (high)\n  balanced/fanout:mix/red_team: GPT-6.1 Sol (max) -> Claude Opus 5.5 (max)\n  balanced/fanout:open/chair: Kimi K3.1 Pro -> Claude Fable 5.2 (low)\n  balanced/fanout:open/elders: Kimi K3.1 Pro -> Claude Fable 5.2 (low), Gemini 4 Argon (high), Kimi K3.1 Pro\n  balanced/fanout:open/experts: Kimi K3.1 Pro -> Claude Fable 5.2 (low), Gemini 4 Argon (high), Kimi K3.1 Pro\n  balanced/fanout:open/red_team: Kimi K3.1 Pro -> Gemini 4 Argon (high)\n  balanced/fanout:open/verifier: DeepSeek V4.1 Flash 1017 (max) -> GPT-6.1 Sol (low)\n  balanced/fanout:openrouter/chair: Claude Fable 5.2 (high) -> GPT-6.1 Sol (max)\n  balanced/fanout:openrouter/elders: Claude Fable 5.2 (high), Claude Opus 5.5 (max), GPT-6.1 Sol (max) -> Claude Opus 5.5 (max), Claude Sonnet 5.5 (xhigh), GPT-6.1 Sol (max)\n  balanced/fanout:openrouter/experts: Claude Fable 5.2 (low), GPT-6.1 Sol (high) -> GPT-6.1 Sol (high)\n  balanced/fanout:openrouter/red_team: GPT-6.1 Sol (max) -> Claude Opus 5.5 (max)\n  balanced/fanout:openrouter/verifier: GPT-6.1 Sol (medium) -> GPT-6.1 Terra (medium)\n  efficient/crosslab/chair: GPT-6.1 Sol (xhigh) -> GPT-6.1 Sol (high)\n  efficient/crosslab/experts: Claude Haiku 5.5 (xhigh), GPT-6.1 Terra (medium), Gemini 4 Argon (high) -> Claude Haiku 5.5 (high), GPT-6.1 Terra (medium), Gemini 4 Argon (high)\n  efficient/crosslab/red_team: Claude Fable 5.2 (medium) -> Claude Fable 5.2 (low)\n  efficient/fanout:claude/elders: Claude Fable 5.2 (medium), Claude Opus 5.5 (xhigh), Claude Sonnet 5.5 (max) -> Claude Fable 5.2 (low), Claude Opus 5.5 (xhigh), Claude Sonnet 5.5 (xhigh)\n  efficient/fanout:mix/chair: GPT-6.1 Sol (xhigh) -> GPT-6.1 Sol (high)\n  efficient/fanout:mix/elders: Claude Fable 5.2 (medium), Claude Opus 5.5 (xhigh), GPT-6.1 Sol (xhigh) -> Claude Fable 5.2 (low), GPT-6.1 Sol (high), GPT-6.1 Terra (max)\n  efficient/fanout:mix/experts: Claude Haiku 5.5 (xhigh), GPT-6.1 Terra (medium) -> Claude Haiku 5.5 (high), GPT-6.1 Terra (medium)\n  efficient/fanout:mix/red_team: Claude Fable 5.2 (medium) -> Claude Fable 5.2 (low)\n  efficient/fanout:open/chair: Kimi K3.1 Pro -> Claude Fable 5.2 (low)\n  efficient/fanout:open/elders: Kimi K3.1 Pro -> Claude Fable 5.2 (low), Gemini 4 Argon (high), Kimi K3.1 Pro\n  efficient/fanout:open/experts: DeepSeek V4.1 Flash 1017 (max), Kimi K3.1 Pro -> GPT-6.1 Sol (low)\n  efficient/fanout:open/red_team: DeepSeek V4.1 Flash 1017 (max) -> Gemini 4 Argon (high)\n  efficient/fanout:open/verifier: DeepSeek V4.1 Flash 1017 (max) -> GPT-6.1 Sol (low)\n  efficient/fanout:openrouter/chair: GPT-6.1 Sol (xhigh) -> GPT-6.1 Sol (high)\n  efficient/fanout:openrouter/elders: Claude Fable 5.2 (medium), Claude Opus 5.5 (xhigh), GPT-6.1 Sol (xhigh) -> Claude Opus 5.5 (high), Claude Sonnet 5.5 (xhigh), GPT-6.1 Sol (high)\n  efficient/fanout:openrouter/experts: Claude Haiku 5.5 (xhigh), GPT-6.1 Terra (medium) -> Claude Haiku 5.5 (high), GPT-6.1 Terra (medium)\n  efficient/fanout:openrouter/red_team: Claude Fable 5.2 (medium) -> Claude Opus 5.5 (high)\n  max/crosslab/chair: Claude Fable 5.2 (max) -> Claude Opus 5.5 (max)\n  max/crosslab/elders: Claude Fable 5.2 (max), GPT-6.1 Sol (max), Gemini 3.5 Flash-Lite -> Claude Opus 5.5 (max), GPT-6.1 Sol (max), Gemini 3.5 Flash-Lite\n  max/crosslab/experts: Claude Fable 5.2 (high) -> Claude Fable 5.2 (high), GPT-6.1 Sol (max)\n  max/fanout:claude/chair: Claude Fable 5.2 (max) -> Claude Opus 5.5 (max)\n  max/fanout:claude/experts: Claude Fable 5.2 (high), Claude Opus 5.5 (max) -> Claude Fable 5.2 (low), Claude Opus 5.5 (max), Claude Sonnet 5.5 (max)\n  max/fanout:claude/red_team: Claude Opus 5.5 (max) -> Claude Sonnet 5.5 (max)\n  max/fanout:mix/chair: Claude Fable 5.2 (max) -> Claude Opus 5.5 (max)\n  max/fanout:mix/elders: Claude Fable 5.2 (max), Claude Opus 5.5 (max), Claude Sonnet 5.5 (max) -> Claude Opus 5.5 (max), Claude Sonnet 5.5 (max), GPT-6.1 Sol (max)\n  max/fanout:mix/experts: Claude Fable 5.2 (high), Claude Opus 5.5 (max) -> Claude Opus 5.5 (max), GPT-6.1 Sol (max)\n  max/fanout:open/chair: Kimi K3.1 Pro -> Claude Fable 5.2 (low)\n  max/fanout:open/elders: Kimi K3.1 Pro -> Claude Fable 5.2 (low), Gemini 4 Argon (high), Kimi K3.1 Pro\n  max/fanout:open/experts: Kimi K3.1 Pro -> Claude Fable 5.2 (low), Gemini 4 Argon (high), Kimi K3.1 Pro\n  max/fanout:open/red_team: Kimi K3.1 Pro -> Gemini 4 Argon (high)\n  max/fanout:open/verifier: Kimi K3.1 Pro -> GPT-6.1 Sol (low)\n  max/fanout:openrouter/chair: Claude Fable 5.2 (max) -> Claude Opus 5.5 (max)\n  max/fanout:openrouter/elders: Claude Fable 5.2 (max), Claude Opus 5.5 (max), Claude Sonnet 5.5 (max) -> Claude Opus 5.5 (max), Claude Sonnet 5.5 (xhigh), GPT-6.1 Sol (max)\n  max/fanout:openrouter/experts: Claude Fable 5.2 (high), Claude Opus 5.5 (max) -> Claude Opus 5.5 (max), GPT-6.1 Sol (max)\n  max/fanout:openrouter/verifier: GPT-6.1 Sol (medium) -> GPT-6.1 Terra (medium)\n| Mode | Chair | Experts (7 seats) | Red team | Elders | Rel. cost |\n| --- | --- | --- | --- | --- | --- |\n| fanout:claude | Claude Opus 5.5 (max) | 5x Claude Fable 5.2 (low) + 1x Claude Opus 5.5 (high) + 1x Claude Sonnet 5.5 (xhigh) | Claude Fable 5.2 (low) | Claude Opus 5.5 (max), Claude Fable 5.2 (low), Claude Sonnet 5.5 (max) | 1.94 |\n| fanout:openai | GPT-6.1 Sol (max) | 6x GPT-6.1 Sol (medium) + 1x GPT-6.1 Terra (high) | GPT-6.1 Terra (max) | GPT-6.1 Sol (max), GPT-6.1 Terra (max), GPT-6.1 Sol (max) | 0.24 |\n| fanout:gemini | Gemini 4 Argon (high) | 7x Gemini 4 Argon (high) | Gemini 4 Argon (high) | Gemini 4 Argon (high), Gemini 4 Argon (high), Gemini 4 Argon (high) | 2.26 |\n| fanout:open | Claude Fable 5.2 (low) | 5x Claude Fable 5.2 (low) + 1x Gemini 4 Argon (high) + 1x Kimi K3.1 Pro | Gemini 4 Argon (high) | Claude Fable 5.2 (low), Gemini 4 Argon (high), Kimi K3.1 Pro | 1.61 |\n| fanout:openrouter | GPT-6.1 Sol (max) | 7x GPT-6.1 Sol (high) | Claude Opus 5.5 (max) | GPT-6.1 Sol (max), Claude Opus 5.5 (max), Claude Sonnet 5.5 (xhigh) | 0.7 |\n| fanout:mix | GPT-6.1 Sol (max) | 5x GPT-6.1 Sol (medium) + 1x Claude Fable 5.2 (low) + 1x Odd One (high) | Claude Opus 5.5 (max) | GPT-6.1 Sol (max), Claude Opus 5.5 (max), GPT-6.1 Terra (max) | 0.74 |\n| crosslab | Claude Haiku 5.5 (low) | 5x GPT-6.1 Sol (medium) + 1x Claude Fable 5.2 (low) + 1x Gemini 4 Argon (high) | Claude Opus 5.5 (max) | Claude Opus 5.5 (max), GPT-6.1 Sol (max), Gemini 4 Argon (high) | 1.0 |\n| solo | current model @ high | current model @ medium | current model @ high | current model @ high | n/a |\n",
+   "err": "warning: pin max/nowhere/chair -> Claude Fable 5.2 (max) not applied\nwarning: pin balanced/crosslab/red_team -> No Such Model not applied\n",
+   "env": {
+    "COUNCIL_SKILL_DIR": "<BASE>/skill"
+   }
+  },
+  {
+   "put": "<BASE>/skill/models/policy.yaml",
+   "text": "version: 1\ndata:\n  provider: artificial_analysis\n  api_url: https://artificialanalysis.ai/api/v2/language/models\n  quality: intelligence_index\n  cost: cost_per_task\n  stale_after_days: 30\nprofiles:\n  max:\n    chair:\n      k: 0\n    experts:\n      k: 2\n      floor: 0.85\n      diversity_seats: 2\n      diversity_margin: 12\n    red_team:\n      k: 0\n      other_family: true\n      floor: 0.8\n    elders:\n      k: 0\n      floor: 0.8\n    verifier:\n      k: 2\n      max_minutes: 5\n      min_quality: 30\n  balanced:\n    chair:\n      k: 2\n    experts:\n      k: 6\n      floor: 0.75\n      diversity_seats: 2\n      diversity_margin: 12\n    red_team:\n      k: 2\n      other_family: true\n      floor: 0.75\n    elders:\n      k: 2\n      floor: 0.8\n    verifier:\n      k: 6\n      max_minutes: 5\n      min_quality: 30\n  efficient:\n    chair:\n      k: 6\n      floor_vs_best: 0.8\n    experts:\n      k: 8\n      floor: 0.6\n      diversity_seats: 2\n      diversity_margin: 12\n    red_team:\n      k: 5\n      other_family: true\n      floor: 0.7\n    elders:\n      k: 6\n      floor: 0.8\n    verifier:\n      k: 10\n      max_minutes: 5\n      min_quality: 30\ntie_break:\n  within_points: 0.5\n  prefer: faster\nsolo_efforts:\n  max:\n    chair: max\n    experts: high\n    red_team: high\n    elders: max\n    verifier: medium\n  balanced:\n    chair: high\n    experts: medium\n    red_team: high\n    elders: high\n    verifier: low\n  efficient:\n    chair: medium\n    experts: low\n    red_team: medium\n    elders: medium\n    verifier: low\nfamilies:\n  claude:\n    creators:\n    - Anthropic\n  openai:\n    creators:\n    - OpenAI\n  gemini:\n    creators:\n    - Google\n  open:\n    open_weights_only: true\n  openrouter:\n    requires: openrouter_id\n  mix:\n    creators: any\n  nobody:\n    creators:\n    - Nobody\n  empty:\n    creators:\n    - No Such Lab\nmodes:\n  solo: One model plays every role. Elders are fresh contexts of that model (no cross-lab\n    check).\n  fanout: Strong chair + cheaper workhorse experts, limited to one family. Elders\n    come from the same family.\n  crosslab: Experts from the mix family with one seat per lab that clears the quality\n    floor; elders are one flagship each from Anthropic, OpenAI and Google.\ncrosslab_labs:\n- Anthropic\n- OpenAI\n- Google\ncost_model:\n  loops: 3\n  expert_passes_per_loop: 2.0\n  red_team_passes_per_loop: 1.0\n  elder_passes_per_loop: 0.5\n  chair_passes_per_loop: 1.0\n  final_chair_passes: 2.0\nmeasured_tokens_per_call:\n  source: 'run 261113-183103-take-turn-review (13 Nov 2026): 9 seat calls, 1,269,206\n    tokens'\n  ideate: 150000\n  control: 150000\n  vote: 64000\n  rank: 64000\n  redteam: 240000\n  elders: 64000\n  elders_verify: 240000\nassumed_tokens_per_call:\n  research: 200000\n  map: 150000\naccess:\n  Claude Fable 5.2:\n    has_access: true\n    note: approved organisation\nnative_ids:\n  Claude Fable 5.2: claude-fable-5-2\n  Claude Opus 5.5: claude-opus-5-5\n  GPT-6.1 Sol: gpt-6.1-sol\n  Gemini 4 Argon: gemini-4-argon\npins: {}\nbans: []\n"
+  },
+  {
+   "cmd": [
+    "refresh",
+    "--offline",
+    "gaps.json",
+    "--table",
+    "max"
+   ],
+   "clock": 12,
+   "rc": 0,
+   "out": "wrote <BASE>/skill/models/lock.yaml (135 picks, 59 changed)\nchanges since last lock:\n  balanced/crosslab/chair: Claude Haiku 5.5 (low) -> Claude Fable 5.2 (max)\n  balanced/crosslab/elders: Claude Opus 5.5 (max), GPT-6.1 Sol (max), Gemini 4 Argon (high) -> Claude Fable 5.2 (max), GPT-6.1 Sol (max), Gemini 4 Argon (high)\n  balanced/crosslab/experts: Claude Fable 5.2 (low), GPT-6.1 Sol (medium), Gemini 4 Argon (high) -> Claude Fable 5.2 (low), GPT-6.1 Sol (high), Gemini 4 Argon (high)\n  balanced/crosslab/red_team: Claude Opus 5.5 (max) -> GPT-6.1 Sol (max)\n  balanced/fanout:claude/chair: Claude Opus 5.5 (max) -> Claude Fable 5.2 (max)\n  balanced/fanout:claude/elders: Claude Fable 5.2 (low), Claude Opus 5.5 (max), Claude Sonnet 5.5 (max) -> Claude Fable 5.2 (max), Claude Opus 5.5 (max), Claude Sonnet 5.5 (max)\n  balanced/fanout:claude/red_team: Claude Fable 5.2 (low) -> Claude Opus 5.5 (max)\n  balanced/fanout:mix/chair: GPT-6.1 Sol (max) -> Claude Fable 5.2 (max)\n  balanced/fanout:mix/elders: Claude Opus 5.5 (max), GPT-6.1 Sol (max), GPT-6.1 Terra (max) -> Claude Fable 5.2 (max), Claude Opus 5.5 (max), GPT-6.1 Sol (max)\n  balanced/fanout:mix/experts: Claude Fable 5.2 (low), GPT-6.1 Sol (medium), Odd One (high) -> Claude Fable 5.2 (low), GPT-6.1 Sol (high)\n  balanced/fanout:mix/red_team: Claude Opus 5.5 (max) -> GPT-6.1 Sol (max)\n  balanced/fanout:nobody/chair: (none) -> Odd One (high)\n  balanced/fanout:nobody/elders: (none) -> Odd One (high)\n  balanced/fanout:nobody/experts: (none) -> Odd One (high)\n  balanced/fanout:nobody/red_team: (none) -> Odd One (high)\n  balanced/fanout:nobody/verifier: (none) -> Odd One (high)\n  balanced/fanout:open/experts: Claude Fable 5.2 (low), Gemini 4 Argon (high), Kimi K3.1 Pro -> Claude Fable 5.2 (low), GPT-6 Astra (low), Gemini 4 Argon (high)\n  balanced/fanout:openai/elders: GPT-6.1 Sol (max), GPT-6.1 Terra (max) -> GPT-6 Astra (max), GPT-6.1 Sol (max), GPT-6.1 Terra (max)\n  balanced/fanout:openai/experts: GPT-6.1 Sol (medium), GPT-6.1 Terra (high) -> GPT-6 Astra (high), GPT-6.1 Sol (medium), GPT-6.1 Terra (high)\n  balanced/fanout:openai/red_team: GPT-6.1 Terra (max) -> GPT-6 Astra (high)\n  balanced/fanout:openrouter/elders: Claude Opus 5.5 (max), Claude Sonnet 5.5 (xhigh), GPT-6.1 Sol (max) -> Claude Opus 5.5 (max), GPT-6 Astra (xhigh), GPT-6.1 Sol (max)\n  efficient/crosslab/chair: GPT-6.1 Sol (high) -> GPT-6.1 Sol (xhigh)\n  efficient/crosslab/experts: Claude Haiku 5.5 (high), GPT-6.1 Terra (medium), Gemini 4 Argon (high) -> Claude Haiku 5.5 (xhigh), GPT-6.1 Terra (medium), Gemini 4 Argon (high)\n  efficient/fanout:claude/elders: Claude Fable 5.2 (low), Claude Opus 5.5 (xhigh), Claude Sonnet 5.5 (xhigh) -> Claude Fable 5.2 (low), Claude Opus 5.5 (xhigh), Claude Sonnet 5.5 (max)\n  efficient/fanout:mix/chair: GPT-6.1 Sol (high) -> GPT-6.1 Sol (xhigh)\n  efficient/fanout:mix/elders: Claude Fable 5.2 (low), GPT-6.1 Sol (high), GPT-6.1 Terra (max) -> Claude Fable 5.2 (low), GPT-6 Astra (high), GPT-6.1 Sol (xhigh)\n  efficient/fanout:mix/experts: Claude Haiku 5.5 (high), GPT-6.1 Terra (medium) -> Claude Haiku 5.5 (xhigh), GPT-6.1 Terra (medium)\n  efficient/fanout:nobody/chair: (none) -> Odd One (high)\n  efficient/fanout:nobody/elders: (none) -> Odd One (high)\n  efficient/fanout:nobody/experts: (none) -> Odd One (high)\n  efficient/fanout:nobody/red_team: (none) -> Odd One (high)\n  efficient/fanout:nobody/verifier: (none) -> Odd One (high)\n  efficient/fanout:open/red_team: Gemini 4 Argon (high) -> GPT-6 Astra (low)\n  efficient/fanout:openai/elders: GPT-6.1 Sol (medium), GPT-6.1 Terra (xhigh) -> GPT-6 Astra (high), GPT-6.1 Sol (medium), GPT-6.1 Terra (max)\n  efficient/fanout:openrouter/elders: Claude Opus 5.5 (high), Claude Sonnet 5.5 (xhigh), GPT-6.1 Sol (high) -> Claude Opus 5.5 (high), GPT-6 Astra (xhigh), GPT-6.1 Sol (high)\n  max/crosslab/chair: Claude Opus 5.5 (max) -> Claude Fable 5.2 (max)\n  max/crosslab/elders: Claude Opus 5.5 (max), GPT-6.1 Sol (max), Gemini 3.5 Flash-Lite -> Claude Fable 5.2 (max), GPT-6 Astra (max), Gemini 4 Argon (high)\n  max/crosslab/experts: Claude Fable 5.2 (high), GPT-6.1 Sol (max) -> Claude Fable 5.2 (max), GPT-6 Astra (max)\n  max/crosslab/red_team: GPT-6.1 Sol (max) -> GPT-6 Astra (max)\n  max/fanout:claude/chair: Claude Opus 5.5 (max) -> Claude Fable 5.2 (max)\n  max/fanout:claude/elders: Claude Fable 5.2 (xhigh) -> Claude Fable 5.2 (max), Claude Opus 5.5 (max), Claude Sonnet 5.5 (max)\n  max/fanout:claude/experts: Claude Fable 5.2 (low), Claude Opus 5.5 (max), Claude Sonnet 5.5 (max) -> Claude Fable 5.2 (max), Claude Opus 5.5 (max)\n  max/fanout:claude/red_team: Claude Sonnet 5.5 (max) -> Claude Opus 5.5 (max)\n  max/fanout:mix/chair: Claude Opus 5.5 (max) -> Claude Fable 5.2 (max)\n  max/fanout:mix/elders: Claude Opus 5.5 (max), Claude Sonnet 5.5 (max), GPT-6.1 Sol (max) -> Claude Fable 5.2 (max), Claude Opus 5.5 (max), GPT-6 Astra (max)\n  max/fanout:mix/experts: Claude Opus 5.5 (max), GPT-6.1 Sol (max) -> Claude Fable 5.2 (max), GPT-6 Astra (max)\n  max/fanout:mix/red_team: GPT-6.1 Sol (max) -> GPT-6 Astra (max)\n  max/fanout:nobody/chair: (none) -> Odd One (high)\n  max/fanout:nobody/elders: (none) -> Odd One (high)\n  max/fanout:nobody/experts: (none) -> Odd One (high)\n  max/fanout:nobody/red_team: (none) -> Odd One (high)\n  max/fanout:nobody/verifier: (none) -> Odd One (high)\n  max/fanout:open/verifier: GPT-6.1 Sol (low) -> GPT-6 Astra (low)\n  max/fanout:openai/chair: GPT-6.1 Sol (max) -> GPT-6 Astra (max)\n  max/fanout:openai/elders: GPT-6.1 Sol (max), GPT-6.1 Terra (max) -> GPT-6 Astra (max), GPT-6.1 Sol (max), GPT-6.1 Terra (max)\n  max/fanout:openai/experts: GPT-6.1 Sol (max), GPT-6.1 Terra (max) -> GPT-6 Astra (high), GPT-6.1 Sol (max), GPT-6.1 Terra (max)\n  max/fanout:openai/red_team: GPT-6.1 Terra (max) -> GPT-6.1 Sol (max)\n  max/fanout:openrouter/elders: Claude Opus 5.5 (max), Claude Sonnet 5.5 (xhigh), GPT-6.1 Sol (max) -> Claude Opus 5.5 (max), GPT-6 Astra (xhigh), GPT-6.1 Sol (max)\n  max/fanout:openrouter/red_team: GPT-6.1 Sol (max) -> GPT-6 Astra (xhigh)\n| Mode | Chair | Experts (7 seats) | Red team | Elders | Rel. cost |\n| --- | --- | --- | --- | --- | --- |\n| fanout:claude | Claude Fable 5.2 (max) | 6x Claude Fable 5.2 (max) + 1x Claude Opus 5.5 (max) | Claude Opus 5.5 (max) | Claude Fable 5.2 (max), Claude Opus 5.5 (max), Claude Sonnet 5.5 (max) | 4.96 |\n| fanout:openai | GPT-6 Astra (max) | 5x GPT-6.1 Sol (max) + 1x GPT-6 Astra (high) + 1x GPT-6.1 Terra (max) | GPT-6.1 Sol (max) | GPT-6 Astra (max), GPT-6.1 Sol (max), GPT-6.1 Terra (max) | 0.44 |\n| fanout:gemini | Gemini 4 Argon (high) | 7x Gemini 4 Argon (high) | Gemini 4 Argon (high) | Gemini 4 Argon (high), Gemini 4 Argon (high), Gemini 4 Argon (high) | 1.08 |\n| fanout:open | Claude Fable 5.2 (low) | 5x Claude Fable 5.2 (low) + 1x Gemini 4 Argon (high) + 1x Kimi K3.1 Pro | Gemini 4 Argon (high) | Claude Fable 5.2 (low), Gemini 4 Argon (high), Kimi K3.1 Pro | 0.77 |\n| fanout:openrouter | Claude Opus 5.5 (max) | 6x GPT-6.1 Sol (max) + 1x Claude Opus 5.5 (max) | GPT-6 Astra (xhigh) | Claude Opus 5.5 (max), GPT-6 Astra (xhigh), GPT-6.1 Sol (max) | 0.75 |\n| fanout:mix | Claude Fable 5.2 (max) | 6x Claude Fable 5.2 (max) + 1x GPT-6 Astra (max) | GPT-6 Astra (max) | Claude Fable 5.2 (max), Claude Opus 5.5 (max), GPT-6 Astra (max) | 4.8 |\n| fanout:nobody | Odd One (high) | 7x Odd One (high) | Odd One (high) | Odd One (high), Odd One (high), Odd One (high) | 0.16 |\n| fanout:empty | no usable models | | | | |\n| crosslab | Claude Fable 5.2 (max) | 6x Claude Fable 5.2 (max) + 1x GPT-6 Astra (max) | GPT-6 Astra (max) | Claude Fable 5.2 (max), GPT-6 Astra (max), Gemini 4 Argon (high) | 4.77 |\n| solo | current model @ max | current model @ high | current model @ high | current model @ max | n/a |\n",
+   "err": "",
+   "env": {
+    "COUNCIL_SKILL_DIR": "<BASE>/skill"
+   }
+  },
+  {
+   "cmd": [
+    "models",
+    "--mode",
+    "fanout:nobody",
+    "--profile",
+    "max"
+   ],
+   "clock": 13,
+   "rc": 0,
+   "out": "{\n \"mode\": \"fanout:nobody\",\n \"profile\": \"max\",\n \"data_collected\": \"2026-11-13\",\n \"attribution\": \"Model data: Artificial Analysis (https://artificialanalysis.ai)\",\n \"warnings\": [],\n \"chair\": {\n  \"model\": \"Odd One (high)\",\n  \"creator\": \"Nobody\",\n  \"quality\": 41.5,\n  \"cost_per_task\": 0.75\n },\n \"experts\": [\n  {\n   \"model\": \"Odd One (high)\",\n   \"creator\": \"Nobody\",\n   \"quality\": 41.5,\n   \"cost_per_task\": 0.75\n  },\n  {\n   \"model\": \"Odd One (high)\",\n   \"creator\": \"Nobody\",\n   \"quality\": 41.5,\n   \"cost_per_task\": 0.75\n  },\n  {\n   \"model\": \"Odd One (high)\",\n   \"creator\": \"Nobody\",\n   \"quality\": 41.5,\n   \"cost_per_task\": 0.75\n  },\n  {\n   \"model\": \"Odd One (high)\",\n   \"creator\": \"Nobody\",\n   \"quality\": 41.5,\n   \"cost_per_task\": 0.75\n  },\n  {\n   \"model\": \"Odd One (high)\",\n   \"creator\": \"Nobody\",\n   \"quality\": 41.5,\n   \"cost_per_task\": 0.75\n  },\n  {\n   \"model\": \"Odd One (high)\",\n   \"creator\": \"Nobody\",\n   \"quality\": 41.5,\n   \"cost_per_task\": 0.75\n  },\n  {\n   \"model\": \"Odd One (high)\",\n   \"creator\": \"Nobody\",\n   \"quality\": 41.5,\n   \"cost_per_task\": 0.75\n  }\n ],\n \"red_team\": {\n  \"model\": \"Odd One (high)\",\n  \"creator\": \"Nobody\",\n  \"quality\": 41.5,\n  \"cost_per_task\": 0.75\n },\n \"elders\": [\n  {\n   \"model\": \"Odd One (high)\",\n   \"creator\": \"Nobody\",\n   \"quality\": 41.5,\n   \"cost_per_task\": 0.75\n  },\n  {\n   \"model\": \"Odd One (high)\",\n   \"creator\": \"Nobody\",\n   \"quality\": 41.5,\n   \"cost_per_task\": 0.75\n  },\n  {\n   \"model\": \"Odd One (high)\",\n   \"creator\": \"Nobody\",\n   \"quality\": 41.5,\n   \"cost_per_task\": 0.75\n  }\n ],\n \"verifier\": {\n  \"model\": \"Odd One (high)\",\n  \"creator\": \"Nobody\",\n  \"quality\": 41.5,\n  \"cost_per_task\": 0.75\n },\n \"relative_cost\": 0.16\n}\n",
+   "err": "",
+   "env": {
+    "COUNCIL_SKILL_DIR": "<BASE>/skill"
+   }
+  },
+  {
+   "cmd": [
+    "models",
+    "--mode",
+    "fanout:empty"
+   ],
+   "clock": 14,
+   "rc": 0,
+   "out": "{\n \"mode\": \"fanout:empty\",\n \"profile\": \"efficient\",\n \"data_collected\": \"2026-11-13\",\n \"attribution\": \"Model data: Artificial Analysis (https://artificialanalysis.ai)\",\n \"warnings\": [],\n \"error\": \"no usable models\"\n}\n",
+   "err": "",
+   "env": {
+    "COUNCIL_SKILL_DIR": "<BASE>/skill"
+   }
+  },
+  {
+   "put": "<ROOT>/broken.json",
+   "text": "{\"models\": [{\"name\": \"x\"}]}"
+  },
+  {
+   "cmd": [
+    "refresh",
+    "--offline",
+    "broken.json"
+   ],
+   "clock": 15,
+   "rc": 1,
+   "out": "",
+   "err": "the snapshot broken.json has a model without a name or a creator\n",
+   "env": {
+    "COUNCIL_SKILL_DIR": "<BASE>/skill"
+   }
+  },
+  {
+   "put": "<ROOT>/broken.json",
+   "text": "[1, 2]"
+  },
+  {
+   "cmd": [
+    "refresh",
+    "--offline",
+    "broken.json"
+   ],
+   "clock": 16,
+   "rc": 1,
+   "out": "",
+   "err": "the snapshot broken.json has no \"models\" list\n",
+   "env": {
+    "COUNCIL_SKILL_DIR": "<BASE>/skill"
+   }
+  },
+  {
+   "put": "<ROOT>/broken.json",
+   "text": "{not json"
+  },
+  {
+   "cmd": [
+    "refresh",
+    "--offline",
+    "broken.json"
+   ],
+   "clock": 17,
+   "rc": 1,
+   "out": "",
+   "err": "",
+   "env": {
+    "COUNCIL_SKILL_DIR": "<BASE>/skill"
+   },
+   "loose": true
+  },
+  {
+   "put": "<BASE>/skill/models/policy.yaml",
+   "text": "version: 1\ndata:\n  provider: artificial_analysis\n  api_url: <AA>/models/\n  quality: intelligence_index\n  cost: cost_per_task\n  stale_after_days: 30\nprofiles:\n  max:\n    chair:\n      k: 0\n    experts:\n      k: 2\n      floor: 0.85\n      diversity_seats: 2\n      diversity_margin: 12\n    red_team:\n      k: 0\n      other_family: true\n      floor: 0.8\n    elders:\n      k: 0\n      floor: 0.8\n    verifier:\n      k: 2\n      max_minutes: 5\n      min_quality: 30\n  balanced:\n    chair:\n      k: 2\n    experts:\n      k: 6\n      floor: 0.75\n      diversity_seats: 2\n      diversity_margin: 12\n    red_team:\n      k: 2\n      other_family: true\n      floor: 0.75\n    elders:\n      k: 2\n      floor: 0.8\n    verifier:\n      k: 6\n      max_minutes: 5\n      min_quality: 30\n  efficient:\n    chair:\n      k: 6\n      floor_vs_best: 0.8\n    experts:\n      k: 8\n      floor: 0.6\n      diversity_seats: 2\n      diversity_margin: 12\n    red_team:\n      k: 5\n      other_family: true\n      floor: 0.7\n    elders:\n      k: 6\n      floor: 0.8\n    verifier:\n      k: 10\n      max_minutes: 5\n      min_quality: 30\ntie_break:\n  within_points: 0.5\n  prefer: faster\nsolo_efforts:\n  max:\n    chair: max\n    experts: high\n    red_team: high\n    elders: max\n    verifier: medium\n  balanced:\n    chair: high\n    experts: medium\n    red_team: high\n    elders: high\n    verifier: low\n  efficient:\n    chair: medium\n    experts: low\n    red_team: medium\n    elders: medium\n    verifier: low\nfamilies:\n  claude:\n    creators:\n    - Anthropic\n  openai:\n    creators:\n    - OpenAI\n  gemini:\n    creators:\n    - Google\n  open:\n    open_weights_only: true\n  openrouter:\n    requires: openrouter_id\n  mix:\n    creators: any\n  nobody:\n    creators:\n    - Nobody\n  empty:\n    creators:\n    - No Such Lab\nmodes:\n  solo: One model plays every role. Elders are fresh contexts of that model (no cross-lab\n    check).\n  fanout: Strong chair + cheaper workhorse experts, limited to one family. Elders\n    come from the same family.\n  crosslab: Experts from the mix family with one seat per lab that clears the quality\n    floor; elders are one flagship each from Anthropic, OpenAI and Google.\ncrosslab_labs:\n- Anthropic\n- OpenAI\n- Google\ncost_model:\n  loops: 3\n  expert_passes_per_loop: 2.0\n  red_team_passes_per_loop: 1.0\n  elder_passes_per_loop: 0.5\n  chair_passes_per_loop: 1.0\n  final_chair_passes: 2.0\nmeasured_tokens_per_call:\n  source: 'run 261113-183103-take-turn-review (13 Nov 2026): 9 seat calls, 1,269,206\n    tokens'\n  ideate: 150000\n  control: 150000\n  vote: 64000\n  rank: 64000\n  redteam: 240000\n  elders: 64000\n  elders_verify: 240000\nassumed_tokens_per_call:\n  research: 200000\n  map: 150000\naccess:\n  Claude Fable 5.2:\n    has_access: true\n    note: approved organisation\nnative_ids:\n  Claude Fable 5.2: claude-fable-5-2\n  Claude Opus 5.5: claude-opus-5-5\n  GPT-6.1 Sol: gpt-6.1-sol\n  Gemini 4 Argon: gemini-4-argon\npins: {}\nbans: []\n"
+  },
+  {
+   "cmd": [
+    "refresh",
+    "--table",
+    "balanced"
+   ],
+   "clock": 18,
+   "rc": 0,
+   "out": "wrote <BASE>/skill/models/lock.yaml (120 picks, 62 changed)\nchanges since last lock:\n  balanced/crosslab/chair: Claude Fable 5.2 (max) -> Claude Fable 5.2 (high)\n  balanced/crosslab/elders: Claude Fable 5.2 (max), GPT-6.1 Sol (max), Gemini 4 Argon (high) -> Claude Fable 5.2 (high), GPT-6.1 Sol (max), Gemini 4 Carbon (high)\n  balanced/crosslab/experts: Claude Fable 5.2 (low), GPT-6.1 Sol (high), Gemini 4 Argon (high) -> Claude Fable 5.2 (low), GPT-6.1 Sol (high), Gemini 4 Carbon (high)\n  balanced/crosslab/red_team: GPT-6.1 Sol (max) -> Gemini 4 Carbon (high)\n  balanced/fanout:claude/chair: Claude Fable 5.2 (max) -> Claude Fable 5.2 (high)\n  balanced/fanout:claude/elders: Claude Fable 5.2 (max), Claude Opus 5.5 (max), Claude Sonnet 5.5 (max) -> Claude Fable 5.2 (high), Claude Opus 5.5 (max), Claude Sonnet 5.5 (max)\n  balanced/fanout:gemini/chair: Gemini 4 Argon (high) -> Gemini 4 Carbon (high)\n  balanced/fanout:gemini/elders: Gemini 4 Argon (high) -> Gemini 4 Argon (high), Gemini 4 Carbon (high)\n  balanced/fanout:gemini/experts: Gemini 4 Argon (high) -> Gemini 4 Argon (high), Gemini 4 Carbon (high)\n  balanced/fanout:gemini/verifier: Gemini 4 Argon (high) -> Gemini 4 Carbon (high)\n  balanced/fanout:mix/chair: Claude Fable 5.2 (max) -> Claude Fable 5.2 (high)\n  balanced/fanout:mix/elders: Claude Fable 5.2 (max), Claude Opus 5.5 (max), GPT-6.1 Sol (max) -> Claude Fable 5.2 (high), GPT-6.1 Sol (max), Gemini 4 Carbon (high)\n  balanced/fanout:mix/experts: Claude Fable 5.2 (low), GPT-6.1 Sol (high) -> Claude Fable 5.2 (low), GPT-6.1 Sol (high), Gemini 4 Carbon (high)\n  balanced/fanout:mix/red_team: GPT-6.1 Sol (max) -> Gemini 4 Carbon (high)\n  balanced/fanout:open/chair: Claude Fable 5.2 (low) -> Kimi K3.1 Pro\n  balanced/fanout:open/elders: Claude Fable 5.2 (low), Gemini 4 Argon (high), Kimi K3.1 Pro -> Kimi K3.1 Pro\n  balanced/fanout:open/experts: Claude Fable 5.2 (low), GPT-6 Astra (low), Gemini 4 Argon (high) -> Kimi K3.1 Pro\n  balanced/fanout:open/red_team: Gemini 4 Argon (high) -> Kimi K3.1 Pro\n  balanced/fanout:open/verifier: GPT-6.1 Sol (low) -> DeepSeek V4.1 Flash 1017 (max)\n  balanced/fanout:openrouter/chair: GPT-6.1 Sol (max) -> Claude Fable 5.2 (max)\n  balanced/fanout:openrouter/elders: Claude Opus 5.5 (max), GPT-6 Astra (xhigh), GPT-6.1 Sol (max) -> Claude Fable 5.2 (max), Claude Opus 5.5 (xhigh), Gemini 4 Carbon (medium)\n  balanced/fanout:openrouter/experts: GPT-6.1 Sol (high) -> Claude Fable 5.2 (medium), GPT-6.1 Sol (high), Gemini 4 Carbon (medium)\n  balanced/fanout:openrouter/red_team: Claude Opus 5.5 (max) -> Gemini 4 Carbon (medium)\n  efficient/crosslab/elders: Claude Fable 5.2 (low), GPT-6.1 Sol (medium), Gemini 4 Argon (high) -> Claude Fable 5.2 (low), GPT-6.1 Sol (medium), Gemini 4 Carbon (high)\n  efficient/crosslab/experts: Claude Haiku 5.5 (xhigh), GPT-6.1 Terra (medium), Gemini 4 Argon (high) -> Claude Haiku 5.5 (xhigh), GPT-6.1 Terra (medium), Gemini 4 Carbon (medium)\n  efficient/crosslab/red_team: Claude Fable 5.2 (low) -> Gemini 4 Carbon (high)\n  efficient/fanout:claude/elders: Claude Fable 5.2 (low), Claude Opus 5.5 (xhigh), Claude Sonnet 5.5 (max) -> Claude Fable 5.2 (medium), Claude Opus 5.5 (xhigh), Claude Sonnet 5.5 (max)\n  efficient/fanout:gemini/chair: Gemini 4 Argon (high) -> Gemini 4 Carbon (high)\n  efficient/fanout:gemini/elders: Gemini 4 Argon (high) -> Gemini 4 Argon (high), Gemini 4 Carbon (high)\n  efficient/fanout:gemini/experts: Gemini 4 Argon (high) -> Gemini 4 Argon (high), Gemini 4 Carbon (medium)\n  efficient/fanout:gemini/verifier: Gemini 4 Argon (high) -> Gemini 4 Carbon (medium)\n  efficient/fanout:mix/elders: Claude Fable 5.2 (low), GPT-6 Astra (high), GPT-6.1 Sol (xhigh) -> GPT-6 Astra (high), GPT-6.1 Sol (xhigh), Gemini 4 Carbon (high)\n  efficient/fanout:mix/red_team: Claude Fable 5.2 (low) -> Gemini 4 Carbon (high)\n  efficient/fanout:open/chair: Claude Fable 5.2 (low) -> Kimi K3.1 Pro\n  efficient/fanout:open/elders: Claude Fable 5.2 (low), Gemini 4 Argon (high), Kimi K3.1 Pro -> Kimi K3.1 Pro\n  efficient/fanout:open/experts: GPT-6.1 Sol (low) -> DeepSeek V4.1 Flash 1017 (max), Kimi K3.1 Pro\n  efficient/fanout:open/red_team: GPT-6 Astra (low) -> DeepSeek V4.1 Flash 1017 (max)\n  efficient/fanout:open/verifier: GPT-6.1 Sol (low) -> DeepSeek V4.1 Flash 1017 (max)\n  efficient/fanout:openrouter/chair: GPT-6.1 Sol (high) -> Claude Fable 5.2 (medium)\n  efficient/fanout:openrouter/elders: Claude Opus 5.5 (high), GPT-6 Astra (xhigh), GPT-6.1 Sol (high) -> Claude Fable 5.2 (medium), GPT-6 Astra (xhigh), Gemini 4 Carbon (medium)\n  efficient/fanout:openrouter/experts: Claude Haiku 5.5 (high), GPT-6.1 Terra (medium) -> GPT-6.1 Terra (medium)\n  efficient/fanout:openrouter/red_team: Claude Opus 5.5 (high) -> GPT-6.1 Sol (high)\n  max/crosslab/elders: Claude Fable 5.2 (max), GPT-6 Astra (max), Gemini 4 Argon (high) -> Claude Fable 5.2 (max), GPT-6 Astra (max), Gemini 4 Carbon (high)\n  max/crosslab/experts: Claude Fable 5.2 (max), GPT-6 Astra (max) -> Claude Fable 5.2 (high), GPT-6 Astra (max), Gemini 4 Carbon (high)\n  max/crosslab/red_team: GPT-6 Astra (max) -> Gemini 4 Carbon (high)\n  max/fanout:claude/experts: Claude Fable 5.2 (max), Claude Opus 5.5 (max) -> Claude Fable 5.2 (high), Claude Opus 5.5 (max)\n  max/fanout:gemini/chair: Gemini 4 Argon (high) -> Gemini 4 Carbon (high)\n  max/fanout:gemini/elders: Gemini 4 Argon (high) -> Gemini 4 Argon (high), Gemini 4 Carbon (high)\n  max/fanout:gemini/experts: Gemini 4 Argon (high) -> Gemini 4 Carbon (high)\n  max/fanout:gemini/verifier: Gemini 4 Argon (high) -> Gemini 4 Carbon (high)\n  max/fanout:mix/elders: Claude Fable 5.2 (max), Claude Opus 5.5 (max), GPT-6 Astra (max) -> Claude Fable 5.2 (max), Claude Opus 5.5 (max), Gemini 4 Carbon (high)\n  max/fanout:mix/experts: Claude Fable 5.2 (max), GPT-6 Astra (max) -> Claude Fable 5.2 (high), GPT-6 Astra (max), Gemini 4 Carbon (high)\n  max/fanout:mix/red_team: GPT-6 Astra (max) -> Gemini 4 Carbon (high)\n  max/fanout:open/chair: Claude Fable 5.2 (low) -> Kimi K3.1 Pro\n  max/fanout:open/elders: Claude Fable 5.2 (low), Gemini 4 Argon (high), Kimi K3.1 Pro -> Kimi K3.1 Pro\n  max/fanout:open/experts: Claude Fable 5.2 (low), Gemini 4 Argon (high), Kimi K3.1 Pro -> Kimi K3.1 Pro\n  max/fanout:open/red_team: Gemini 4 Argon (high) -> Kimi K3.1 Pro\n  max/fanout:open/verifier: GPT-6 Astra (low) -> Kimi K3.1 Pro\n  max/fanout:openrouter/chair: Claude Opus 5.5 (max) -> Claude Fable 5.2 (max)\n  max/fanout:openrouter/elders: Claude Opus 5.5 (max), GPT-6 Astra (xhigh), GPT-6.1 Sol (max) -> Claude Fable 5.2 (max), Claude Opus 5.5 (xhigh), Gemini 4 Carbon (medium)\n  max/fanout:openrouter/experts: Claude Opus 5.5 (max), GPT-6.1 Sol (max) -> Claude Fable 5.2 (max), Gemini 4 Carbon (medium)\n  max/fanout:openrouter/red_team: GPT-6 Astra (xhigh) -> Gemini 4 Carbon (medium)\n| Mode | Chair | Experts (7 seats) | Red team | Elders | Rel. cost |\n| --- | --- | --- | --- | --- | --- |\n| fanout:claude | Claude Fable 5.2 (high) | 5x Claude Fable 5.2 (low) + 1x Claude Opus 5.5 (high) + 1x Claude Sonnet 5.5 (xhigh) | Claude Opus 5.5 (max) | Claude Fable 5.2 (high), Claude Opus 5.5 (max), Claude Sonnet 5.5 (max) | 1.66 |\n| fanout:openai | GPT-6.1 Sol (max) | 5x GPT-6.1 Sol (medium) + 1x GPT-6.1 Terra (high) + 1x GPT-6 Astra (high) | GPT-6 Astra (high) | GPT-6.1 Sol (max), GPT-6 Astra (max), GPT-6.1 Terra (max) | 0.39 |\n| fanout:gemini | Gemini 4 Carbon (high) | 6x Gemini 4 Carbon (high) + 1x Gemini 4 Argon (high) | Gemini 4 Argon (high) | Gemini 4 Carbon (high), Gemini 4 Argon (high), Gemini 4 Carbon (high) | 1.9 |\n| fanout:open | Kimi K3.1 Pro | 7x Kimi K3.1 Pro | Kimi K3.1 Pro | Kimi K3.1 Pro, Kimi K3.1 Pro, Kimi K3.1 Pro | 1.3 |\n| fanout:openrouter | Claude Fable 5.2 (max) | 5x GPT-6.1 Sol (high) + 1x Gemini 4 Carbon (medium) + 1x Claude Fable 5.2 (medium) | Gemini 4 Carbon (medium) | Claude Fable 5.2 (max), Gemini 4 Carbon (medium), Claude Opus 5.5 (xhigh) | 1.75 |\n| fanout:mix | Claude Fable 5.2 (high) | 5x GPT-6.1 Sol (high) + 1x Gemini 4 Carbon (high) + 1x Claude Fable 5.2 (low) | Gemini 4 Carbon (high) | Claude Fable 5.2 (high), Gemini 4 Carbon (high), GPT-6.1 Sol (max) | 1.0 |\n| fanout:nobody | no usable models | | | | |\n| fanout:empty | no usable models | | | | |\n| crosslab | Claude Fable 5.2 (high) | 5x GPT-6.1 Sol (high) + 1x Claude Fable 5.2 (low) + 1x Gemini 4 Carbon (high) | Gemini 4 Carbon (high) | Claude Fable 5.2 (high), GPT-6.1 Sol (max), Gemini 4 Carbon (high) | 1.0 |\n| solo | current model @ high | current model @ medium | current model @ high | current model @ high | n/a |\n",
+   "err": "",
+   "env": {
+    "COUNCIL_SKILL_DIR": "<BASE>/skill",
+    "AA_API_KEY": "test-key",
+    "HTTPS_PROXY": null,
+    "https_proxy": null,
+    "HTTP_PROXY": null,
+    "http_proxy": null,
+    "ALL_PROXY": null,
+    "all_proxy": null
+   }
+  },
+  {
+   "cmd": [
+    "refresh",
+    "--check"
+   ],
+   "clock": 19,
+   "rc": 0,
+   "out": "model data is 30 days old (limit 30)\n",
+   "err": "",
+   "env": {
+    "COUNCIL_SKILL_DIR": "<BASE>/skill",
+    "COUNCIL_NOW": "2026-12-13T08:00:00"
+   }
+  },
+  {
+   "cmd": [
+    "refresh"
+   ],
+   "clock": 20,
+   "rc": 1,
+   "out": "",
+   "err": "",
+   "env": {
+    "COUNCIL_SKILL_DIR": "<BASE>/skill",
+    "AA_API_KEY": "wrong-key",
+    "HTTPS_PROXY": null,
+    "https_proxy": null,
+    "HTTP_PROXY": null,
+    "http_proxy": null,
+    "ALL_PROXY": null,
+    "all_proxy": null
+   },
+   "loose": true
+  },
+  {
+   "rm": "<BASE>/skill/models/lock.yaml"
+  },
+  {
+   "put": "<ROOT>/lock-from-live-data.yaml",
+   "text": "# GENERATED by `council refresh` from models/policy.yaml (k values and floors are\n# starting defaults: tune them against your golden set, see reference/model-modes.md).\n# Do not edit by hand: change policy.yaml (rules, pins, bans) and re-run. Review diffs in a PR.\ngenerated: '2026-11-13'\ndata:\n  source: Artificial Analysis API (artificialanalysis.ai)\n  collected: '2026-11-13'\n  index: AA Intelligence Index (live)\n  attribution: 'Model data: Artificial Analysis (https://artificialanalysis.ai)'\npolicy_version: 1\nwarnings: []\nconfigs:\n  max:\n    fanout:claude:\n      chair:\n        model: Claude Fable 5.2 (max)\n        creator: Anthropic\n        quality: 65\n        cost_per_task: 26.54\n        openrouter_id: lab/0\n      experts:\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: Claude Opus 5.5 (max)\n        creator: Anthropic\n        quality: 59\n        cost_per_task: 10.04\n      red_team:\n        model: Claude Opus 5.5 (max)\n        creator: Anthropic\n        quality: 59\n        cost_per_task: 10.04\n      elders:\n      - model: Claude Fable 5.2 (max)\n        creator: Anthropic\n        quality: 65\n        cost_per_task: 26.54\n        openrouter_id: lab/0\n      - model: Claude Opus 5.5 (max)\n        creator: Anthropic\n        quality: 59\n        cost_per_task: 10.04\n      - model: Claude Sonnet 5.5 (max)\n        creator: Anthropic\n        quality: 55\n        cost_per_task: 10.02\n      verifier:\n        model: Claude Opus 5.5 (low)\n        creator: Anthropic\n        quality: 35\n        cost_per_task: 0.98\n        openrouter_id: lab/9\n      relative_cost: 4.01\n    fanout:openai:\n      chair:\n        model: GPT-6 Astra (max)\n        creator: OpenAI\n        quality: 57\n        cost_per_task: 6.24\n      experts:\n      - model: GPT-6.1 Sol (max)\n        creator: OpenAI\n        quality: 55\n        cost_per_task: 1.27\n      - model: GPT-6.1 Sol (max)\n        creator: OpenAI\n        quality: 55\n        cost_per_task: 1.27\n      - model: GPT-6.1 Sol (max)\n        creator: OpenAI\n        quality: 55\n        cost_per_task: 1.27\n      - model: GPT-6.1 Sol (max)\n        creator: OpenAI\n        quality: 55\n        cost_per_task: 1.27\n      - model: GPT-6.1 Sol (max)\n        creator: OpenAI\n        quality: 55\n        cost_per_task: 1.27\n      - model: GPT-6 Astra (high)\n        creator: OpenAI\n        quality: 55\n        cost_per_task: 3.24\n      - model: GPT-6.1 Terra (max)\n        creator: OpenAI\n        quality: 51\n        cost_per_task: 0.96\n        openrouter_id: lab/30\n      red_team:\n        model: GPT-6.1 Sol (max)\n        creator: OpenAI\n        quality: 55\n        cost_per_task: 1.27\n      elders:\n      - model: GPT-6 Astra (max)\n        creator: OpenAI\n        quality: 57\n        cost_per_task: 6.24\n      - model: GPT-6.1 Sol (max)\n        creator: OpenAI\n        quality: 55\n        cost_per_task: 1.27\n      - model: GPT-6.1 Terra (max)\n        creator: OpenAI\n        quality: 51\n        cost_per_task: 0.96\n        openrouter_id: lab/30\n      verifier:\n        model: GPT-6.1 Sol (medium)\n        creator: OpenAI\n        quality: 46\n        cost_per_task: 0.36\n      relative_cost: 0.72\n    fanout:gemini:\n      chair:\n        model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      experts:\n      - model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      - model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      - model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      - model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      - model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      - model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      - model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      red_team:\n        model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      elders:\n      - model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      - model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      verifier:\n        model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      relative_cost: 1.91\n    fanout:open:\n      chair:\n        model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      experts:\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      red_team:\n        model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      elders:\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      verifier:\n        model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      relative_cost: 1.3\n    fanout:openrouter:\n      chair:\n        model: Claude Fable 5.2 (max)\n        creator: Anthropic\n        quality: 65\n        cost_per_task: 26.54\n        openrouter_id: lab/0\n      experts:\n      - model: Claude Fable 5.2 (max)\n        creator: Anthropic\n        quality: 65\n        cost_per_task: 26.54\n        openrouter_id: lab/0\n      - model: Claude Fable 5.2 (max)\n        creator: Anthropic\n        quality: 65\n        cost_per_task: 26.54\n        openrouter_id: lab/0\n      - model: Claude Fable 5.2 (max)\n        creator: Anthropic\n        quality: 65\n        cost_per_task: 26.54\n        openrouter_id: lab/0\n      - model: Claude Fable 5.2 (max)\n        creator: Anthropic\n        quality: 65\n        cost_per_task: 26.54\n        openrouter_id: lab/0\n      - model: Claude Fable 5.2 (max)\n        creator: Anthropic\n        quality: 65\n        cost_per_task: 26.54\n        openrouter_id: lab/0\n      - model: Claude Fable 5.2 (max)\n        creator: Anthropic\n        quality: 65\n        cost_per_task: 26.54\n        openrouter_id: lab/0\n      - model: Gemini 4 Carbon (medium)\n        creator: Google\n        quality: 58\n        cost_per_task: 4.68\n        openrouter_id: lab/42\n      red_team:\n        model: Gemini 4 Carbon (medium)\n        creator: Google\n        quality: 58\n        cost_per_task: 4.68\n        openrouter_id: lab/42\n      elders:\n      - model: Claude Fable 5.2 (max)\n        creator: Anthropic\n        quality: 65\n        cost_per_task: 26.54\n        openrouter_id: lab/0\n      - model: Gemini 4 Carbon (medium)\n        creator: Google\n        quality: 58\n        cost_per_task: 4.68\n        openrouter_id: lab/42\n      - model: Claude Opus 5.5 (xhigh)\n        creator: Anthropic\n        quality: 57\n        cost_per_task: 6.05\n        openrouter_id: lab/6\n      verifier:\n        model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n        openrouter_id: lab/33\n      relative_cost: 7.66\n    fanout:mix:\n      chair:\n        model: Claude Fable 5.2 (max)\n        creator: Anthropic\n        quality: 65\n        cost_per_task: 26.54\n        openrouter_id: lab/0\n      experts:\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      - model: GPT-6 Astra (max)\n        creator: OpenAI\n        quality: 57\n        cost_per_task: 6.24\n      red_team:\n        model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      elders:\n      - model: Claude Fable 5.2 (max)\n        creator: Anthropic\n        quality: 65\n        cost_per_task: 26.54\n        openrouter_id: lab/0\n      - model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      - model: Claude Opus 5.5 (max)\n        creator: Anthropic\n        quality: 59\n        cost_per_task: 10.04\n      verifier:\n        model: GPT-6.1 Sol (medium)\n        creator: OpenAI\n        quality: 46\n        cost_per_task: 0.36\n      relative_cost: 3.59\n    fanout:nobody:\n      error: no usable models\n    fanout:empty:\n      error: no usable models\n    crosslab:\n      chair:\n        model: Claude Fable 5.2 (max)\n        creator: Anthropic\n        quality: 65\n        cost_per_task: 26.54\n        openrouter_id: lab/0\n      experts:\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: GPT-6 Astra (max)\n        creator: OpenAI\n        quality: 57\n        cost_per_task: 6.24\n      - model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      red_team:\n        model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      elders:\n      - model: Claude Fable 5.2 (max)\n        creator: Anthropic\n        quality: 65\n        cost_per_task: 26.54\n        openrouter_id: lab/0\n      - model: GPT-6 Astra (max)\n        creator: OpenAI\n        quality: 57\n        cost_per_task: 6.24\n      - model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      verifier:\n        model: GPT-6.1 Sol (medium)\n        creator: OpenAI\n        quality: 46\n        cost_per_task: 0.36\n      relative_cost: 3.55\n    solo:\n      chair: current model @ max\n      experts: current model @ high\n      red_team: current model @ high\n      elders: current model @ max\n      verifier: current model @ medium\n  balanced:\n    fanout:claude:\n      chair:\n        model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      experts:\n      - model: Claude Fable 5.2 (low)\n        creator: Anthropic\n        quality: 54\n        cost_per_task: 3.1\n      - model: Claude Fable 5.2 (low)\n        creator: Anthropic\n        quality: 54\n        cost_per_task: 3.1\n      - model: Claude Fable 5.2 (low)\n        creator: Anthropic\n        quality: 54\n        cost_per_task: 3.1\n      - model: Claude Fable 5.2 (low)\n        creator: Anthropic\n        quality: 54\n        cost_per_task: 3.1\n      - model: Claude Fable 5.2 (low)\n        creator: Anthropic\n        quality: 54\n        cost_per_task: 3.1\n      - model: Claude Opus 5.5 (high)\n        creator: Anthropic\n        quality: 52\n        cost_per_task: 3.46\n      - model: Claude Sonnet 5.5 (xhigh)\n        creator: Anthropic\n        quality: 50\n        cost_per_task: 4.09\n      red_team:\n        model: Claude Opus 5.5 (max)\n        creator: Anthropic\n        quality: 59\n        cost_per_task: 10.04\n      elders:\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: Claude Opus 5.5 (max)\n        creator: Anthropic\n        quality: 59\n        cost_per_task: 10.04\n      - model: Claude Sonnet 5.5 (max)\n        creator: Anthropic\n        quality: 55\n        cost_per_task: 10.02\n      verifier:\n        model: Claude Opus 5.5 (low)\n        creator: Anthropic\n        quality: 35\n        cost_per_task: 0.98\n        openrouter_id: lab/9\n      relative_cost: 1.66\n    fanout:openai:\n      chair:\n        model: GPT-6.1 Sol (max)\n        creator: OpenAI\n        quality: 55\n        cost_per_task: 1.27\n      experts:\n      - model: GPT-6.1 Sol (medium)\n        creator: OpenAI\n        quality: 46\n        cost_per_task: 0.36\n      - model: GPT-6.1 Sol (medium)\n        creator: OpenAI\n        quality: 46\n        cost_per_task: 0.36\n      - model: GPT-6.1 Sol (medium)\n        creator: OpenAI\n        quality: 46\n        cost_per_task: 0.36\n      - model: GPT-6.1 Sol (medium)\n        creator: OpenAI\n        quality: 46\n        cost_per_task: 0.36\n      - model: GPT-6.1 Sol (medium)\n        creator: OpenAI\n        quality: 46\n        cost_per_task: 0.36\n      - model: GPT-6.1 Terra (high)\n        creator: OpenAI\n        quality: 42\n        cost_per_task: 0.26\n      - model: GPT-6 Astra (high)\n        creator: OpenAI\n        quality: 55\n        cost_per_task: 3.24\n      red_team:\n        model: GPT-6 Astra (high)\n        creator: OpenAI\n        quality: 55\n        cost_per_task: 3.24\n      elders:\n      - model: GPT-6.1 Sol (max)\n        creator: OpenAI\n        quality: 55\n        cost_per_task: 1.27\n      - model: GPT-6 Astra (max)\n        creator: OpenAI\n        quality: 57\n        cost_per_task: 6.24\n      - model: GPT-6.1 Terra (max)\n        creator: OpenAI\n        quality: 51\n        cost_per_task: 0.96\n        openrouter_id: lab/30\n      verifier:\n        model: GPT-6.1 Sol (medium)\n        creator: OpenAI\n        quality: 46\n        cost_per_task: 0.36\n      relative_cost: 0.39\n    fanout:gemini:\n      chair:\n        model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      experts:\n      - model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      - model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      - model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      - model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      - model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      - model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      red_team:\n        model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      elders:\n      - model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      - model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      verifier:\n        model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      relative_cost: 1.9\n    fanout:open:\n      chair:\n        model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      experts:\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      red_team:\n        model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      elders:\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      verifier:\n        model: DeepSeek V4.1 Flash 1017 (max)\n        creator: DeepSeek\n        quality: 33\n        cost_per_task: 0.6\n        open_weights: true\n      relative_cost: 1.3\n    fanout:openrouter:\n      chair:\n        model: Claude Fable 5.2 (max)\n        creator: Anthropic\n        quality: 65\n        cost_per_task: 26.54\n        openrouter_id: lab/0\n      experts:\n      - model: GPT-6.1 Sol (high)\n        creator: OpenAI\n        quality: 50\n        cost_per_task: 0.59\n        openrouter_id: lab/27\n      - model: GPT-6.1 Sol (high)\n        creator: OpenAI\n        quality: 50\n        cost_per_task: 0.59\n        openrouter_id: lab/27\n      - model: GPT-6.1 Sol (high)\n        creator: OpenAI\n        quality: 50\n        cost_per_task: 0.59\n        openrouter_id: lab/27\n      - model: GPT-6.1 Sol (high)\n        creator: OpenAI\n        quality: 50\n        cost_per_task: 0.59\n        openrouter_id: lab/27\n      - model: GPT-6.1 Sol (high)\n        creator: OpenAI\n        quality: 50\n        cost_per_task: 0.59\n        openrouter_id: lab/27\n      - model: Gemini 4 Carbon (medium)\n        creator: Google\n        quality: 58\n        cost_per_task: 4.68\n        openrouter_id: lab/42\n      - model: Claude Fable 5.2 (medium)\n        creator: Anthropic\n        quality: 56\n        cost_per_task: 3.8\n        openrouter_id: lab/3\n      red_team:\n        model: Gemini 4 Carbon (medium)\n        creator: Google\n        quality: 58\n        cost_per_task: 4.68\n        openrouter_id: lab/42\n      elders:\n      - model: Claude Fable 5.2 (max)\n        creator: Anthropic\n        quality: 65\n        cost_per_task: 26.54\n        openrouter_id: lab/0\n      - model: Gemini 4 Carbon (medium)\n        creator: Google\n        quality: 58\n        cost_per_task: 4.68\n        openrouter_id: lab/42\n      - model: Claude Opus 5.5 (xhigh)\n        creator: Anthropic\n        quality: 57\n        cost_per_task: 6.05\n        openrouter_id: lab/6\n      verifier:\n        model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n        openrouter_id: lab/33\n      relative_cost: 1.75\n    fanout:mix:\n      chair:\n        model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      experts:\n      - model: GPT-6.1 Sol (high)\n        creator: OpenAI\n        quality: 50\n        cost_per_task: 0.59\n        openrouter_id: lab/27\n      - model: GPT-6.1 Sol (high)\n        creator: OpenAI\n        quality: 50\n        cost_per_task: 0.59\n        openrouter_id: lab/27\n      - model: GPT-6.1 Sol (high)\n        creator: OpenAI\n        quality: 50\n        cost_per_task: 0.59\n        openrouter_id: lab/27\n      - model: GPT-6.1 Sol (high)\n        creator: OpenAI\n        quality: 50\n        cost_per_task: 0.59\n        openrouter_id: lab/27\n      - model: GPT-6.1 Sol (high)\n        creator: OpenAI\n        quality: 50\n        cost_per_task: 0.59\n        openrouter_id: lab/27\n      - model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      - model: Claude Fable 5.2 (low)\n        creator: Anthropic\n        quality: 54\n        cost_per_task: 3.1\n      red_team:\n        model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      elders:\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      - model: GPT-6.1 Sol (max)\n        creator: OpenAI\n        quality: 55\n        cost_per_task: 1.27\n      verifier:\n        model: GPT-6.1 Sol (medium)\n        creator: OpenAI\n        quality: 46\n        cost_per_task: 0.36\n      relative_cost: 1.0\n    fanout:nobody:\n      error: no usable models\n    fanout:empty:\n      error: no usable models\n    crosslab:\n      chair:\n        model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      experts:\n      - model: GPT-6.1 Sol (high)\n        creator: OpenAI\n        quality: 50\n        cost_per_task: 0.59\n        openrouter_id: lab/27\n      - model: GPT-6.1 Sol (high)\n        creator: OpenAI\n        quality: 50\n        cost_per_task: 0.59\n        openrouter_id: lab/27\n      - model: GPT-6.1 Sol (high)\n        creator: OpenAI\n        quality: 50\n        cost_per_task: 0.59\n        openrouter_id: lab/27\n      - model: GPT-6.1 Sol (high)\n        creator: OpenAI\n        quality: 50\n        cost_per_task: 0.59\n        openrouter_id: lab/27\n      - model: GPT-6.1 Sol (high)\n        creator: OpenAI\n        quality: 50\n        cost_per_task: 0.59\n        openrouter_id: lab/27\n      - model: Claude Fable 5.2 (low)\n        creator: Anthropic\n        quality: 54\n        cost_per_task: 3.1\n      - model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      red_team:\n        model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      elders:\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: GPT-6.1 Sol (max)\n        creator: OpenAI\n        quality: 55\n        cost_per_task: 1.27\n      - model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      verifier:\n        model: GPT-6.1 Sol (medium)\n        creator: OpenAI\n        quality: 46\n        cost_per_task: 0.36\n      relative_cost: 1.0\n    solo:\n      chair: current model @ high\n      experts: current model @ medium\n      red_team: current model @ high\n      elders: current model @ high\n      verifier: current model @ low\n  efficient:\n    fanout:claude:\n      chair:\n        model: Claude Fable 5.2 (low)\n        creator: Anthropic\n        quality: 54\n        cost_per_task: 3.1\n      experts:\n      - model: Claude Haiku 5.5 (xhigh)\n        creator: Anthropic\n        quality: 35\n        cost_per_task: 0.25\n      - model: Claude Haiku 5.5 (xhigh)\n        creator: Anthropic\n        quality: 35\n        cost_per_task: 0.25\n      - model: Claude Haiku 5.5 (xhigh)\n        creator: Anthropic\n        quality: 35\n        cost_per_task: 0.25\n      - model: Claude Haiku 5.5 (xhigh)\n        creator: Anthropic\n        quality: 35\n        cost_per_task: 0.25\n      - model: Claude Haiku 5.5 (xhigh)\n        creator: Anthropic\n        quality: 35\n        cost_per_task: 0.25\n      - model: Claude Haiku 5.5 (xhigh)\n        creator: Anthropic\n        quality: 35\n        cost_per_task: 0.25\n      - model: Claude Fable 5.2 (low)\n        creator: Anthropic\n        quality: 54\n        cost_per_task: 3.1\n      red_team:\n        model: Claude Opus 5.5 (xhigh)\n        creator: Anthropic\n        quality: 57\n        cost_per_task: 6.05\n        openrouter_id: lab/6\n      elders:\n      - model: Claude Fable 5.2 (medium)\n        creator: Anthropic\n        quality: 56\n        cost_per_task: 3.8\n        openrouter_id: lab/3\n      - model: Claude Opus 5.5 (xhigh)\n        creator: Anthropic\n        quality: 57\n        cost_per_task: 6.05\n        openrouter_id: lab/6\n      - model: Claude Sonnet 5.5 (max)\n        creator: Anthropic\n        quality: 55\n        cost_per_task: 10.02\n      verifier:\n        model: Claude Opus 5.5 (low)\n        creator: Anthropic\n        quality: 35\n        cost_per_task: 0.98\n        openrouter_id: lab/9\n      relative_cost: 0.59\n    fanout:openai:\n      chair:\n        model: GPT-6.1 Sol (medium)\n        creator: OpenAI\n        quality: 46\n        cost_per_task: 0.36\n      experts:\n      - model: GPT-6.1 Terra (low)\n        creator: OpenAI\n        quality: 29\n        cost_per_task: 0.0713\n      - model: GPT-6.1 Terra (low)\n        creator: OpenAI\n        quality: 29\n        cost_per_task: 0.0713\n      - model: GPT-6.1 Terra (low)\n        creator: OpenAI\n        quality: 29\n        cost_per_task: 0.0713\n      - model: GPT-6.1 Terra (low)\n        creator: OpenAI\n        quality: 29\n        cost_per_task: 0.0713\n      - model: GPT-6.1 Terra (low)\n        creator: OpenAI\n        quality: 29\n        cost_per_task: 0.0713\n      - model: GPT-6.1 Sol (medium)\n        creator: OpenAI\n        quality: 46\n        cost_per_task: 0.36\n      - model: GPT-6 Luna (max)\n        creator: OpenAI\n        quality: 28\n        cost_per_task: 0.15\n      red_team:\n        model: GPT-6.1 Terra (high)\n        creator: OpenAI\n        quality: 42\n        cost_per_task: 0.26\n      elders:\n      - model: GPT-6.1 Sol (medium)\n        creator: OpenAI\n        quality: 46\n        cost_per_task: 0.36\n      - model: GPT-6.1 Terra (max)\n        creator: OpenAI\n        quality: 51\n        cost_per_task: 0.96\n        openrouter_id: lab/30\n      - model: GPT-6 Astra (high)\n        creator: OpenAI\n        quality: 55\n        cost_per_task: 3.24\n      verifier:\n        model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n        openrouter_id: lab/33\n      relative_cost: 0.09\n    fanout:gemini:\n      chair:\n        model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      experts:\n      - model: Gemini 4 Carbon (medium)\n        creator: Google\n        quality: 58\n        cost_per_task: 4.68\n        openrouter_id: lab/42\n      - model: Gemini 4 Carbon (medium)\n        creator: Google\n        quality: 58\n        cost_per_task: 4.68\n        openrouter_id: lab/42\n      - model: Gemini 4 Carbon (medium)\n        creator: Google\n        quality: 58\n        cost_per_task: 4.68\n        openrouter_id: lab/42\n      - model: Gemini 4 Carbon (medium)\n        creator: Google\n        quality: 58\n        cost_per_task: 4.68\n        openrouter_id: lab/42\n      - model: Gemini 4 Carbon (medium)\n        creator: Google\n        quality: 58\n        cost_per_task: 4.68\n        openrouter_id: lab/42\n      - model: Gemini 4 Carbon (medium)\n        creator: Google\n        quality: 58\n        cost_per_task: 4.68\n        openrouter_id: lab/42\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      red_team:\n        model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      elders:\n      - model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      - model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      verifier:\n        model: Gemini 4 Carbon (medium)\n        creator: Google\n        quality: 58\n        cost_per_task: 4.68\n        openrouter_id: lab/42\n      relative_cost: 1.71\n    fanout:open:\n      chair:\n        model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      experts:\n      - model: DeepSeek V4.1 Flash 1017 (max)\n        creator: DeepSeek\n        quality: 33\n        cost_per_task: 0.6\n        open_weights: true\n      - model: DeepSeek V4.1 Flash 1017 (max)\n        creator: DeepSeek\n        quality: 33\n        cost_per_task: 0.6\n        open_weights: true\n      - model: DeepSeek V4.1 Flash 1017 (max)\n        creator: DeepSeek\n        quality: 33\n        cost_per_task: 0.6\n        open_weights: true\n      - model: DeepSeek V4.1 Flash 1017 (max)\n        creator: DeepSeek\n        quality: 33\n        cost_per_task: 0.6\n        open_weights: true\n      - model: DeepSeek V4.1 Flash 1017 (max)\n        creator: DeepSeek\n        quality: 33\n        cost_per_task: 0.6\n        open_weights: true\n      - model: DeepSeek V4.1 Flash 1017 (max)\n        creator: DeepSeek\n        quality: 33\n        cost_per_task: 0.6\n        open_weights: true\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      red_team:\n        model: DeepSeek V4.1 Flash 1017 (max)\n        creator: DeepSeek\n        quality: 33\n        cost_per_task: 0.6\n        open_weights: true\n      elders:\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      verifier:\n        model: DeepSeek V4.1 Flash 1017 (max)\n        creator: DeepSeek\n        quality: 33\n        cost_per_task: 0.6\n        open_weights: true\n      relative_cost: 0.52\n    fanout:openrouter:\n      chair:\n        model: Claude Fable 5.2 (medium)\n        creator: Anthropic\n        quality: 56\n        cost_per_task: 3.8\n        openrouter_id: lab/3\n      experts:\n      - model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n        openrouter_id: lab/33\n      - model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n        openrouter_id: lab/33\n      - model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n        openrouter_id: lab/33\n      - model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n        openrouter_id: lab/33\n      - model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n        openrouter_id: lab/33\n      - model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n        openrouter_id: lab/33\n      - model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n        openrouter_id: lab/33\n      red_team:\n        model: GPT-6.1 Sol (high)\n        creator: OpenAI\n        quality: 50\n        cost_per_task: 0.59\n        openrouter_id: lab/27\n      elders:\n      - model: Gemini 4 Carbon (medium)\n        creator: Google\n        quality: 58\n        cost_per_task: 4.68\n        openrouter_id: lab/42\n      - model: Claude Fable 5.2 (medium)\n        creator: Anthropic\n        quality: 56\n        cost_per_task: 3.8\n        openrouter_id: lab/3\n      - model: GPT-6 Astra (xhigh)\n        creator: OpenAI\n        quality: 55\n        cost_per_task: 3.66\n        openrouter_id: lab/21\n      verifier:\n        model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n        openrouter_id: lab/33\n      relative_cost: 0.3\n    fanout:mix:\n      chair:\n        model: GPT-6.1 Sol (xhigh)\n        creator: OpenAI\n        quality: 52\n        cost_per_task: 0.76\n      experts:\n      - model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n        openrouter_id: lab/33\n      - model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n        openrouter_id: lab/33\n      - model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n        openrouter_id: lab/33\n      - model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n        openrouter_id: lab/33\n      - model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n        openrouter_id: lab/33\n      - model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n        openrouter_id: lab/33\n      - model: Claude Haiku 5.5 (xhigh)\n        creator: Anthropic\n        quality: 35\n        cost_per_task: 0.25\n      red_team:\n        model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      elders:\n      - model: GPT-6.1 Sol (xhigh)\n        creator: OpenAI\n        quality: 52\n        cost_per_task: 0.76\n      - model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      - model: GPT-6 Astra (high)\n        creator: OpenAI\n        quality: 55\n        cost_per_task: 3.24\n      verifier:\n        model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n        openrouter_id: lab/33\n      relative_cost: 0.27\n    fanout:nobody:\n      error: no usable models\n    fanout:empty:\n      error: no usable models\n    crosslab:\n      chair:\n        model: GPT-6.1 Sol (xhigh)\n        creator: OpenAI\n        quality: 52\n        cost_per_task: 0.76\n      experts:\n      - model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n        openrouter_id: lab/33\n      - model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n        openrouter_id: lab/33\n      - model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n        openrouter_id: lab/33\n      - model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n        openrouter_id: lab/33\n      - model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n        openrouter_id: lab/33\n      - model: Claude Haiku 5.5 (xhigh)\n        creator: Anthropic\n        quality: 35\n        cost_per_task: 0.25\n      - model: Gemini 4 Carbon (medium)\n        creator: Google\n        quality: 58\n        cost_per_task: 4.68\n        openrouter_id: lab/42\n      red_team:\n        model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      elders:\n      - model: Claude Fable 5.2 (low)\n        creator: Anthropic\n        quality: 54\n        cost_per_task: 3.1\n      - model: GPT-6.1 Sol (medium)\n        creator: OpenAI\n        quality: 46\n        cost_per_task: 0.36\n      - model: Gemini 4 Carbon (high)\n        creator: Google\n        quality: 60\n        cost_per_task: 5.48\n      verifier:\n        model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n        openrouter_id: lab/33\n      relative_cost: 0.44\n    solo:\n      chair: current model @ medium\n      experts: current model @ low\n      red_team: current model @ medium\n      elders: current model @ medium\n      verifier: current model @ low\n"
+  },
+  {
+   "cmd": [
+    "refresh",
+    "--check"
+   ],
+   "clock": 21,
+   "rc": 1,
+   "out": "lock.yaml missing: run `council refresh`\n",
+   "err": "",
+   "env": {
+    "COUNCIL_SKILL_DIR": "<BASE>/skill"
+   }
+  },
+  {
+   "cmd": [
+    "doctor"
+   ],
+   "clock": 22,
+   "rc": 0,
+   "out": "recommended mode: fanout:claude · fresh contexts via: subagents\nnote: only one lab reachable: elders come from the same family (no cross-lab check). Install the codex / gemini CLIs or set OPENROUTER_API_KEY to get one\nnote: models/lock.yaml missing: run `council refresh --offline <snapshot>`\n{\n \"claude_code\": true,\n \"cli\": {\n  \"claude\": true,\n  \"codex\": false,\n  \"gemini\": false\n },\n \"git\": true,\n \"openrouter_key\": false,\n \"aa_key\": false,\n \"labs_reachable\": {\n  \"Anthropic\": true,\n  \"OpenAI\": false,\n  \"Google\": false\n },\n \"fresh_contexts\": \"subagents\",\n \"lock\": {\n  \"exists\": false,\n  \"age_days\": null,\n  \"stale\": null\n },\n \"recommended_mode\": \"fanout:claude\",\n \"strongest_mode\": \"fanout:claude\",\n \"mode_costs\": {},\n \"notes\": [\n  \"only one lab reachable: elders come from the same family (no cross-lab check). Install the codex / gemini CLIs or set OPENROUTER_API_KEY to get one\",\n  \"models/lock.yaml missing: run `council refresh --offline <snapshot>`\"\n ],\n \"memory\": {\n  \"backend\": \"files\",\n  \"dir\": \"<ROOT>/.council/memory\",\n  \"source\": \"default\",\n  \"ok\": true\n }\n}\n",
+   "err": "",
+   "env": {
+    "COUNCIL_SKILL_DIR": "<BASE>/skill"
+   }
+  },
+  {
+   "cmd": [
+    "models"
+   ],
+   "clock": 23,
+   "rc": 0,
+   "out": "{\n \"error\": \"<BASE>/skill/models/lock.yaml missing: run `council refresh`\"\n}\n",
+   "err": "",
+   "env": {
+    "COUNCIL_SKILL_DIR": "<BASE>/skill"
+   }
+  },
+  {
+   "cmd": [
+    "plan",
+    "Pick the queue technology for the billing pipeline"
+   ],
+   "clock": 24,
+   "rc": 0,
+   "out": "GATE tier=lite mode=fanout:claude profile=efficient loops<=1 calls~11 tokens~1.7M rel_cost=n/a (default: pass --stakes and --reversible to record your judgment)\nMEMBERS researchers=2 (papers and primary research; practice in the field; about 10 searches each) mapper=not needed (no source code found in this project) memory=files:.council/memory\n{\n \"tier\": \"lite\",\n \"reason\": \"default: pass --stakes and --reversible to record your judgment\",\n \"tripwires\": [],\n \"mode\": \"fanout:claude\",\n \"profile\": \"efficient\",\n \"chosen_by\": {\n  \"mode\": \"default\",\n  \"profile\": \"default\"\n },\n \"shape\": {\n  \"experts\": 3,\n  \"ideas_min\": 5,\n  \"keep\": 2,\n  \"elders\": 1,\n  \"start\": 3,\n  \"loops\": 1,\n  \"rubric\": [\n   3,\n   7\n  ],\n  \"schedule\": [\n   3,\n   1\n  ]\n },\n \"calls_estimate\": 11,\n \"tokens_estimate\": 1672000,\n \"models\": {\n  \"error\": \"<BASE>/skill/models/lock.yaml missing: run `council refresh`\"\n },\n \"support\": {\n  \"research\": {\n   \"budget\": {\n    \"lite\": 10,\n    \"full\": 15\n   },\n   \"seats\": 2,\n   \"later_loops\": \"on_request\",\n   \"model\": \"auto\",\n   \"beats\": []\n  },\n  \"map\": {\n   \"when\": \"stale\",\n   \"model\": \"chair\",\n   \"focus_tokens\": 700,\n   \"skeleton_lines\": 420,\n   \"path\": \"\",\n   \"due\": false,\n   \"reason\": \"no source code found in this project\"\n  },\n  \"digest\": 14,\n  \"origin\": {\n   \"research.seats\": \"default\",\n   \"research.budget.lite\": \"default\",\n   \"research.budget.full\": \"default\",\n   \"research.later_loops\": \"default\",\n   \"research.model\": \"default\",\n   \"research.beats\": \"default\",\n   \"map.when\": \"default\",\n   \"map.model\": \"default\",\n   \"map.focus_tokens\": \"default\",\n   \"map.skeleton_lines\": \"default\",\n   \"map.path\": \"default\",\n   \"digest\": \"default\"\n  },\n  \"problems\": []\n },\n \"environment_notes\": [\n  \"only one lab reachable: elders come from the same family (no cross-lab check). Install the codex / gemini CLIs or set OPENROUTER_API_KEY to get one\",\n  \"models/lock.yaml missing: run `council refresh --offline <snapshot>`\",\n  \"mode=fanout:claude and profile=efficient are the cheapest that work here (the default). More rigour costs more: --profile balanced or max. Keep a choice: `defaults:` in your ~/.council/config.yaml\"\n ]\n}\n",
+   "err": "",
+   "env": {
+    "COUNCIL_SKILL_DIR": "<BASE>/skill"
+   }
+  },
+  {
+   "cmd": [
+    "init",
+    "Pick the queue technology for the billing pipeline",
+    "--tier",
+    "lite"
+   ],
+   "clock": 25,
+   "rc": 2,
+   "out": "",
+   "err": "error: <BASE>/skill/models/lock.yaml missing: run `council refresh`\n",
+   "env": {
+    "COUNCIL_SKILL_DIR": "<BASE>/skill"
+   }
+  }
+ ],
+ "final": {
+  "<ROOT>/broken.json": {
+   "as_put": true
+  },
+  "<ROOT>/gaps.json": {
+   "as_put": true
+  },
+  "<ROOT>/lock-from-live-data.yaml": {
+   "as_put": true
+  },
+  "<ROOT>/lock.yaml": {
+   "text": "# GENERATED by `council refresh` from models/policy.yaml (k values and floors are\n# starting defaults: tune them against your golden set, see reference/model-modes.md).\n# Do not edit by hand: change policy.yaml (rules, pins, bans) and re-run. Review diffs in a PR.\ngenerated: '2026-11-13'\ndata:\n  source: Artificial Analysis (https://artificialanalysis.ai) - attribution required\n  collected: '2026-11-13'\n  index: Artificial Analysis Intelligence Index v5.0.1 (0-100)\n  attribution: 'Model data: Artificial Analysis (https://artificialanalysis.ai)'\npolicy_version: 1\nwarnings:\n- 'fanout:openrouter: OpenRouter availability unknown in this snapshot; using all usable models. Run a live refresh to filter\n  by openrouter_api_id.'\nconfigs:\n  max:\n    fanout:claude:\n      chair:\n        model: Claude Fable 5.2 (max)\n        creator: Anthropic\n        quality: 65\n        cost_per_task: 26.54\n      experts:\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: Claude Opus 5.5 (max)\n        creator: Anthropic\n        quality: 59\n        cost_per_task: 10.04\n      red_team:\n        model: Claude Opus 5.5 (max)\n        creator: Anthropic\n        quality: 59\n        cost_per_task: 10.04\n      elders:\n      - model: Claude Fable 5.2 (max)\n        creator: Anthropic\n        quality: 65\n        cost_per_task: 26.54\n      - model: Claude Opus 5.5 (max)\n        creator: Anthropic\n        quality: 59\n        cost_per_task: 10.04\n      - model: Claude Sonnet 5.5 (max)\n        creator: Anthropic\n        quality: 55\n        cost_per_task: 10.02\n      verifier:\n        model: Claude Opus 5.5 (low)\n        creator: Anthropic\n        quality: 35\n        cost_per_task: 0.98\n      relative_cost: 4.48\n    fanout:openai:\n      chair:\n        model: GPT-6 Astra (max)\n        creator: OpenAI\n        quality: 57\n        cost_per_task: 6.24\n      experts:\n      - model: GPT-6.1 Sol (max)\n        creator: OpenAI\n        quality: 55\n        cost_per_task: 1.27\n      - model: GPT-6.1 Sol (max)\n        creator: OpenAI\n        quality: 55\n        cost_per_task: 1.27\n      - model: GPT-6.1 Sol (max)\n        creator: OpenAI\n        quality: 55\n        cost_per_task: 1.27\n      - model: GPT-6.1 Sol (max)\n        creator: OpenAI\n        quality: 55\n        cost_per_task: 1.27\n      - model: GPT-6.1 Sol (max)\n        creator: OpenAI\n        quality: 55\n        cost_per_task: 1.27\n      - model: GPT-6 Astra (high)\n        creator: OpenAI\n        quality: 55\n        cost_per_task: 3.24\n      - model: GPT-6.1 Terra (max)\n        creator: OpenAI\n        quality: 51\n        cost_per_task: 0.96\n      red_team:\n        model: GPT-6.1 Sol (max)\n        creator: OpenAI\n        quality: 55\n        cost_per_task: 1.27\n      elders:\n      - model: GPT-6 Astra (max)\n        creator: OpenAI\n        quality: 57\n        cost_per_task: 6.24\n      - model: GPT-6.1 Sol (max)\n        creator: OpenAI\n        quality: 55\n        cost_per_task: 1.27\n      - model: GPT-6.1 Terra (max)\n        creator: OpenAI\n        quality: 51\n        cost_per_task: 0.96\n      verifier:\n        model: GPT-6.1 Sol (medium)\n        creator: OpenAI\n        quality: 46\n        cost_per_task: 0.36\n      relative_cost: 0.8\n    fanout:gemini:\n      chair:\n        model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      experts:\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      red_team:\n        model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      elders:\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      verifier:\n        model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      relative_cost: 1.96\n    fanout:open:\n      chair:\n        model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      experts:\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      red_team:\n        model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      elders:\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      verifier:\n        model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      relative_cost: 1.45\n    fanout:openrouter:\n      chair:\n        model: Claude Fable 5.2 (max)\n        creator: Anthropic\n        quality: 65\n        cost_per_task: 26.54\n      experts:\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: GPT-6 Astra (max)\n        creator: OpenAI\n        quality: 57\n        cost_per_task: 6.24\n      red_team:\n        model: GPT-6 Astra (max)\n        creator: OpenAI\n        quality: 57\n        cost_per_task: 6.24\n      elders:\n      - model: Claude Fable 5.2 (max)\n        creator: Anthropic\n        quality: 65\n        cost_per_task: 26.54\n      - model: Claude Opus 5.5 (max)\n        creator: Anthropic\n        quality: 59\n        cost_per_task: 10.04\n      - model: GPT-6 Astra (max)\n        creator: OpenAI\n        quality: 57\n        cost_per_task: 6.24\n      verifier:\n        model: GPT-6.1 Sol (medium)\n        creator: OpenAI\n        quality: 46\n        cost_per_task: 0.36\n      relative_cost: 4.19\n    fanout:mix:\n      chair:\n        model: Claude Fable 5.2 (max)\n        creator: Anthropic\n        quality: 65\n        cost_per_task: 26.54\n      experts:\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: GPT-6 Astra (max)\n        creator: OpenAI\n        quality: 57\n        cost_per_task: 6.24\n      red_team:\n        model: GPT-6 Astra (max)\n        creator: OpenAI\n        quality: 57\n        cost_per_task: 6.24\n      elders:\n      - model: Claude Fable 5.2 (max)\n        creator: Anthropic\n        quality: 65\n        cost_per_task: 26.54\n      - model: Claude Opus 5.5 (max)\n        creator: Anthropic\n        quality: 59\n        cost_per_task: 10.04\n      - model: GPT-6 Astra (max)\n        creator: OpenAI\n        quality: 57\n        cost_per_task: 6.24\n      verifier:\n        model: GPT-6.1 Sol (medium)\n        creator: OpenAI\n        quality: 46\n        cost_per_task: 0.36\n      relative_cost: 4.19\n    crosslab:\n      chair:\n        model: Claude Fable 5.2 (max)\n        creator: Anthropic\n        quality: 65\n        cost_per_task: 26.54\n      experts:\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: GPT-6 Astra (max)\n        creator: OpenAI\n        quality: 57\n        cost_per_task: 6.24\n      red_team:\n        model: GPT-6 Astra (max)\n        creator: OpenAI\n        quality: 57\n        cost_per_task: 6.24\n      elders:\n      - model: Claude Fable 5.2 (max)\n        creator: Anthropic\n        quality: 65\n        cost_per_task: 26.54\n      - model: GPT-6 Astra (max)\n        creator: OpenAI\n        quality: 57\n        cost_per_task: 6.24\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      verifier:\n        model: GPT-6.1 Sol (medium)\n        creator: OpenAI\n        quality: 46\n        cost_per_task: 0.36\n      relative_cost: 4.14\n    solo:\n      chair: current model @ max\n      experts: current model @ high\n      red_team: current model @ high\n      elders: current model @ max\n      verifier: current model @ medium\n  balanced:\n    fanout:claude:\n      chair:\n        model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      experts:\n      - model: Claude Fable 5.2 (low)\n        creator: Anthropic\n        quality: 54\n        cost_per_task: 3.1\n      - model: Claude Fable 5.2 (low)\n        creator: Anthropic\n        quality: 54\n        cost_per_task: 3.1\n      - model: Claude Fable 5.2 (low)\n        creator: Anthropic\n        quality: 54\n        cost_per_task: 3.1\n      - model: Claude Fable 5.2 (low)\n        creator: Anthropic\n        quality: 54\n        cost_per_task: 3.1\n      - model: Claude Fable 5.2 (low)\n        creator: Anthropic\n        quality: 54\n        cost_per_task: 3.1\n      - model: Claude Opus 5.5 (high)\n        creator: Anthropic\n        quality: 52\n        cost_per_task: 3.46\n      - model: Claude Sonnet 5.5 (xhigh)\n        creator: Anthropic\n        quality: 50\n        cost_per_task: 4.09\n      red_team:\n        model: Claude Opus 5.5 (max)\n        creator: Anthropic\n        quality: 59\n        cost_per_task: 10.04\n      elders:\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: Claude Opus 5.5 (max)\n        creator: Anthropic\n        quality: 59\n        cost_per_task: 10.04\n      - model: Claude Sonnet 5.5 (max)\n        creator: Anthropic\n        quality: 55\n        cost_per_task: 10.02\n      verifier:\n        model: Claude Opus 5.5 (low)\n        creator: Anthropic\n        quality: 35\n        cost_per_task: 0.98\n      relative_cost: 1.86\n    fanout:openai:\n      chair:\n        model: GPT-6.1 Sol (max)\n        creator: OpenAI\n        quality: 55\n        cost_per_task: 1.27\n      experts:\n      - model: GPT-6.1 Sol (medium)\n        creator: OpenAI\n        quality: 46\n        cost_per_task: 0.36\n      - model: GPT-6.1 Sol (medium)\n        creator: OpenAI\n        quality: 46\n        cost_per_task: 0.36\n      - model: GPT-6.1 Sol (medium)\n        creator: OpenAI\n        quality: 46\n        cost_per_task: 0.36\n      - model: GPT-6.1 Sol (medium)\n        creator: OpenAI\n        quality: 46\n        cost_per_task: 0.36\n      - model: GPT-6.1 Sol (medium)\n        creator: OpenAI\n        quality: 46\n        cost_per_task: 0.36\n      - model: GPT-6.1 Terra (high)\n        creator: OpenAI\n        quality: 42\n        cost_per_task: 0.26\n      - model: GPT-6 Astra (high)\n        creator: OpenAI\n        quality: 55\n        cost_per_task: 3.24\n      red_team:\n        model: GPT-6 Astra (high)\n        creator: OpenAI\n        quality: 55\n        cost_per_task: 3.24\n      elders:\n      - model: GPT-6.1 Sol (max)\n        creator: OpenAI\n        quality: 55\n        cost_per_task: 1.27\n      - model: GPT-6 Astra (max)\n        creator: OpenAI\n        quality: 57\n        cost_per_task: 6.24\n      - model: GPT-6.1 Terra (max)\n        creator: OpenAI\n        quality: 51\n        cost_per_task: 0.96\n      verifier:\n        model: GPT-6.1 Sol (medium)\n        creator: OpenAI\n        quality: 46\n        cost_per_task: 0.36\n      relative_cost: 0.44\n    fanout:gemini:\n      chair:\n        model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      experts:\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      red_team:\n        model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      elders:\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      verifier:\n        model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      relative_cost: 1.96\n    fanout:open:\n      chair:\n        model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      experts:\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      red_team:\n        model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      elders:\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      verifier:\n        model: DeepSeek V4.1 Flash 1017 (max)\n        creator: DeepSeek\n        quality: 33\n        cost_per_task: 0.6\n        open_weights: true\n      relative_cost: 1.45\n    fanout:openrouter:\n      chair:\n        model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      experts:\n      - model: GPT-6.1 Sol (high)\n        creator: OpenAI\n        quality: 50\n        cost_per_task: 0.59\n      - model: GPT-6.1 Sol (high)\n        creator: OpenAI\n        quality: 50\n        cost_per_task: 0.59\n      - model: GPT-6.1 Sol (high)\n        creator: OpenAI\n        quality: 50\n        cost_per_task: 0.59\n      - model: GPT-6.1 Sol (high)\n        creator: OpenAI\n        quality: 50\n        cost_per_task: 0.59\n      - model: GPT-6.1 Sol (high)\n        creator: OpenAI\n        quality: 50\n        cost_per_task: 0.59\n      - model: GPT-6.1 Sol (high)\n        creator: OpenAI\n        quality: 50\n        cost_per_task: 0.59\n      - model: Claude Fable 5.2 (low)\n        creator: Anthropic\n        quality: 54\n        cost_per_task: 3.1\n      red_team:\n        model: GPT-6.1 Sol (max)\n        creator: OpenAI\n        quality: 55\n        cost_per_task: 1.27\n      elders:\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: GPT-6.1 Sol (max)\n        creator: OpenAI\n        quality: 55\n        cost_per_task: 1.27\n      - model: Claude Opus 5.5 (max)\n        creator: Anthropic\n        quality: 59\n        cost_per_task: 10.04\n      verifier:\n        model: GPT-6.1 Sol (medium)\n        creator: OpenAI\n        quality: 46\n        cost_per_task: 0.36\n      relative_cost: 0.86\n    fanout:mix:\n      chair:\n        model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      experts:\n      - model: GPT-6.1 Sol (high)\n        creator: OpenAI\n        quality: 50\n        cost_per_task: 0.59\n      - model: GPT-6.1 Sol (high)\n        creator: OpenAI\n        quality: 50\n        cost_per_task: 0.59\n      - model: GPT-6.1 Sol (high)\n        creator: OpenAI\n        quality: 50\n        cost_per_task: 0.59\n      - model: GPT-6.1 Sol (high)\n        creator: OpenAI\n        quality: 50\n        cost_per_task: 0.59\n      - model: GPT-6.1 Sol (high)\n        creator: OpenAI\n        quality: 50\n        cost_per_task: 0.59\n      - model: GPT-6.1 Sol (high)\n        creator: OpenAI\n        quality: 50\n        cost_per_task: 0.59\n      - model: Claude Fable 5.2 (low)\n        creator: Anthropic\n        quality: 54\n        cost_per_task: 3.1\n      red_team:\n        model: GPT-6.1 Sol (max)\n        creator: OpenAI\n        quality: 55\n        cost_per_task: 1.27\n      elders:\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: GPT-6.1 Sol (max)\n        creator: OpenAI\n        quality: 55\n        cost_per_task: 1.27\n      - model: Claude Opus 5.5 (max)\n        creator: Anthropic\n        quality: 59\n        cost_per_task: 10.04\n      verifier:\n        model: GPT-6.1 Sol (medium)\n        creator: OpenAI\n        quality: 46\n        cost_per_task: 0.36\n      relative_cost: 0.86\n    crosslab:\n      chair:\n        model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      experts:\n      - model: GPT-6.1 Sol (high)\n        creator: OpenAI\n        quality: 50\n        cost_per_task: 0.59\n      - model: GPT-6.1 Sol (high)\n        creator: OpenAI\n        quality: 50\n        cost_per_task: 0.59\n      - model: GPT-6.1 Sol (high)\n        creator: OpenAI\n        quality: 50\n        cost_per_task: 0.59\n      - model: GPT-6.1 Sol (high)\n        creator: OpenAI\n        quality: 50\n        cost_per_task: 0.59\n      - model: GPT-6.1 Sol (high)\n        creator: OpenAI\n        quality: 50\n        cost_per_task: 0.59\n      - model: Claude Fable 5.2 (low)\n        creator: Anthropic\n        quality: 54\n        cost_per_task: 3.1\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      red_team:\n        model: GPT-6.1 Sol (max)\n        creator: OpenAI\n        quality: 55\n        cost_per_task: 1.27\n      elders:\n      - model: Claude Fable 5.2 (high)\n        creator: Anthropic\n        quality: 62\n        cost_per_task: 9.08\n      - model: GPT-6.1 Sol (max)\n        creator: OpenAI\n        quality: 55\n        cost_per_task: 1.27\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      verifier:\n        model: GPT-6.1 Sol (medium)\n        creator: OpenAI\n        quality: 46\n        cost_per_task: 0.36\n      relative_cost: 1.0\n    solo:\n      chair: current model @ high\n      experts: current model @ medium\n      red_team: current model @ high\n      elders: current model @ high\n      verifier: current model @ low\n  efficient:\n    fanout:claude:\n      chair:\n        model: Claude Fable 5.2 (low)\n        creator: Anthropic\n        quality: 54\n        cost_per_task: 3.1\n      experts:\n      - model: Claude Haiku 5.5 (xhigh)\n        creator: Anthropic\n        quality: 35\n        cost_per_task: 0.25\n      - model: Claude Haiku 5.5 (xhigh)\n        creator: Anthropic\n        quality: 35\n        cost_per_task: 0.25\n      - model: Claude Haiku 5.5 (xhigh)\n        creator: Anthropic\n        quality: 35\n        cost_per_task: 0.25\n      - model: Claude Haiku 5.5 (xhigh)\n        creator: Anthropic\n        quality: 35\n        cost_per_task: 0.25\n      - model: Claude Haiku 5.5 (xhigh)\n        creator: Anthropic\n        quality: 35\n        cost_per_task: 0.25\n      - model: Claude Haiku 5.5 (xhigh)\n        creator: Anthropic\n        quality: 35\n        cost_per_task: 0.25\n      - model: Claude Fable 5.2 (low)\n        creator: Anthropic\n        quality: 54\n        cost_per_task: 3.1\n      red_team:\n        model: Claude Opus 5.5 (xhigh)\n        creator: Anthropic\n        quality: 57\n        cost_per_task: 6.05\n      elders:\n      - model: Claude Fable 5.2 (medium)\n        creator: Anthropic\n        quality: 56\n        cost_per_task: 3.8\n      - model: Claude Opus 5.5 (xhigh)\n        creator: Anthropic\n        quality: 57\n        cost_per_task: 6.05\n      - model: Claude Sonnet 5.5 (max)\n        creator: Anthropic\n        quality: 55\n        cost_per_task: 10.02\n      verifier:\n        model: Claude Opus 5.5 (low)\n        creator: Anthropic\n        quality: 35\n        cost_per_task: 0.98\n      relative_cost: 0.66\n    fanout:openai:\n      chair:\n        model: GPT-6.1 Sol (medium)\n        creator: OpenAI\n        quality: 46\n        cost_per_task: 0.36\n      experts:\n      - model: GPT-6.1 Terra (low)\n        creator: OpenAI\n        quality: 29\n        cost_per_task: 0.0713\n      - model: GPT-6.1 Terra (low)\n        creator: OpenAI\n        quality: 29\n        cost_per_task: 0.0713\n      - model: GPT-6.1 Terra (low)\n        creator: OpenAI\n        quality: 29\n        cost_per_task: 0.0713\n      - model: GPT-6.1 Terra (low)\n        creator: OpenAI\n        quality: 29\n        cost_per_task: 0.0713\n      - model: GPT-6.1 Terra (low)\n        creator: OpenAI\n        quality: 29\n        cost_per_task: 0.0713\n      - model: GPT-6.1 Sol (medium)\n        creator: OpenAI\n        quality: 46\n        cost_per_task: 0.36\n      - model: GPT-6 Luna (max)\n        creator: OpenAI\n        quality: 28\n        cost_per_task: 0.15\n      red_team:\n        model: GPT-6.1 Terra (high)\n        creator: OpenAI\n        quality: 42\n        cost_per_task: 0.26\n      elders:\n      - model: GPT-6.1 Sol (medium)\n        creator: OpenAI\n        quality: 46\n        cost_per_task: 0.36\n      - model: GPT-6.1 Terra (max)\n        creator: OpenAI\n        quality: 51\n        cost_per_task: 0.96\n      - model: GPT-6 Astra (high)\n        creator: OpenAI\n        quality: 55\n        cost_per_task: 3.24\n      verifier:\n        model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n      relative_cost: 0.11\n    fanout:gemini:\n      chair:\n        model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      experts:\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      red_team:\n        model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      elders:\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      verifier:\n        model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      relative_cost: 1.96\n    fanout:open:\n      chair:\n        model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      experts:\n      - model: DeepSeek V4.1 Flash 1017 (max)\n        creator: DeepSeek\n        quality: 33\n        cost_per_task: 0.6\n        open_weights: true\n      - model: DeepSeek V4.1 Flash 1017 (max)\n        creator: DeepSeek\n        quality: 33\n        cost_per_task: 0.6\n        open_weights: true\n      - model: DeepSeek V4.1 Flash 1017 (max)\n        creator: DeepSeek\n        quality: 33\n        cost_per_task: 0.6\n        open_weights: true\n      - model: DeepSeek V4.1 Flash 1017 (max)\n        creator: DeepSeek\n        quality: 33\n        cost_per_task: 0.6\n        open_weights: true\n      - model: DeepSeek V4.1 Flash 1017 (max)\n        creator: DeepSeek\n        quality: 33\n        cost_per_task: 0.6\n        open_weights: true\n      - model: DeepSeek V4.1 Flash 1017 (max)\n        creator: DeepSeek\n        quality: 33\n        cost_per_task: 0.6\n        open_weights: true\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      red_team:\n        model: DeepSeek V4.1 Flash 1017 (max)\n        creator: DeepSeek\n        quality: 33\n        cost_per_task: 0.6\n        open_weights: true\n      elders:\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      - model: Kimi K3.1 Pro\n        creator: Moonshot\n        quality: 46\n        cost_per_task: 3.68\n        open_weights: true\n      verifier:\n        model: DeepSeek V4.1 Flash 1017 (max)\n        creator: DeepSeek\n        quality: 33\n        cost_per_task: 0.6\n        open_weights: true\n      relative_cost: 0.58\n    fanout:openrouter:\n      chair:\n        model: GPT-6.1 Sol (xhigh)\n        creator: OpenAI\n        quality: 52\n        cost_per_task: 0.76\n      experts:\n      - model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n      - model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n      - model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n      - model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n      - model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n      - model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n      - model: Claude Haiku 5.5 (xhigh)\n        creator: Anthropic\n        quality: 35\n        cost_per_task: 0.25\n      red_team:\n        model: Claude Fable 5.2 (medium)\n        creator: Anthropic\n        quality: 56\n        cost_per_task: 3.8\n      elders:\n      - model: GPT-6.1 Sol (xhigh)\n        creator: OpenAI\n        quality: 52\n        cost_per_task: 0.76\n      - model: GPT-6 Astra (high)\n        creator: OpenAI\n        quality: 55\n        cost_per_task: 3.24\n      - model: Claude Fable 5.2 (medium)\n        creator: Anthropic\n        quality: 56\n        cost_per_task: 3.8\n      verifier:\n        model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n      relative_cost: 0.25\n    fanout:mix:\n      chair:\n        model: GPT-6.1 Sol (xhigh)\n        creator: OpenAI\n        quality: 52\n        cost_per_task: 0.76\n      experts:\n      - model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n      - model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n      - model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n      - model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n      - model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n      - model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n      - model: Claude Haiku 5.5 (xhigh)\n        creator: Anthropic\n        quality: 35\n        cost_per_task: 0.25\n      red_team:\n        model: Claude Fable 5.2 (medium)\n        creator: Anthropic\n        quality: 56\n        cost_per_task: 3.8\n      elders:\n      - model: GPT-6.1 Sol (xhigh)\n        creator: OpenAI\n        quality: 52\n        cost_per_task: 0.76\n      - model: GPT-6 Astra (high)\n        creator: OpenAI\n        quality: 55\n        cost_per_task: 3.24\n      - model: Claude Fable 5.2 (medium)\n        creator: Anthropic\n        quality: 56\n        cost_per_task: 3.8\n      verifier:\n        model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n      relative_cost: 0.25\n    crosslab:\n      chair:\n        model: GPT-6.1 Sol (xhigh)\n        creator: OpenAI\n        quality: 52\n        cost_per_task: 0.76\n      experts:\n      - model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n      - model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n      - model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n      - model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n      - model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n      - model: Claude Haiku 5.5 (xhigh)\n        creator: Anthropic\n        quality: 35\n        cost_per_task: 0.25\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      red_team:\n        model: Claude Fable 5.2 (medium)\n        creator: Anthropic\n        quality: 56\n        cost_per_task: 3.8\n      elders:\n      - model: Claude Fable 5.2 (low)\n        creator: Anthropic\n        quality: 54\n        cost_per_task: 3.1\n      - model: GPT-6.1 Sol (medium)\n        creator: OpenAI\n        quality: 46\n        cost_per_task: 0.36\n      - model: Gemini 4 Argon (high)\n        creator: Google\n        quality: 50\n        cost_per_task: 4.97\n      verifier:\n        model: GPT-6.1 Terra (medium)\n        creator: OpenAI\n        quality: 38\n        cost_per_task: 0.17\n      relative_cost: 0.46\n    solo:\n      chair: current model @ medium\n      experts: current model @ low\n      red_team: current model @ medium\n      elders: current model @ medium\n      verifier: current model @ low\n"
+  },
+  "<BASE>/skill/models/policy.yaml": {
+   "as_put": true
+  },
+  "<BASE>/skill/models/snapshot-2026-11-13.json": {
+   "json": {
+    "source": "Artificial Analysis API (artificialanalysis.ai)",
+    "collected": "2026-11-13",
+    "index": "AA Intelligence Index (live)",
+    "models": [
+     {
+      "name": "Claude Fable 5.2 (max)",
+      "creator": "Anthropic",
+      "quality": 65,
+      "cost_per_task": 26.54,
+      "minutes": 46.1,
+      "open_weights": false,
+      "restricted": true,
+      "openrouter_id": "lab/0"
+     },
+     {
+      "name": "Claude Fable 5.2 (xhigh)",
+      "creator": "Anthropic",
+      "quality": 62,
+      "cost_per_task": 14.83,
+      "minutes": 27.5,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "Claude Fable 5.2 (high)",
+      "creator": "Anthropic",
+      "quality": 62,
+      "cost_per_task": 9.08,
+      "minutes": 16.7,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "Claude Fable 5.2 (medium)",
+      "creator": "Anthropic",
+      "quality": 56,
+      "cost_per_task": 3.8,
+      "minutes": 8.0,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": "lab/3"
+     },
+     {
+      "name": "Claude Fable 5.2 (low)",
+      "creator": "Anthropic",
+      "quality": 54,
+      "cost_per_task": 3.1,
+      "minutes": 6.0,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "Claude Opus 5.5 (max)",
+      "creator": "Anthropic",
+      "quality": 59,
+      "cost_per_task": 10.04,
+      "minutes": 25.1,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "Claude Opus 5.5 (xhigh)",
+      "creator": "Anthropic",
+      "quality": 57,
+      "cost_per_task": 6.05,
+      "minutes": 16.0,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": "lab/6"
+     },
+     {
+      "name": "Claude Opus 5.5 (high)",
+      "creator": "Anthropic",
+      "quality": 52,
+      "cost_per_task": 3.46,
+      "minutes": 9.5,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "Claude Opus 5.5 (medium)",
+      "creator": "Anthropic",
+      "quality": 48,
+      "cost_per_task": 2.45,
+      "minutes": 7.1,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "Claude Opus 5.5 (low)",
+      "creator": "Anthropic",
+      "quality": 35,
+      "cost_per_task": 0.98,
+      "minutes": 3.0,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": "lab/9"
+     },
+     {
+      "name": "Claude Sonnet 5.5 (max)",
+      "creator": "Anthropic",
+      "quality": 55,
+      "cost_per_task": 10.02,
+      "minutes": 34.0,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "Claude Sonnet 5.5 (xhigh)",
+      "creator": "Anthropic",
+      "quality": 50,
+      "cost_per_task": 4.09,
+      "minutes": 14.6,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "Claude Sonnet 5.5 (high)",
+      "creator": "Anthropic",
+      "quality": 42,
+      "cost_per_task": 1.64,
+      "minutes": 6.8,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": "lab/12"
+     },
+     {
+      "name": "Claude Sonnet 5.5 (medium)",
+      "creator": "Anthropic",
+      "quality": 31,
+      "cost_per_task": 0.78,
+      "minutes": 4.0,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "Claude Sonnet 5.5 (low)",
+      "creator": "Anthropic",
+      "quality": 26,
+      "cost_per_task": 0.51,
+      "minutes": 2.5,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "Claude Haiku 5.5 (max)",
+      "creator": "Anthropic",
+      "quality": 36,
+      "cost_per_task": 0.41,
+      "minutes": 14.8,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": "lab/15"
+     },
+     {
+      "name": "Claude Haiku 5.5 (xhigh)",
+      "creator": "Anthropic",
+      "quality": 35,
+      "cost_per_task": 0.25,
+      "minutes": 9.8,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "Claude Haiku 5.5 (high)",
+      "creator": "Anthropic",
+      "quality": 30,
+      "cost_per_task": 0.16,
+      "minutes": 6.5,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "Claude Haiku 5.5 (medium)",
+      "creator": "Anthropic",
+      "quality": 25,
+      "cost_per_task": 0.0918,
+      "minutes": 4.1,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": "lab/18"
+     },
+     {
+      "name": "Claude Haiku 5.5 (low)",
+      "creator": "Anthropic",
+      "quality": 19,
+      "cost_per_task": 0.0438,
+      "minutes": 2.2,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "GPT-6 Astra (max)",
+      "creator": "OpenAI",
+      "quality": 57,
+      "cost_per_task": 6.24,
+      "minutes": 23.8,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "GPT-6 Astra (xhigh)",
+      "creator": "OpenAI",
+      "quality": 55,
+      "cost_per_task": 3.66,
+      "minutes": 12.1,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": "lab/21"
+     },
+     {
+      "name": "GPT-6 Astra (high)",
+      "creator": "OpenAI",
+      "quality": 55,
+      "cost_per_task": 3.24,
+      "minutes": 9.7,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "GPT-6 Astra (medium)",
+      "creator": "OpenAI",
+      "quality": 52,
+      "cost_per_task": 2.73,
+      "minutes": 7.5,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "GPT-6 Astra (low)",
+      "creator": "OpenAI",
+      "quality": 43,
+      "cost_per_task": 1.42,
+      "minutes": 4.0,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": "lab/24"
+     },
+     {
+      "name": "GPT-6.1 Sol (max)",
+      "creator": "OpenAI",
+      "quality": 55,
+      "cost_per_task": 1.27,
+      "minutes": 23.2,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "GPT-6.1 Sol (xhigh)",
+      "creator": "OpenAI",
+      "quality": 52,
+      "cost_per_task": 0.76,
+      "minutes": 10.5,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "GPT-6.1 Sol (high)",
+      "creator": "OpenAI",
+      "quality": 50,
+      "cost_per_task": 0.59,
+      "minutes": 7.7,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": "lab/27"
+     },
+     {
+      "name": "GPT-6.1 Sol (medium)",
+      "creator": "OpenAI",
+      "quality": 46,
+      "cost_per_task": 0.36,
+      "minutes": 4.5,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "GPT-6.1 Sol (low)",
+      "creator": "OpenAI",
+      "quality": 35,
+      "cost_per_task": 0.16,
+      "minutes": 2.0,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "GPT-6.1 Terra (max)",
+      "creator": "OpenAI",
+      "quality": 51,
+      "cost_per_task": 0.96,
+      "minutes": 14.7,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": "lab/30"
+     },
+     {
+      "name": "GPT-6.1 Terra (xhigh)",
+      "creator": "OpenAI",
+      "quality": 45,
+      "cost_per_task": 0.4,
+      "minutes": 6.6,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "GPT-6.1 Terra (high)",
+      "creator": "OpenAI",
+      "quality": 42,
+      "cost_per_task": 0.26,
+      "minutes": 4.3,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "GPT-6.1 Terra (medium)",
+      "creator": "OpenAI",
+      "quality": 38,
+      "cost_per_task": 0.17,
+      "minutes": 2.9,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": "lab/33"
+     },
+     {
+      "name": "GPT-6.1 Terra (low)",
+      "creator": "OpenAI",
+      "quality": 29,
+      "cost_per_task": 0.0713,
+      "minutes": 1.2,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "GPT-6 Luna (max)",
+      "creator": "OpenAI",
+      "quality": 28,
+      "cost_per_task": 0.15,
+      "minutes": 11.8,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "GPT-6 Luna (xhigh)",
+      "creator": "OpenAI",
+      "quality": 23,
+      "cost_per_task": 0.1,
+      "minutes": 7.4,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": "lab/36"
+     },
+     {
+      "name": "GPT-6 Luna (high)",
+      "creator": "OpenAI",
+      "quality": 21,
+      "cost_per_task": 0.0729,
+      "minutes": 5.7,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "GPT-6 Luna (medium)",
+      "creator": "OpenAI",
+      "quality": 18,
+      "cost_per_task": 0.0422,
+      "minutes": 3.5,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "GPT-6 Luna (low)",
+      "creator": "OpenAI",
+      "quality": 10,
+      "cost_per_task": 0.0051,
+      "minutes": 0.6,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": "lab/39"
+     },
+     {
+      "name": "gpt-oss-120b (high)",
+      "creator": "OpenAI",
+      "quality": 4,
+      "cost_per_task": 0.35,
+      "minutes": 7.9,
+      "open_weights": true,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "Gemini 4 Carbon (high)",
+      "creator": "Google",
+      "quality": 60,
+      "cost_per_task": 5.48,
+      "minutes": 28.6,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "Gemini 4 Carbon (medium)",
+      "creator": "Google",
+      "quality": 58,
+      "cost_per_task": 4.68,
+      "minutes": 25.3,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": "lab/42"
+     },
+     {
+      "name": "Gemini 4 Carbon (low)",
+      "creator": "Google",
+      "quality": 54,
+      "cost_per_task": 5.22,
+      "minutes": 24.9,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "Gemini 4 Argon (high)",
+      "creator": "Google",
+      "quality": 50,
+      "cost_per_task": 4.97,
+      "minutes": 30.1,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "Gemini 3.8 Flash (high)",
+      "creator": "Google",
+      "quality": 31,
+      "cost_per_task": 7.77,
+      "minutes": 14.9,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": "lab/45"
+     },
+     {
+      "name": "Gemini 3.8 Flash (medium)",
+      "creator": "Google",
+      "quality": 30,
+      "cost_per_task": 6.26,
+      "minutes": 12.9,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "Gemini 3.8 Flash (low)",
+      "creator": "Google",
+      "quality": 23,
+      "cost_per_task": null,
+      "minutes": null,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "Gemini 3.5 Flash-Lite",
+      "creator": "Google",
+      "quality": 12,
+      "cost_per_task": 0.69,
+      "minutes": 1.7,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": "lab/48"
+     },
+     {
+      "name": "Grok 4.7 (xhigh)",
+      "creator": "xAI",
+      "quality": 35,
+      "cost_per_task": 7.77,
+      "minutes": 26.9,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "Grok 4.7 (high)",
+      "creator": "xAI",
+      "quality": 35,
+      "cost_per_task": 6.18,
+      "minutes": 21.9,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "Grok 4.7 (low)",
+      "creator": "xAI",
+      "quality": 31,
+      "cost_per_task": 2.92,
+      "minutes": 11.1,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": "lab/51"
+     },
+     {
+      "name": "Kimi K3.1 Pro",
+      "creator": "Moonshot",
+      "quality": 46,
+      "cost_per_task": 3.68,
+      "minutes": 39.0,
+      "open_weights": true,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "DeepSeek V4.1 Flash 1017 (max)",
+      "creator": "DeepSeek",
+      "quality": 33,
+      "cost_per_task": 0.6,
+      "minutes": 14.6,
+      "open_weights": true,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "DeepSeek V4.1 Flash 1017 (high)",
+      "creator": "DeepSeek",
+      "quality": 29,
+      "cost_per_task": 0.46,
+      "minutes": 11.5,
+      "open_weights": true,
+      "restricted": false,
+      "openrouter_id": "lab/54"
+     },
+     {
+      "name": "GLM-5.3 (max)",
+      "creator": "Z AI",
+      "quality": 32,
+      "cost_per_task": 5.01,
+      "minutes": 27.6,
+      "open_weights": true,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "Inkling 2 Small",
+      "creator": "Thinking Machines",
+      "quality": 31,
+      "cost_per_task": null,
+      "minutes": null,
+      "open_weights": true,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "MiMo-V2.6-Pro",
+      "creator": "Xiaomi",
+      "quality": 30,
+      "cost_per_task": null,
+      "minutes": null,
+      "open_weights": true,
+      "restricted": false,
+      "openrouter_id": "lab/57"
+     },
+     {
+      "name": "Mistral Large 4 (high)",
+      "creator": "Mistral",
+      "quality": 26,
+      "cost_per_task": 2.06,
+      "minutes": 12.3,
+      "open_weights": true,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "Muse Spark Open (xhigh)",
+      "creator": "Meta",
+      "quality": 25,
+      "cost_per_task": 2.02,
+      "minutes": 7.8,
+      "open_weights": true,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "Qwen3.8 27B (xhigh)",
+      "creator": "Alibaba",
+      "quality": 20,
+      "cost_per_task": 3.53,
+      "minutes": 44.0,
+      "open_weights": true,
+      "restricted": false,
+      "openrouter_id": "lab/60"
+     },
+     {
+      "name": "MiniMax-M3.1-Flash",
+      "creator": "MiniMax",
+      "quality": 29,
+      "cost_per_task": 0.49,
+      "minutes": 16.3,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "Qwen3.8 Max (0902)",
+      "creator": "Alibaba",
+      "quality": 34,
+      "cost_per_task": 10.02,
+      "minutes": 51.2,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": null
+     },
+     {
+      "name": "no-name-no-data",
+      "creator": "?",
+      "quality": null,
+      "cost_per_task": null,
+      "minutes": null,
+      "open_weights": false,
+      "restricted": false,
+      "openrouter_id": null
+     }
+    ]
+   }
+  }
+ },
+ "http": {
+  "path": "/models/free",
+  "key": "test-key",
+  "body": "{\"status\": 200, \"data\": [{\"name\": \"Claude Fable 5.2 (max)\", \"slug\": \"claude-fable-5.2-(max)\", \"model_creator\": {\"name\": \"Anthropic\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 65}, \"performance_v3\": {\"time_per_task_seconds\": 2766.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": true, \"openrouter_api_id\": \"lab/0\", \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 26.54}}}, {\"name\": \"Claude Fable 5.2 (xhigh)\", \"slug\": \"claude-fable-5.2-(xhigh)\", \"model_creator\": {\"name\": \"Anthropic\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 62}, \"performance_v3\": {\"time_per_task_seconds\": 1650.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": null, \"pricing\": {\"price_1m_blended_3_to_1\": 14.83}}, {\"name\": \"Claude Fable 5.2 (high)\", \"slug\": \"claude-fable-5.2-(high)\", \"model_creator\": {\"name\": \"Anthropic\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 62}, \"performance_v3\": {\"time_per_task_seconds\": 1002.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": null, \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 9.08}}}, {\"name\": \"Claude Fable 5.2 (medium)\", \"slug\": \"claude-fable-5.2-(medium)\", \"model_creator\": {\"name\": \"Anthropic\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 56}, \"performance_v3\": {\"time_per_task_seconds\": 480.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": \"lab/3\", \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 3.8}}}, {\"name\": \"Claude Fable 5.2 (low)\", \"slug\": \"claude-fable-5.2-(low)\", \"model_creator\": {\"name\": \"Anthropic\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 54}, \"performance_v3\": {\"time_per_task_seconds\": 360.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": null, \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 3.1}}}, {\"name\": \"Claude Opus 5.5 (max)\", \"slug\": \"claude-opus-5.5-(max)\", \"model_creator\": {\"name\": \"Anthropic\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 59}, \"performance_v3\": {\"time_per_task_seconds\": 1506.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": null, \"pricing\": {\"price_1m_blended_3_to_1\": 10.04}}, {\"name\": \"Claude Opus 5.5 (xhigh)\", \"slug\": \"claude-opus-5.5-(xhigh)\", \"model_creator\": {\"name\": \"Anthropic\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 57}, \"performance_v3\": {\"time_per_task_seconds\": 960.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": \"lab/6\", \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 6.05}}}, {\"name\": \"Claude Opus 5.5 (high)\", \"slug\": \"claude-opus-5.5-(high)\", \"model_creator\": {\"name\": \"Anthropic\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 52}, \"performance_v3\": {\"time_per_task_seconds\": 570.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": null, \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 3.46}}}, {\"name\": \"Claude Opus 5.5 (medium)\", \"slug\": \"claude-opus-5.5-(medium)\", \"model_creator\": {\"name\": \"Anthropic\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 48}, \"performance_v3\": {\"time_per_task_seconds\": 426.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": null, \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 2.45}}}, {\"name\": \"Claude Opus 5.5 (low)\", \"slug\": \"claude-opus-5.5-(low)\", \"model_creator\": {\"name\": \"Anthropic\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 35}, \"performance_v3\": {\"time_per_task_seconds\": 180.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": \"lab/9\", \"pricing\": {\"price_1m_blended_3_to_1\": 0.98}}, {\"name\": \"Claude Sonnet 5.5 (max)\", \"slug\": \"claude-sonnet-5.5-(max)\", \"model_creator\": {\"name\": \"Anthropic\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 55}, \"performance_v3\": {\"time_per_task_seconds\": 2040.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": null, \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 10.02}}}, {\"name\": \"Claude Sonnet 5.5 (xhigh)\", \"slug\": \"claude-sonnet-5.5-(xhigh)\", \"model_creator\": {\"name\": \"Anthropic\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 50}, \"performance_v3\": {\"time_per_task_seconds\": 876.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": null, \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 4.09}}}, {\"name\": \"Claude Sonnet 5.5 (high)\", \"slug\": \"claude-sonnet-5.5-(high)\", \"model_creator\": {\"name\": \"Anthropic\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 42}, \"performance_v3\": {\"time_per_task_seconds\": 408.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": \"lab/12\", \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 1.64}}}, {\"name\": \"Claude Sonnet 5.5 (medium)\", \"slug\": \"claude-sonnet-5.5-(medium)\", \"model_creator\": {\"name\": \"Anthropic\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 31}, \"performance_v3\": {\"time_per_task_seconds\": 240.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": null, \"pricing\": {\"price_1m_blended_3_to_1\": 0.78}}, {\"name\": \"Claude Sonnet 5.5 (low)\", \"slug\": \"claude-sonnet-5.5-(low)\", \"model_creator\": {\"name\": \"Anthropic\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 26}, \"performance_v3\": {\"time_per_task_seconds\": 150.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": null, \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 0.51}}}, {\"name\": \"Claude Haiku 5.5 (max)\", \"slug\": \"claude-haiku-5.5-(max)\", \"model_creator\": {\"name\": \"Anthropic\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 36}, \"performance_v3\": {\"time_per_task_seconds\": 888.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": \"lab/15\", \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 0.41}}}, {\"name\": \"Claude Haiku 5.5 (xhigh)\", \"slug\": \"claude-haiku-5.5-(xhigh)\", \"model_creator\": {\"name\": \"Anthropic\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 35}, \"performance_v3\": {\"time_per_task_seconds\": 588.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": null, \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 0.25}}}, {\"name\": \"Claude Haiku 5.5 (high)\", \"slug\": \"claude-haiku-5.5-(high)\", \"model_creator\": {\"name\": \"Anthropic\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 30}, \"performance_v3\": {\"time_per_task_seconds\": 390.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": null, \"pricing\": {\"price_1m_blended_3_to_1\": 0.16}}, {\"name\": \"Claude Haiku 5.5 (medium)\", \"slug\": \"claude-haiku-5.5-(medium)\", \"model_creator\": {\"name\": \"Anthropic\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 25}, \"performance_v3\": {\"time_per_task_seconds\": 245.99999999999997}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": \"lab/18\", \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 0.0918}}}, {\"name\": \"Claude Haiku 5.5 (low)\", \"slug\": \"claude-haiku-5.5-(low)\", \"model_creator\": {\"name\": \"Anthropic\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 19}, \"performance_v3\": {\"time_per_task_seconds\": 132.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": null, \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 0.0438}}}, {\"name\": \"GPT-6 Astra (max)\", \"slug\": \"gpt-6-astra-(max)\", \"model_creator\": {\"name\": \"OpenAI\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 57}, \"performance_v3\": {\"time_per_task_seconds\": 1428.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": null, \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 6.24}}}, {\"name\": \"GPT-6 Astra (xhigh)\", \"slug\": \"gpt-6-astra-(xhigh)\", \"model_creator\": {\"name\": \"OpenAI\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 55}, \"performance_v3\": {\"time_per_task_seconds\": 726.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": \"lab/21\", \"pricing\": {\"price_1m_blended_3_to_1\": 3.66}}, {\"name\": \"GPT-6 Astra (high)\", \"slug\": \"gpt-6-astra-(high)\", \"model_creator\": {\"name\": \"OpenAI\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 55}, \"performance_v3\": {\"time_per_task_seconds\": 582.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": null, \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 3.24}}}, {\"name\": \"GPT-6 Astra (medium)\", \"slug\": \"gpt-6-astra-(medium)\", \"model_creator\": {\"name\": \"OpenAI\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 52}, \"performance_v3\": {\"time_per_task_seconds\": 450.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": null, \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 2.73}}}, {\"name\": \"GPT-6 Astra (low)\", \"slug\": \"gpt-6-astra-(low)\", \"model_creator\": {\"name\": \"OpenAI\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 43}, \"performance_v3\": {\"time_per_task_seconds\": 240.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": \"lab/24\", \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 1.42}}}, {\"name\": \"GPT-6.1 Sol (max)\", \"slug\": \"gpt-6.1-sol-(max)\", \"model_creator\": {\"name\": \"OpenAI\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 55}, \"performance_v3\": {\"time_per_task_seconds\": 1392.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": null, \"pricing\": {\"price_1m_blended_3_to_1\": 1.27}}, {\"name\": \"GPT-6.1 Sol (xhigh)\", \"slug\": \"gpt-6.1-sol-(xhigh)\", \"model_creator\": {\"name\": \"OpenAI\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 52}, \"performance_v3\": {\"time_per_task_seconds\": 630.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": null, \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 0.76}}}, {\"name\": \"GPT-6.1 Sol (high)\", \"slug\": \"gpt-6.1-sol-(high)\", \"model_creator\": {\"name\": \"OpenAI\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 50}, \"performance_v3\": {\"time_per_task_seconds\": 462.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": \"lab/27\", \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 0.59}}}, {\"name\": \"GPT-6.1 Sol (medium)\", \"slug\": \"gpt-6.1-sol-(medium)\", \"model_creator\": {\"name\": \"OpenAI\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 46}, \"performance_v3\": {\"time_per_task_seconds\": 270.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": null, \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 0.36}}}, {\"name\": \"GPT-6.1 Sol (low)\", \"slug\": \"gpt-6.1-sol-(low)\", \"model_creator\": {\"name\": \"OpenAI\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 35}, \"performance_v3\": {\"time_per_task_seconds\": 120.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": null, \"pricing\": {\"price_1m_blended_3_to_1\": 0.16}}, {\"name\": \"GPT-6.1 Terra (max)\", \"slug\": \"gpt-6.1-terra-(max)\", \"model_creator\": {\"name\": \"OpenAI\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 51}, \"performance_v3\": {\"time_per_task_seconds\": 882.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": \"lab/30\", \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 0.96}}}, {\"name\": \"GPT-6.1 Terra (xhigh)\", \"slug\": \"gpt-6.1-terra-(xhigh)\", \"model_creator\": {\"name\": \"OpenAI\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 45}, \"performance_v3\": {\"time_per_task_seconds\": 396.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": null, \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 0.4}}}, {\"name\": \"GPT-6.1 Terra (high)\", \"slug\": \"gpt-6.1-terra-(high)\", \"model_creator\": {\"name\": \"OpenAI\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 42}, \"performance_v3\": {\"time_per_task_seconds\": 258.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": null, \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 0.26}}}, {\"name\": \"GPT-6.1 Terra (medium)\", \"slug\": \"gpt-6.1-terra-(medium)\", \"model_creator\": {\"name\": \"OpenAI\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 38}, \"performance_v3\": {\"time_per_task_seconds\": 174.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": \"lab/33\", \"pricing\": {\"price_1m_blended_3_to_1\": 0.17}}, {\"name\": \"GPT-6.1 Terra (low)\", \"slug\": \"gpt-6.1-terra-(low)\", \"model_creator\": {\"name\": \"OpenAI\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 29}, \"performance_v3\": {\"time_per_task_seconds\": 72.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": null, \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 0.0713}}}, {\"name\": \"GPT-6 Luna (max)\", \"slug\": \"gpt-6-luna-(max)\", \"model_creator\": {\"name\": \"OpenAI\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 28}, \"performance_v3\": {\"time_per_task_seconds\": 708.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": null, \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 0.15}}}, {\"name\": \"GPT-6 Luna (xhigh)\", \"slug\": \"gpt-6-luna-(xhigh)\", \"model_creator\": {\"name\": \"OpenAI\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 23}, \"performance_v3\": {\"time_per_task_seconds\": 444.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": \"lab/36\", \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 0.1}}}, {\"name\": \"GPT-6 Luna (high)\", \"slug\": \"gpt-6-luna-(high)\", \"model_creator\": {\"name\": \"OpenAI\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 21}, \"performance_v3\": {\"time_per_task_seconds\": 342.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": null, \"pricing\": {\"price_1m_blended_3_to_1\": 0.0729}}, {\"name\": \"GPT-6 Luna (medium)\", \"slug\": \"gpt-6-luna-(medium)\", \"model_creator\": {\"name\": \"OpenAI\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 18}, \"performance_v3\": {\"time_per_task_seconds\": 210.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": null, \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 0.0422}}}, {\"name\": \"GPT-6 Luna (low)\", \"slug\": \"gpt-6-luna-(low)\", \"model_creator\": {\"name\": \"OpenAI\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 10}, \"performance_v3\": {\"time_per_task_seconds\": 36.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": \"lab/39\", \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 0.0051}}}, {\"name\": \"gpt-oss-120b (high)\", \"slug\": \"gpt-oss-120b-(high)\", \"model_creator\": {\"name\": \"OpenAI\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 4}, \"performance_v3\": {\"time_per_task_seconds\": 474.0}, \"licensing\": {\"is_open_weights\": true}, \"trusted_access\": false, \"openrouter_api_id\": null, \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 0.35}}}, {\"name\": \"Gemini 4 Carbon (high)\", \"slug\": \"gemini-4-carbon-(high)\", \"model_creator\": {\"name\": \"Google\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 60}, \"performance_v3\": {\"time_per_task_seconds\": 1716.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": null, \"pricing\": {\"price_1m_blended_3_to_1\": 5.48}}, {\"name\": \"Gemini 4 Carbon (medium)\", \"slug\": \"gemini-4-carbon-(medium)\", \"model_creator\": {\"name\": \"Google\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 58}, \"performance_v3\": {\"time_per_task_seconds\": 1518.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": \"lab/42\", \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 4.68}}}, {\"name\": \"Gemini 4 Carbon (low)\", \"slug\": \"gemini-4-carbon-(low)\", \"model_creator\": {\"name\": \"Google\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 54}, \"performance_v3\": {\"time_per_task_seconds\": 1494.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": null, \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 5.22}}}, {\"name\": \"Gemini 4 Argon (high)\", \"slug\": \"gemini-4-argon-(high)\", \"model_creator\": {\"name\": \"Google\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 50}, \"performance_v3\": {\"time_per_task_seconds\": 1806.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": null, \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 4.97}}}, {\"name\": \"Gemini 3.8 Flash (high)\", \"slug\": \"gemini-3.8-flash-(high)\", \"model_creator\": {\"name\": \"Google\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 31}, \"performance_v3\": {\"time_per_task_seconds\": 894.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": \"lab/45\", \"pricing\": {\"price_1m_blended_3_to_1\": 7.77}}, {\"name\": \"Gemini 3.8 Flash (medium)\", \"slug\": \"gemini-3.8-flash-(medium)\", \"model_creator\": {\"name\": \"Google\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 30}, \"performance_v3\": {\"time_per_task_seconds\": 774.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": null, \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 6.26}}}, {\"name\": \"Gemini 3.8 Flash (low)\", \"slug\": \"gemini-3.8-flash-(low)\", \"model_creator\": {\"name\": \"Google\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 23}, \"performance_v3\": {\"time_per_task_seconds\": 0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": null, \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": null}}}, {\"name\": \"Gemini 3.5 Flash-Lite\", \"slug\": \"gemini-3.5-flash-lite\", \"model_creator\": {\"name\": \"Google\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 12}, \"performance_v3\": {\"time_per_task_seconds\": 102.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": \"lab/48\", \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 0.69}}}, {\"name\": \"Grok 4.7 (xhigh)\", \"slug\": \"grok-4.7-(xhigh)\", \"model_creator\": {\"name\": \"xAI\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 35}, \"performance_v3\": {\"time_per_task_seconds\": 1614.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": null, \"pricing\": {\"price_1m_blended_3_to_1\": 7.77}}, {\"name\": \"Grok 4.7 (high)\", \"slug\": \"grok-4.7-(high)\", \"model_creator\": {\"name\": \"xAI\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 35}, \"performance_v3\": {\"time_per_task_seconds\": 1314.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": null, \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 6.18}}}, {\"name\": \"Grok 4.7 (low)\", \"slug\": \"grok-4.7-(low)\", \"model_creator\": {\"name\": \"xAI\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 31}, \"performance_v3\": {\"time_per_task_seconds\": 666.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": \"lab/51\", \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 2.92}}}, {\"name\": \"Kimi K3.1 Pro\", \"slug\": \"kimi-k3.1-pro\", \"model_creator\": {\"name\": \"Moonshot\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 46}, \"performance_v3\": {\"time_per_task_seconds\": 2340.0}, \"licensing\": {\"is_open_weights\": true}, \"trusted_access\": false, \"openrouter_api_id\": null, \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 3.68}}}, {\"name\": \"DeepSeek V4.1 Flash 1017 (max)\", \"slug\": \"deepseek-v4.1-flash-1017-(max)\", \"model_creator\": {\"name\": \"DeepSeek\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 33}, \"performance_v3\": {\"time_per_task_seconds\": 876.0}, \"licensing\": {\"is_open_weights\": true}, \"trusted_access\": false, \"openrouter_api_id\": null, \"pricing\": {\"price_1m_blended_3_to_1\": 0.6}}, {\"name\": \"DeepSeek V4.1 Flash 1017 (high)\", \"slug\": \"deepseek-v4.1-flash-1017-(high)\", \"model_creator\": {\"name\": \"DeepSeek\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 29}, \"performance_v3\": {\"time_per_task_seconds\": 690.0}, \"licensing\": {\"is_open_weights\": true}, \"trusted_access\": false, \"openrouter_api_id\": \"lab/54\", \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 0.46}}}, {\"name\": \"GLM-5.3 (max)\", \"slug\": \"glm-5.3-(max)\", \"model_creator\": {\"name\": \"Z AI\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 32}, \"performance_v3\": {\"time_per_task_seconds\": 1656.0}, \"licensing\": {\"is_open_weights\": true}, \"trusted_access\": false, \"openrouter_api_id\": null, \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 5.01}}}, {\"name\": \"Inkling 2 Small\", \"slug\": \"inkling-2-small\", \"model_creator\": {\"name\": \"Thinking Machines\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 31}, \"performance_v3\": {\"time_per_task_seconds\": 0}, \"licensing\": {\"is_open_weights\": true}, \"trusted_access\": false, \"openrouter_api_id\": null, \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": null}}}, {\"name\": \"MiMo-V2.6-Pro\", \"slug\": \"mimo-v2.6-pro\", \"model_creator\": {\"name\": \"Xiaomi\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 30}, \"performance_v3\": {\"time_per_task_seconds\": 0}, \"licensing\": {\"is_open_weights\": true}, \"trusted_access\": false, \"openrouter_api_id\": \"lab/57\", \"pricing\": {\"price_1m_blended_3_to_1\": null}}, {\"name\": \"Mistral Large 4 (high)\", \"slug\": \"mistral-large-4-(high)\", \"model_creator\": {\"name\": \"Mistral\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 26}, \"performance_v3\": {\"time_per_task_seconds\": 738.0}, \"licensing\": {\"is_open_weights\": true}, \"trusted_access\": false, \"openrouter_api_id\": null, \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 2.06}}}, {\"name\": \"Muse Spark Open (xhigh)\", \"slug\": \"muse-spark-open-(xhigh)\", \"model_creator\": {\"name\": \"Meta\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 25}, \"performance_v3\": {\"time_per_task_seconds\": 468.0}, \"licensing\": {\"is_open_weights\": true}, \"trusted_access\": false, \"openrouter_api_id\": null, \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 2.02}}}, {\"name\": \"Qwen3.8 27B (xhigh)\", \"slug\": \"qwen3.8-27b-(xhigh)\", \"model_creator\": {\"name\": \"Alibaba\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 20}, \"performance_v3\": {\"time_per_task_seconds\": 2640.0}, \"licensing\": {\"is_open_weights\": true}, \"trusted_access\": false, \"openrouter_api_id\": \"lab/60\", \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 3.53}}}, {\"name\": \"MiniMax-M3.1-Flash\", \"slug\": \"minimax-m3.1-flash\", \"model_creator\": {\"name\": \"MiniMax\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 29}, \"performance_v3\": {\"time_per_task_seconds\": 978.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": null, \"pricing\": {\"price_1m_blended_3_to_1\": 0.49}}, {\"name\": \"Qwen3.8 Max (0902)\", \"slug\": \"qwen3.8-max-(0902)\", \"model_creator\": {\"name\": \"Alibaba\"}, \"evaluations\": {\"artificial_analysis_intelligence_index\": 34}, \"performance_v3\": {\"time_per_task_seconds\": 3072.0}, \"licensing\": {\"is_open_weights\": false}, \"trusted_access\": false, \"openrouter_api_id\": null, \"artificial_analysis_intelligence_index_cost\": {\"cost_per_task\": {\"total_cost\": 10.02}}}, {\"slug\": \"no-name-no-data\"}]}",
+  "denied": "{\"error\": \"no\"}"
+ }
+}

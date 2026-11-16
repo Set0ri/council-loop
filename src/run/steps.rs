@@ -57,12 +57,15 @@ pub fn cmd_init(ask: &str, args: &GateArgs, obsidian: bool) -> Result<i32> {
         slug(ask, 3)
     );
     let d = runs_dir(&root).join(&rid);
-    if d.exists() {
-        anyhow::bail!("a run named {rid} already exists: {}", d.display());
+    if !crate::safe::make_new_dir(&d)? {
+        // run ids are stamped to the second: two runs of the same ask in one second collide
+        return fail(format!(
+            "a run named {rid} already exists: {}. Wait a second and start again, or go on with that run: council status --run {rid}",
+            d.display()
+        ));
     }
-    std::fs::create_dir_all(&d)?;
     let mut run = json!({"id": rid, "created": now(), "ask": ask, "paths": args.paths, "gate": plan.at("gate"), "tier": tier,
-                         "mode": plan.at("mode"), "profile": args.profile, "tripwires": plan.at("tripwires"),
+                         "mode": plan.at("mode"), "profile": plan.at("profile"), "tripwires": plan.at("tripwires"),
                          "gate_reason": plan.at("reason"), "calls_estimate": plan.at("calls_estimate"), "deviations": [],
                          "friction": [], "calls": {}, "loops": []});
     let support = plan.at("support");
@@ -137,7 +140,7 @@ pub fn cmd_init(ask: &str, args: &GateArgs, obsidian: bool) -> Result<i32> {
         );
     }
     say!();
-    cmd_next(Some(&rid), None)
+    self::cmd_next(Some(&rid), None)
 }
 
 // ----------------------------------------------------------------------------- next
@@ -328,7 +331,8 @@ fn map_packet_vars(root: &Path, skeleton_file: &Path) -> Result<(codemap::Skelet
             py::posix(path.strip_prefix(root).unwrap_or(&path))
         )
     } else {
-        let text = core::read_text(&path).unwrap_or_default();
+        let text = crate::safe::read_capped(&path, crate::safe::MAX_OUTPUT).unwrap_or_default();
+        let text = crate::safe::shown(&text);
         let first = py::lines(&text)
             .into_iter()
             .take(5)
@@ -1081,11 +1085,7 @@ pub(crate) fn control_card(run: &Value, d: &Path) -> Result<Option<Value>> {
         return Ok(None);
     }
     let f = d.join("control").join("CTRL.out.json");
-    let obj = if f.exists() {
-        providers::parse_json(&core::read_text(&f)?)
-    } else {
-        None
-    };
+    let obj = read_out(&f);
     let field = |k: &str| obj.as_ref().map(|o| text_of(o.at(k))).unwrap_or_default();
     let card = json!({"title": field("title"), "body": field("body"), "eli5": field("eli5")});
     if obj.is_none() || (c.truthy("sha256") && sha_value(&card) != c.s("sha256")) {

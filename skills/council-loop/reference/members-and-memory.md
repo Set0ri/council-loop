@@ -49,6 +49,16 @@ Web access: a Claude subagent or the claude command-line tool gets the web tools
 tools use whatever web access those tools are set up with; a bare API call has none. `init` says so,
 and a fact that was only recalled is stored as `source: memory`, low confidence, not re-checked.
 
+Who may read what. A model that reads private files, reads the open web and can send text out is a
+model that can be talked into leaking: a web page only has to ask. So the three are kept apart.
+A researcher on the first three beats searches the web and reads nothing of the project but its
+own packet. The researcher on the project's own record (the `council-historian` agent) reads the
+project and has no web tools. Experts read the project and do not go online; a fact they want from
+outside is a question for the researchers (`notes`, `"to": "research"`). In Claude Code the agent
+definitions and the hook enforce this, and through `claude -p` the list of allowed tools does;
+behind the `codex` and `gemini` tools it is as strong as those tools' own settings. The red team and the elders may run code to reproduce a claim, and a shell can reach
+the network: see `SECURITY.md` in the repository for what that leaves open.
+
 ## The mapper
 
 A script does the cheap part and a model does the part that needs judgment.
@@ -76,10 +86,9 @@ token budget (`map.focus_tokens`, default 700).
 A map a person wrote (no marker on its first line) is never overwritten: the mapper's version is
 saved beside it as `ARCHITECTURE.council.md`.
 
-Languages: Python is read with the standard library's parser. JavaScript, TypeScript, Go, Rust,
-Java, Kotlin, C#, Ruby, PHP, Swift, C, C++, shell and SQL are read by patterns. With the optional
-`tree-sitter-language-pack` installed (`pip install tree-sitter-language-pack`, then
-`council map --parsers`), signatures come from real parsers for every language it knows.
+Languages: Python is read with a real parser (tree-sitter). JavaScript, TypeScript, Go, Rust, Java,
+Kotlin, C#, Ruby, PHP, Swift, C, C++, shell and SQL are read by built-in pattern readers. All of it
+is in the program: there is nothing to install. `council map --parsers` says what a build reads.
 
 ## The shared memory
 
