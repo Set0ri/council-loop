@@ -1,0 +1,6 @@
+{"voter": "L3",
+ "ranking": ["C", "B", "A"],
+ "reasons": {"C": "R1, R2: Slashes token consumption while dynamically resolving cross-lab model slugs without hardcoded bloat.", "B": "R1, R5: Cuts significant voter startup tokens and chair-side MCP schema bloat effectively."},
+ "best_on": {"R1": "B", "R2": "C", "R3": "A", "R4": "A", "R5": "B"},
+ "notes": [{"to": "all", "text": "Sanitizing JSON before saving and handling Windows path casing both prevent costly validation traps."}],
+ "friction": ""}

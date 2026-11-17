@@ -1,0 +1,78 @@
+{
+ "1/redteam": {
+  "A": {
+   "id": "P1",
+   "authors": [
+    "L1",
+    "L2"
+   ]
+  },
+  "B": {
+   "id": "P3",
+   "authors": [
+    "L2"
+   ]
+  },
+  "C": {
+   "id": "P5",
+   "authors": [
+    "L3"
+   ]
+  },
+  "D": {
+   "id": "P2",
+   "authors": [
+    "L1"
+   ]
+  },
+  "E": {
+   "id": "P4",
+   "authors": [
+    "L3"
+   ]
+  }
+ },
+ "1/rank": {
+  "A": {
+   "id": "C3",
+   "authors": [
+    "L2",
+    "L3"
+   ]
+  },
+  "B": {
+   "id": "C2",
+   "authors": [
+    "L1",
+    "L2"
+   ]
+  },
+  "C": {
+   "id": "C1",
+   "authors": [
+    "L1",
+    "L2"
+   ]
+  }
+ },
+ "1/elders": {
+  "A": {
+   "id": "CONTROL",
+   "authors": []
+  },
+  "B": {
+   "id": "C1",
+   "authors": [
+    "L1",
+    "L2"
+   ]
+  },
+  "C": {
+   "id": "C2",
+   "authors": [
+    "L1",
+    "L2"
+   ]
+  }
+ }
+}

@@ -56,6 +56,181 @@ static EFFORT_RE: LazyLock<Regex> = LazyLock::new(|| {
         .expect("valid")
 });
 
+static HTTP_POOL: LazyLock<ureq::Agent> = LazyLock::new(|| {
+    ureq::Agent::config_builder()
+        .timeout_global(Some(Duration::from_secs(120)))
+        .http_status_as_error(false)
+        .build()
+        .into()
+});
+
+static HTTP_POOL_LONG: LazyLock<ureq::Agent> = LazyLock::new(|| {
+    ureq::Agent::config_builder()
+        .timeout_global(Some(Duration::from_secs(900)))
+        .http_status_as_error(false)
+        .build()
+        .into()
+});
+
+fn user_openrouter_config() -> Value {
+    let path = core::user_config_path();
+    if path.exists() {
+        core::load_yaml(&path)
+            .unwrap_or(Value::Null)
+            .at("openrouter")
+            .clone()
+    } else {
+        Value::Null
+    }
+}
+
+/// The OpenRouter endpoint (`COUNCIL_OPENROUTER_URL`, `openrouter.url` in `~/.council/config.yaml`, or default).
+pub fn openrouter_url() -> String {
+    if let Some(url) = std::env::var("COUNCIL_OPENROUTER_URL")
+        .ok()
+        .map(|u| py::strip(&u).to_string())
+        .filter(|u| !u.is_empty())
+    {
+        return url;
+    }
+    let cfg = user_openrouter_config();
+    if let Some(url) = cfg
+        .at("url")
+        .as_str()
+        .map(py::strip)
+        .filter(|u| !u.is_empty())
+    {
+        return url.to_string();
+    }
+    OPENROUTER_URL.to_string()
+}
+
+/// Read the OpenRouter API key from `OPENROUTER_API_KEY` or `openrouter.api_key_file` in `~/.council/config.yaml`.
+pub fn openrouter_api_key() -> Option<String> {
+    if let Some(key) = std::env::var("OPENROUTER_API_KEY")
+        .ok()
+        .map(|k| py::strip(&k).to_string())
+        .filter(|k| !k.is_empty())
+    {
+        return Some(key);
+    }
+    let cfg_path = core::user_config_path();
+    let cfg = user_openrouter_config();
+    let file_str = cfg
+        .at("api_key_file")
+        .as_str()
+        .map(py::strip)
+        .filter(|s| !s.is_empty())?;
+    let key_path = py::path(file_str);
+    let key_path = if key_path.is_absolute() {
+        key_path
+    } else if let Some(parent) = cfg_path.parent() {
+        parent.join(key_path)
+    } else {
+        key_path
+    };
+    let text = core::read_text(&key_path).ok()?;
+    let trimmed = py::strip(&text).to_string();
+    (!trimmed.is_empty()).then_some(trimmed)
+}
+
+/// Whether an OpenRouter API key is available via `OPENROUTER_API_KEY` or `~/.council/config.yaml`.
+pub fn has_openrouter_key() -> bool {
+    openrouter_api_key().is_some()
+}
+
+/// Resolve an OpenRouter `<org>/<model>` slug from explicit metadata, user/policy overrides, or creator/model name.
+pub fn openrouter_slug(
+    model_name: Option<&str>,
+    creator: Option<&str>,
+    explicit_id: Option<&str>,
+) -> Option<String> {
+    if let Some(id) = explicit_id
+        .map(py::strip)
+        .filter(|id| !id.is_empty() && id.contains('/') && crate::safe::plain_arg(id))
+    {
+        return Some(id.to_string());
+    }
+    if let Some(override_id) = std::env::var("COUNCIL_OPENROUTER_MODEL")
+        .ok()
+        .map(|v| py::strip(&v).to_string())
+        .filter(|v| !v.is_empty() && crate::safe::plain_arg(v))
+    {
+        return Some(override_id);
+    }
+    let cfg = user_openrouter_config();
+    let raw_name = model_name.map(py::strip).unwrap_or("");
+    let base = base_name(raw_name);
+    if base.is_empty() || base == "current model" || base.starts_with("stand-in:") {
+        return cfg
+            .at("default_model")
+            .as_str()
+            .map(py::strip)
+            .filter(|m| !m.is_empty() && crate::safe::plain_arg(m))
+            .map(str::to_string);
+    }
+    for table in [cfg.at("models"), core::policy().at("openrouter_ids")] {
+        for key in [base.as_str(), raw_name] {
+            if let Some(mapped) = table
+                .get(key)
+                .and_then(Value::as_str)
+                .map(py::strip)
+                .filter(|m| !m.is_empty() && crate::safe::plain_arg(m))
+            {
+                return Some(mapped.to_string());
+            }
+        }
+    }
+    if base.contains('/') && crate::safe::plain_arg(&base) {
+        return Some(base);
+    }
+    let low = base.to_ascii_lowercase();
+    let creator_low = creator.unwrap_or("").trim().to_ascii_lowercase();
+    let org = match creator_low.as_str() {
+        "anthropic" => Some("anthropic"),
+        "openai" => Some("openai"),
+        "google" => Some("google"),
+        "deepseek" => Some("deepseek"),
+        "moonshot ai" | "moonshot" => Some("moonshotai"),
+        "xai" | "x-ai" => Some("x-ai"),
+        "alibaba" | "qwen" => Some("qwen"),
+        "meta" => Some("meta-llama"),
+        "mistral" | "mistral ai" => Some("mistralai"),
+        _ if low.starts_with("claude") => Some("anthropic"),
+        _ if low.starts_with("gpt")
+            || low.starts_with("o1")
+            || low.starts_with("o3")
+            || low.starts_with("o4") =>
+        {
+            Some("openai")
+        }
+        _ if low.starts_with("gemini") || low.starts_with("gemma") => Some("google"),
+        _ if low.starts_with("deepseek") => Some("deepseek"),
+        _ if low.starts_with("kimi") => Some("moonshotai"),
+        _ if low.starts_with("grok") => Some("x-ai"),
+        _ if low.starts_with("qwen") => Some("qwen"),
+        _ if low.starts_with("llama") => Some("meta-llama"),
+        _ if low.starts_with("mistral") => Some("mistralai"),
+        _ => None,
+    }?;
+    let mut slug = String::with_capacity(low.len());
+    let mut prev_dash = false;
+    for ch in low.chars() {
+        if ch.is_ascii_alphanumeric() || ch == '.' {
+            slug.push(ch);
+            prev_dash = false;
+        } else if !prev_dash && !slug.is_empty() {
+            slug.push('-');
+            prev_dash = true;
+        }
+    }
+    let slug = slug.trim_matches(|c| c == '-' || c == '.');
+    if slug.is_empty() {
+        return None;
+    }
+    Some(format!("{org}/{slug}"))
+}
+
 /// A model name without its effort suffix: `"GPT-6.1 Sol (high)"` -> `"GPT-6.1 Sol"`.
 pub fn base_name(model_name: &str) -> String {
     py::strip(&EFFORT_RE.replace_all(model_name, "")).to_string()
@@ -177,26 +352,57 @@ fn command(
 }
 
 fn openrouter(prompt: &str, model: &str, timeout: u64) -> Result<String, String> {
-    let key = std::env::var("OPENROUTER_API_KEY")
-        .map_err(|_| "OPENROUTER_API_KEY is not set".to_string())?;
+    let key = openrouter_api_key().ok_or_else(|| "OPENROUTER_API_KEY is not set".to_string())?;
+    let url = openrouter_url();
     let body = Json::LINE
         .dumps(&json!({"model": model, "messages": [{"role": "user", "content": prompt}]}));
-    let agent: ureq::Agent = ureq::Agent::config_builder()
-        .timeout_global(Some(Duration::from_secs(timeout)))
-        .build()
-        .into();
+    let custom_agent: Option<ureq::Agent> = if timeout == 120 || timeout == 900 {
+        None
+    } else {
+        Some(
+            ureq::Agent::config_builder()
+                .timeout_global(Some(Duration::from_secs(timeout)))
+                .http_status_as_error(false)
+                .build()
+                .into(),
+        )
+    };
+    let agent: &ureq::Agent = match custom_agent.as_ref() {
+        Some(custom) => custom,
+        None if timeout == 120 => &HTTP_POOL,
+        None => &HTTP_POOL_LONG,
+    };
     let mut response = agent
-        .post(OPENROUTER_URL)
+        .post(&url)
         .header("Authorization", &format!("Bearer {key}"))
         .header("Content-Type", "application/json")
         .send(body.as_bytes())
         .map_err(|e| e.to_string())?;
+    let status = response.status().as_u16();
     let text = response
         .body_mut()
         .with_config()
         .limit(REPLY_CAP)
         .read_to_string()
         .map_err(|e| e.to_string())?;
+    if status >= 400 {
+        let detail = serde_json::from_str::<Value>(&text)
+            .ok()
+            .and_then(|v| {
+                let msg = v.at("error").s("message");
+                if !msg.is_empty() {
+                    Some(msg.to_string())
+                } else {
+                    v.get("error").and_then(Value::as_str).map(str::to_string)
+                }
+            })
+            .unwrap_or_else(|| py::head(&py::squash(&text), 200).to_string());
+        return Err(if detail.is_empty() {
+            format!("HTTP {status}")
+        } else {
+            format!("HTTP {status}: {detail}")
+        });
+    }
     let reply: Value =
         serde_json::from_str(&text).map_err(|e| format!("the reply is not JSON: {e}"))?;
     match reply
@@ -345,9 +551,9 @@ pub fn ask(
     let model = model.filter(|m| !m.is_empty());
     if provider == "openrouter" {
         if dry_run {
-            return json!({"ok": true, "provider": provider, "model": model, "dry_run": true, "command": format!("POST {OPENROUTER_URL}")});
+            return json!({"ok": true, "provider": provider, "model": model, "dry_run": true, "command": format!("POST {}", openrouter_url())});
         }
-        let has_key = std::env::var("OPENROUTER_API_KEY").is_ok_and(|k| !k.is_empty());
+        let has_key = has_openrouter_key();
         let Some(model) = model.filter(|_| has_key) else {
             return json!({"ok": false, "provider": provider, "error": "need OPENROUTER_API_KEY and a model slug"});
         };

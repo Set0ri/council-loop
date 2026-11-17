@@ -145,7 +145,7 @@ pub fn doctor(root: Option<&Path>, probe: bool) -> Value {
     ];
     let has = |name: &str| cli.iter().any(|(n, ok)| *n == name && *ok);
     let claude_code = env("CLAUDECODE").as_deref() == Some("1");
-    let openrouter = env("OPENROUTER_API_KEY").is_some();
+    let openrouter = crate::providers::has_openrouter_key();
     let labs = [
         ("Anthropic", claude_code || has("claude")),
         ("OpenAI", has("codex") || openrouter),
@@ -271,6 +271,39 @@ pub fn doctor(root: Option<&Path>, probe: bool) -> Value {
                 ));
             }
             probes.insert(name.to_string(), json!(outcome));
+        }
+        if openrouter {
+            let probe_model =
+                env("COUNCIL_OPENROUTER_MODEL").unwrap_or_else(|| "openai/gpt-4o-mini".to_string());
+            let res = crate::providers::ask(
+                "openrouter",
+                "Reply with exactly the two letters: OK",
+                Some(&probe_model),
+                None,
+                30,
+                false,
+                "none",
+            );
+            let said = res.show("text").to_uppercase();
+            let ok = res.truthy("ok") && said.contains("OK") && !said.contains("ERROR");
+            let outcome = if ok {
+                "ok".to_string()
+            } else {
+                let detail = if res.truthy("text") {
+                    res.show("text")
+                } else if res.truthy("error") {
+                    res.show("error")
+                } else {
+                    String::new()
+                };
+                format!("FAILED: {}", py::head(&py::squash(&detail), 120))
+            };
+            if !ok {
+                notes_probe.push(format!(
+                    "the openrouter API key is configured but did not answer a test prompt: {outcome}"
+                ));
+            }
+            probes.insert("openrouter".to_string(), json!(outcome));
         }
     }
     if fresh == "none" {

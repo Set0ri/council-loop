@@ -1,0 +1,63 @@
+{
+  "lens": "L3",
+  "eli5": "Hardening hook schemas, Windows path matching, and ballot validation eliminates silent security bypasses and expensive token-wasting seat respawns.",
+  "ideas": [
+    "Dual-schema event parser in src/hook.rs supporting snake_case and camelCase payloads with Windows case-insensitive path comparisons to enforce locked test integrity across all harnesses.",
+    "Resilient ballot label regex and qualified leak tokens in src/core.rs to prevent spurious seat respawns that consume tens of thousands of tokens per retry.",
+    "Sanitize host PATH in tests/common/mod.rs Sandbox to prevent external CLIs like gemini.cmd from causing non-hermetic integration test runs on Windows.",
+    "Replace hard seat retries on minor card length or title slips with automatic deterministic trimming by the chair, eliminating whole-seat restart token overhead entirely.",
+    "Normalize path roots in src/safe.rs using case-folded prefix comparisons to eliminate false-positive fence rejections on Windows drive letters without relaxing directory restrictions.",
+    "Pre-filter empty research syntheses in memory validation with a one-sentence fallback synthesis rather than failing the researcher seat and repeating search queries."
+  ],
+  "cards": [
+    {
+      "title": "Resilient hook parsing and Windows case-insensitive locking",
+      "body": "The pre-tool hook in src/hook.rs expects Claude Code payload keys such as tool_name and tool_input. When executed inside other agent harnesses like Antigravity, payloads provide camelCase fields like toolName or nested toolCall objects, causing the hook to see empty strings and silently permit edits to locked test files. Furthermore, path lookups in locked sets rely on case-sensitive set containment, failing on Windows where filesystems ignore letter casing. By normalizing incoming JSON event keys across snake_case and camelCase variants and applying case-insensitive relative path normalization on Windows platforms, the hook guarantees tamper-proof test locking and seat lane boundaries everywhere.",
+      "wins": [
+        "R3",
+        "R2",
+        "R4"
+      ],
+      "evidence": "src/hook.rs:445-465, hooks/hooks.json, src/safe.rs:224-230",
+      "eli5": "Make hooks parse both camelCase and snake_case while matching Windows paths case-insensitively to prevent security bypasses."
+    },
+    {
+      "title": "Resilient ballot parsing and qualified leak detection",
+      "body": "Strict validation in src/run/validate.rs and src/core.rs triggers costly seat respawns over harmless formatting slips. In src/core.rs, label parsing requires exact string boundaries, discarding valid ballots containing markdown bolding or candidate title annotations. Meanwhile, identity leak checks match unqualified two-letter tokens, spuriously flagging standard engineering acronyms and forcing hundred-thousand-token seat retries. Relaxing label extraction to capture leading candidate letters across markdown styles and restricting leak patterns to qualified role references preserves protocol integrity while preventing spurious validation rejections. This drastically cuts wasted startup tokens and unnecessary provider retries across all seats without lowering council evaluation standards.",
+      "wins": [
+        "R1",
+        "R3",
+        "R4"
+      ],
+      "evidence": "src/core.rs:1068-1075, src/core.rs:1242-1260, src/run/validate.rs:200-245, docs/council-run-2026-11-13-self-review.md",
+      "eli5": "Allow markdown in ballots and qualify leak checks to prevent expensive validation failures and seat respawns."
+    }
+  ],
+  "research": [
+    {
+      "claim": "In src/hook.rs, locked_target and seat_guard only read snake_case tool_name and tool_input fields, failing to inspect camelCase or nested toolCall objects from other IDE harnesses.",
+      "source": "<repo>/src/hook.rs",
+      "quote": "match event.s(\"tool_name\") { \"Edit\" | \"Write\" | \"MultiEdit\" | \"NotebookEdit\" => { let target = first_text(input, &[\"file_path\", \"notebook_path\", \"path\"]);",
+      "confidence": "high"
+    },
+    {
+      "claim": "In tests/common/mod.rs, Sandbox::command removes select COUNCIL_* and CLAUDE_* variables but leaves host PATH intact, allowing global CLIs like gemini.cmd to perturb test execution.",
+      "source": "<repo>/tests/common/mod.rs",
+      "quote": "cmd.args(args).current_dir(&self.proj); for (name, _) in std::env::vars_os() { let name = name.to_string_lossy().into_owned(); if (name.starts_with(\"COUNCIL_\") && name != \"COUNCIL_TEST_KEEP\") || matches!(name.as_str(), \"CLAUDECODE\" | \"OPENROUTER_API_KEY\" | \"AA_API_KEY\" | \"CI\" | \"CLAUDE_PROJECT_DIR\") { cmd.env_remove(name); } }",
+      "confidence": "high"
+    },
+    {
+      "claim": "In src/core.rs, LABEL_RE strictly anchors candidate labels without allowing markdown bolding or trailing candidate titles, causing valid ballots with titles to be rejected.",
+      "source": "<repo>/src/core.rs",
+      "quote": "Regex::new(r\"(?i)^(?:candidate|card|option)?\\s*[:#-]?\\s*([A-Za-z]{1,2})\\s*[:.)-]?$\").expect(\"valid\");",
+      "confidence": "high"
+    }
+  ],
+  "notes": [
+    {
+      "to": "all",
+      "text": "Auditing src/hook.rs and src/run/validate.rs revealed that validation failures and hook blind spots stem from rigid key schemas and regexes rather than actual model inability; fixing these eliminates respawns without changing model assignments."
+    }
+  ],
+  "friction": "Packet references offline snapshot facts; live code audit was necessary to verify exact regex and hook behavior."
+}

@@ -1,0 +1,87 @@
+{
+ "candidates": [
+  {
+   "id": "C1",
+   "title": "Sanitized Ballot HTTP Dispatch & Refresh Slugs",
+   "body": "Route pure zero-tool ballot phases (shortlist vote, rank vote, and efficient-profile non-probing seats) directly through providers::openrouter via ureq instead of spawning heavy host subagents, while preserving full file and shell verification tools for probing elders, ideate, and redteam. Sanitize HTTP completions through providers::parse_json before saving output files so markdown code fences never trigger ingest rejections. Populate openrouter_id dynamically during council refresh from Artificial Analysis metadata and support optional keyfile or endpoint settings in personal ~/.council/config.yaml without hardcoding model names in policy.yaml, cutting total Lite run token consumption by over fifty percent.",
+   "eli5": "Send pure ballots over sanitized HTTP calls and resolve OpenRouter slugs at refresh time.",
+   "parents": [
+    "P1",
+    "P3"
+   ]
+  },
+  {
+   "id": "C2",
+   "title": "Compact MCP Schemas & Ballot HTTP Dispatch",
+   "body": "Cut both chair-side MCP context tax and voter startup waste together in one cohesive package. Add an optional compact MCP schema mode that trims verbose multi-line tool and parameter prose on tools/list from twenty-three kilobytes to under nine kilobytes while keeping every required run, dispatch, deviation, and audit tool visible for autonomous execution. Pair this with sanitized ureq HTTP dispatch strictly for pure shortlist and rank ballots so probing elders retain full verification tools. Non-lazy MCP hosts save thousands of prompt tokens every turn while each loop saves roughly 180,000 voter startup tokens.",
+   "eli5": "Shrink MCP tool schemas by over half and send pure vote ballots over direct HTTP.",
+   "parents": [
+    "P1",
+    "P2"
+   ]
+  },
+  {
+   "id": "C3",
+   "title": "Dual-Host Hooks, Windows Paths & Anchored Ballots",
+   "body": "Harden multi-client hook safety, native Windows path handling, and ballot retry resilience alongside personal config OpenRouter keyfile support. Extend src/hook.rs to detect both Claude Code snake_case events and Antigravity camelCase toolCall payloads, emitting each host's native denial JSON envelope so locked test files stay protected everywhere. Fix Windows drive-letter and directory case mismatches via canonical case-insensitive prefix matching in hook::inside and memory fact source validation so lowercase c:/ paths never bypass locks or drop valid citations. Strip surrounding markdown bolding on anchored single-label ballot entries without weakening core::blind identity leak rules, eliminating avoidable seat retries.",
+   "eli5": "Support Antigravity and Claude hooks, fix Windows path casing, and clean markdown from ballots.",
+   "parents": [
+    "P3",
+    "P4",
+    "P5"
+   ]
+  }
+ ],
+ "responses": [
+  {
+   "finding": 1,
+   "action": "fixed",
+   "note": "C1 and C2 keep full verification tools for probing elders (balanced/max) and restrict HTTP dispatch to pure ballots and non-probing efficient seats."
+  },
+  {
+   "finding": 2,
+   "action": "fixed",
+   "note": "C1 and C2 pipe HTTP responses through providers::parse_json to strip markdown fences before writing <seat>.out.json."
+  },
+  {
+   "finding": 3,
+   "action": "fixed",
+   "note": "Removed static model slugs from policy.yaml; C1 resolves openrouter_id dynamically in refresh.rs with user-only ~/.council/config.yaml overrides."
+  },
+  {
+   "finding": 4,
+   "action": "fixed",
+   "note": "C3 emits Antigravity's {decision, reason} JSON when camelCase toolCall input is detected and Claude's hookSpecificOutput otherwise."
+  },
+  {
+   "finding": 5,
+   "action": "fixed",
+   "note": "C3 strips markdown wrappers only on single-label array entries while preserving strict boundary anchors in LABEL_RE."
+  },
+  {
+   "finding": 6,
+   "action": "accepted",
+   "note": "Verified src/run/validate.rs:182-191 only warns on ideation leaks; dropped all changes to core::blind leak detection in C3."
+  },
+  {
+   "finding": 7,
+   "action": "fixed",
+   "note": "C2 keeps all required run, dispatch, deviation, and audit tools active, shrinking description verbosity instead of hiding workflow tools."
+  },
+  {
+   "finding": 9,
+   "action": "fixed",
+   "note": "Fused P4 into C3 alongside P3 and P5 so hook/Windows hardening pairs with retry savings and OpenRouter keyfile setup."
+  },
+  {
+   "finding": 10,
+   "action": "fixed",
+   "note": "C3 uses canonical case-insensitive path prefix matching on Windows in both hook::inside and memory source validation."
+  }
+ ],
+ "checks": {
+  "C1": "pass",
+  "C2": "pass",
+  "C3": "pass"
+ }
+}

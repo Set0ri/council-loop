@@ -1,0 +1,17 @@
+{
+  "voter": "L1",
+  "ranking": ["C", "B", "A"],
+  "reasons": {
+    "C": "R1, R2: Direct HTTP ballot dispatch and dynamic slugs slash token consumption.",
+    "B": "R1, R5: Compact MCP schemas and ballot HTTP dispatch reduce context tax."
+  },
+  "best_on": {
+    "R1": "C",
+    "R2": "C",
+    "R3": "A",
+    "R4": "A",
+    "R5": "B"
+  },
+  "notes": [{"to": "chair", "text": "Direct HTTP dispatch and compact schemas deliver massive token savings."}],
+  "friction": ""
+}

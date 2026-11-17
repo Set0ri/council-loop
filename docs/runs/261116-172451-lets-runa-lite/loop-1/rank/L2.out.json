@@ -1,0 +1,21 @@
+{
+  "voter": "L2",
+  "ranking": [
+    "C",
+    "B",
+    "A"
+  ],
+  "reasons": {
+    "C": "R1, R2: Maximizes token reduction and cross-lab provider reliability via direct HTTP dispatch.",
+    "B": "R1, R5: Substantially trims MCP schemas and streamlines chair ergonomics."
+  },
+  "best_on": {
+    "R1": "C",
+    "R2": "C",
+    "R3": "A",
+    "R4": "B",
+    "R5": "B"
+  },
+  "notes": [],
+  "friction": ""
+}

@@ -4,7 +4,7 @@
  "map": "docs/ARCHITECTURE.md",
  "structure": {
   "build.rs": "8c388af0b82e231a",
-  "src/api.rs": "78ea4998816dd006",
+  "src/api.rs": "f2b05c5dd3f4f351",
   "src/assets.rs": "c05933203ebecb51",
   "src/cli.rs": "b413d0578f436b8d",
   "src/clock.rs": "8760d41086cd7f13",
@@ -16,10 +16,10 @@
   "src/lib.rs": "d53f94a3bd1ff684",
   "src/log.rs": "92a8aa3c6fda4b87",
   "src/main.rs": "5ffb8929f8f3b5f4",
-  "src/mcp.rs": "53fb1ef8c9e713ce",
+  "src/mcp.rs": "0d2c7440bbdb00c6",
   "src/memory.rs": "cfbb8bdd02a03038",
   "src/out.rs": "f943f1fb163304b0",
-  "src/providers.rs": "7a9557f9dba4c32d",
+  "src/providers.rs": "0788823c9c3f72a6",
   "src/py.rs": "000e44efdb7345dc",
   "src/pyrand.rs": "47ce39fc73e59b77",
   "src/pyread.rs": "5ce14a606e617626",
@@ -44,6 +44,7 @@
   "tests/scenarios.rs": "b365e40c32a24878",
   "tests/security.rs": "8277d9e277dfbf86",
   "tests/speed.rs": "98d1c30e7f70aeaa",
-  "tests/surfaces.rs": "d2705dd443a96148"
+  "tests/surfaces.rs": "d2705dd443a96148",
+  "tests/winner_261116.rs": "6f4d6e030dfeabf5"
  }
 }

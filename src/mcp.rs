@@ -44,7 +44,39 @@ use anyhow::Result;
 use serde_json::{json, Value};
 use std::io::{BufRead as _, Write as _};
 use std::path::PathBuf;
-use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
+
+static COMPACT_SCHEMAS: AtomicBool = AtomicBool::new(false);
+
+/// Enable or disable compact MCP tool schemas (`--compact-schemas`).
+pub fn set_compact_schemas(compact: bool) {
+    COMPACT_SCHEMAS.store(compact, Ordering::Relaxed);
+}
+
+fn use_compact_schemas() -> bool {
+    if COMPACT_SCHEMAS.load(Ordering::Relaxed) {
+        return true;
+    }
+    if cfg!(test) {
+        return false;
+    }
+    if std::env::var("COUNCIL_MCP_COMPACT")
+        .ok()
+        .filter(|v| !v.is_empty())
+        .is_some_and(|v| !matches!(v.to_ascii_lowercase().as_str(), "0" | "false" | "no"))
+    {
+        return true;
+    }
+    let own_path = core::user_config_path();
+    if own_path.exists() {
+        if let Ok(own) = core::load_yaml(&own_path) {
+            if own.at("mcp").at("compact_schemas").as_bool() == Some(true) {
+                return true;
+            }
+        }
+    }
+    false
+}
 
 /// Protocol revisions this server answers. A client that asks for another one is offered the newest.
 const VERSIONS: [&str; 4] = ["2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05"];
@@ -324,8 +356,13 @@ impl Server {
         if op.effect != Effect::Sends {
             hints.insert("openWorldHint".into(), json!(false));
         }
-        let mut tool = json!({"name": format!("council_{}", op.name), "title": op.title, "description": op.about,
-                              "inputSchema": api::input_schema(op), "annotations": hints});
+        let mut tool = if use_compact_schemas() {
+            json!({"name": format!("council_{}", op.name), "description": op.title,
+                   "inputSchema": api::compact_input_schema(op), "annotations": hints})
+        } else {
+            json!({"name": format!("council_{}", op.name), "title": op.title, "description": op.about,
+                   "inputSchema": api::input_schema(op), "annotations": hints})
+        };
         if self.options.output_schemas {
             tool["outputSchema"] = api::output_schema(op);
         }

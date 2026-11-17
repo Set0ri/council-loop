@@ -457,6 +457,9 @@ enum Cmd {
         /// List each tool's output schema too (a larger tool list for the client to carry).
         #[arg(long)]
         output_schemas: bool,
+        /// Trim tool and parameter prose descriptions to shrink tools/list wire size while keeping all tools and schemas.
+        #[arg(long)]
+        compact_schemas: bool,
     },
     /// The API surface from a shell: list the operations, describe them, or call one with JSON.
     Api {
@@ -870,15 +873,19 @@ fn run_cmd(cmd: Cmd) -> Result<i32> {
             tools,
             deny_tools,
             output_schemas,
-        } => crate::mcp::serve(crate::mcp::Options::resolve(
-            project.as_deref(),
-            read_only,
-            no_dispatch,
-            toolsets.as_deref(),
-            tools.as_deref(),
-            deny_tools.as_deref(),
-            output_schemas,
-        )?),
+            compact_schemas,
+        } => {
+            crate::mcp::set_compact_schemas(compact_schemas);
+            crate::mcp::serve(crate::mcp::Options::resolve(
+                project.as_deref(),
+                read_only,
+                no_dispatch,
+                toolsets.as_deref(),
+                tools.as_deref(),
+                deny_tools.as_deref(),
+                output_schemas,
+            )?)
+        }
         Cmd::Api {
             operation,
             args,

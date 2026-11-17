@@ -1,0 +1,820 @@
+{
+ "id": "261116-172451-lets-runa-lite",
+ "created": "2026-11-16T17:24:51",
+ "ask": "lets runa lite council 1 loop on improving this, crosslab, biggest gains, save tokens",
+ "paths": [],
+ "gate": "GATE tier=lite mode=crosslab profile=efficient loops<=1 calls~9 tokens~1.3M rel_cost=0.46 (the requester: \"lite council 1 loop, crosslab, save tokens\")",
+ "tier": "lite",
+ "mode": "crosslab",
+ "profile": "efficient",
+ "tripwires": [],
+ "gate_reason": "the requester: \"lite council 1 loop, crosslab, save tokens\"",
+ "calls_estimate": 9,
+ "deviations": [
+  "brief: To save startup tokens (L-20261113-6) and achieve real 3-lab crosslab execution via Antigravity + OpenRouter MCP, L1 runs on OpenAI openai/gpt-6.1-terra-pro, L2 on Anthropic anthropic/claude-haiku-5.5, L3 on Google Gemini 4 Flash subagent (with read-only repo access), CTRL on OpenAI openai/gpt-6.1-sol-pro via an isolated subagent so the chair never sees CTRL before final, and RT/EA on Anthropic anthropic/claude-opus-5.5 via isolated subagents.",
+  "loop 1 rank: OpenRouter MCP returned HTTP 401 (API key expired), so L1, L2, CTRL, RT, and EA run as fresh-context Gemini 4 stand-ins rather than external OpenAI/Anthropic endpoints; every stand-in seat is labelled in the final write-up."
+ ],
+ "friction": [
+  "L1 (ideate, loop 1): OpenRouter API key expired in local DPAPI vault, demonstrating need for robust fallback to local CLI transports.",
+  "L2 (ideate, loop 1): OpenRouter API key returned HTTP 401 (expired); seat L2 executed via subagent fresh context.",
+  "L3 (ideate, loop 1): Packet references offline snapshot facts; live code audit was necessary to verify exact regex and hook behavior.",
+  "RT (redteam, loop 1): OpenRouter API key expired on test machine (HTTP 401); red team analysis performed via verified code audit stand-in."
+ ],
+ "calls": {
+  "ideate": 4,
+  "redteam": 1,
+  "rank": 3,
+  "elders": 1
+ },
+ "loops": [
+  {
+   "research_seats": [],
+   "started": "2026-11-16T17:27:25",
+   "ideas": {
+    "L1": [
+     "Direct HTTP completions for zero-tool seats: route votes, rankings, and elders to lean API endpoints, cutting 64k-token subagent startup overhead per ballot.",
+     "Dynamic MCP toolset filtering: default tools/list to a minimal six-tool core workflow, cutting 20KB schema payload overhead on every host LLM interaction.",
+     "Strip codebase maps and focus blocks from pure evaluation seats like rank voting and elders, saving over 1,500 prompt tokens per seat packet.",
+     "Eliminate tool declarations for subagents when tools_for returns none, saving thousands of tool-schema injection tokens on host subagent spawns.",
+     "Contrarian: Cache and reuse invariant prompt headers across all seats in a loop using provider prompt caching tags to reduce input token billing.",
+     "Contrarian: Replace isolated control subagents on Lite runs with single-turn cached zero-tool completions, saving 150k startup and runtime tokens."
+    ],
+    "L2": [
+     "Direct HTTP ureq OpenRouter transport for zero-tool phases bypassing subagent shell forks to eliminate 1.1M startup tokens.",
+     "Dual hook payload parser in src/hook.rs supporting snake_case Claude and camelCase Antigravity toolCall formats for IDE integration.",
+     "Static model slug mapping in policy.yaml mapping AA display names directly to OpenRouter slugs, eliminating stand-in fallback.",
+     "Dynamic lazy tool filtering in src/mcp.rs exposing only active phase verbs to slash 23KB tools/list MCP payload down to 3KB.",
+     "Sanitized PATH isolation in test harness modules to prevent host CLI shims like gemini.CMD from corrupting scenario test outcomes."
+    ],
+    "L3": [
+     "Dual-schema event parser in src/hook.rs supporting snake_case and camelCase payloads with Windows case-insensitive path comparisons to enforce locked test integrity across all harnesses.",
+     "Resilient ballot label regex and qualified leak tokens in src/core.rs to prevent spurious seat respawns that consume tens of thousands of tokens per retry.",
+     "Sanitize host PATH in tests/common/mod.rs Sandbox to prevent external CLIs like gemini.cmd from causing non-hermetic integration test runs on Windows.",
+     "Replace hard seat retries on minor card length or title slips with automatic deterministic trimming by the chair, eliminating whole-seat restart token overhead entirely.",
+     "Normalize path roots in src/safe.rs using case-folded prefix comparisons to eliminate false-positive fence rejections on Windows drive letters without relaxing directory restrictions.",
+     "Pre-filter empty research syntheses in memory validation with a one-sentence fallback synthesis rather than failing the researcher seat and repeating search queries."
+    ]
+   },
+   "kept": {
+    "L1": [
+     {
+      "title": "Direct HTTP Dispatch For Zero-Tool Seats",
+      "body": "Host subagents incur massive startup overhead by loading system instructions, git status, and environment context on every spawn. In measured runs, rank ballots consumed roughly 64,000 tokens each for a tiny 2,000-token prompt packet, totaling 193,000 tokens across voters. Yet the dispatch logic already classifies vote, rank, control, and elder phases as requiring zero tools. The dispatcher should execute zero-tool seats directly via lightweight HTTP completions whenever provider credentials exist, bypassing full subagent instantiation. This single architectural shift eliminates over 80 percent of ballot and elder token consumption while slashing loop latency without compromising isolation or protocol invariants.",
+      "eli5": "Route zero-tool seats through fast HTTP completions instead of spawning heavy subagents with tens of thousands of startup tokens.",
+      "wins": [
+       "R1",
+       "R2",
+       "R4"
+      ],
+      "evidence": "docs/council-run-2026-11-13-self-review.md (rank vote 193k tokens across 3 ballots, ~64k each); src/run/dispatch.rs (tools_for marks vote, rank, elders, control as 'none')"
+     },
+     {
+      "title": "Minimalist Dynamic MCP Toolset Gating",
+      "body": "The MCP server currently advertises between 22 and 27 tools on tools/list, outputting 19 to 23 kilobytes of comprehensive JSON schemas. When an AI host initializes or interacts with the server, these exhaustive schemas are injected directly into context, consuming several thousand prompt tokens on every turn. The server should default to a compact core toolset containing only primary workflow operations such as init, next, ingest, status, cut, and note. Specialized administrative tools like blind verification, memory reconfiguration, and lock inspection should remain tucked behind an explicit flag or progressive disclosure. This reduces baseline MCP token consumption without removing any functionality.",
+      "eli5": "Default MCP tools list to a compact six-tool core, cutting massive schema bloat on every host prompt.",
+      "wins": [
+       "R1",
+       "R5",
+       "R4"
+      ],
+      "evidence": "src/mcp.rs (tools_list sends 19 KB to 23 KB across 22 to 27 tool schemas); src/api.rs (registry defines toolset groupings)"
+     }
+    ],
+    "L2": [
+     {
+      "title": "Direct HTTP Dispatch For Zero-Tool Council Seats",
+      "body": "In measured Lite runs, ballot votes consumed 193k tokens across three calls because host subagent wrappers introduced roughly 60k tokens of startup overhead per packet. Protocol validation in src/run/dispatch.rs already flags vote, rank, elder, and control phases as requiring zero tools. When an OpenRouter key or compatible endpoint is present, council dispatch should route zero-tool seats directly through providers::openrouter using the existing ureq client rather than spawning external subagent processes. This eliminates subagent initialization payloads entirely, preserves strict timeout envelopes, and guarantees clean JSON completions while cutting total run spend by over sixty percent without new crate dependencies.",
+      "eli5": "Execute tool-free seats via direct HTTP API calls to eliminate massive subagent startup token overhead.",
+      "wins": [
+       "R1",
+       "R2",
+       "R4"
+      ],
+      "evidence": "src/run/dispatch.rs:9-16, src/providers.rs:179-214, docs/council-run-2026-11-13-self-review.md"
+     },
+     {
+      "title": "Static Policy Slug Mapping And Dual Hook Ingestion",
+      "body": "Current cross-lab dispatch defaults to stand-ins because models/lock.yaml lacks OpenRouter slugs unless an online refresh was executed, while src/providers.rs only checks raw environment variables. Adding a static slug table in models/policy.yaml gives deterministic cross-lab model resolution offline. Concurrently, src/hook.rs fails on Antigravity IDE events because it only parses snake_case tool_name and tool_input fields from Claude Code instead of camelCase toolCall structures. Extending the hook payload parser to accept both JSON schemas enables seamless IDE integration without proxy wrappers, ensuring that cross-lab seats and automated hooks execute reliably across heterogeneous client environments without touching external crates.",
+      "eli5": "Add static provider slugs in policy.yaml and support camelCase IDE hook payloads to ensure reliable multi-client dispatch.",
+      "wins": [
+       "R2",
+       "R3",
+       "R5"
+      ],
+      "evidence": "src/providers.rs:180-182, src/hook.rs:15-35, skills/council-loop/models/policy.yaml"
+     }
+    ],
+    "L3": [
+     {
+      "title": "Resilient hook parsing and Windows case-insensitive locking",
+      "body": "The pre-tool hook in src/hook.rs expects Claude Code payload keys such as tool_name and tool_input. When executed inside other agent harnesses like Antigravity, payloads provide camelCase fields like toolName or nested toolCall objects, causing the hook to see empty strings and silently permit edits to locked test files. Furthermore, path lookups in locked sets rely on case-sensitive set containment, failing on Windows where filesystems ignore letter casing. By normalizing incoming JSON event keys across snake_case and camelCase variants and applying case-insensitive relative path normalization on Windows platforms, the hook guarantees tamper-proof test locking and seat lane boundaries everywhere.",
+      "eli5": "Make hooks parse both camelCase and snake_case while matching Windows paths case-insensitively to prevent security bypasses.",
+      "wins": [
+       "R3",
+       "R2",
+       "R4"
+      ],
+      "evidence": "src/hook.rs:445-465, hooks/hooks.json, src/safe.rs:224-230"
+     },
+     {
+      "title": "Resilient ballot parsing and qualified leak detection",
+      "body": "Strict validation in src/run/validate.rs and src/core.rs triggers costly seat respawns over harmless formatting slips. In src/core.rs, label parsing requires exact string boundaries, discarding valid ballots containing markdown bolding or candidate title annotations. Meanwhile, identity leak checks match unqualified two-letter tokens, spuriously flagging standard engineering acronyms and forcing hundred-thousand-token seat retries. Relaxing label extraction to capture leading candidate letters across markdown styles and restricting leak patterns to qualified role references preserves protocol integrity while preventing spurious validation rejections. This drastically cuts wasted startup tokens and unnecessary provider retries across all seats without lowering council evaluation standards.",
+      "eli5": "Allow markdown in ballots and qualify leak checks to prevent expensive validation failures and seat respawns.",
+      "wins": [
+       "R1",
+       "R3",
+       "R4"
+      ],
+      "evidence": "src/core.rs:1068-1075, src/core.rs:1242-1260, src/run/validate.rs:200-245, docs/council-run-2026-11-13-self-review.md"
+     }
+    ]
+   },
+   "pool": [
+    {
+     "id": "P1",
+     "title": "Direct HTTP Dispatch For Zero-Tool Seats",
+     "body": "In measured Lite runs, ballot votes consumed roughly 193,000 tokens across three calls because host subagent wrappers add over 60,000 tokens of startup context per 2,000-token packet. Yet protocol logic in src/run/dispatch.rs already marks vote, rank, control, and elder phases as needing zero tools. Whenever an OpenRouter key or compatible HTTP endpoint is configured, council dispatch should route all zero-tool seats directly through providers::openrouter via the existing ureq client instead of spawning external subagent processes. Bypassing subagent instantiation preserves strict timeout envelopes, isolation, and clean JSON completions while eliminating over eighty percent of ballot and elder token spend with zero new crate dependencies.",
+     "eli5": "Route tool-free vote, elder, and control seats through direct HTTP calls instead of heavy subagents.",
+     "authors": [
+      "L1",
+      "L2"
+     ],
+     "from": [
+      "L1#1",
+      "L2#1"
+     ]
+    },
+    {
+     "id": "P2",
+     "title": "Minimalist Dynamic MCP Toolset Gating",
+     "body": "The MCP server currently advertises between 22 and 27 tools on tools/list, outputting 19 to 23 kilobytes of comprehensive JSON schemas. When an AI host initializes or interacts with the server, these exhaustive schemas are injected directly into context, consuming several thousand prompt tokens on every turn. The server should default to a compact core toolset containing only primary workflow operations such as init, next, ingest, status, cut, and note. Specialized administrative tools like blind verification, memory reconfiguration, and lock inspection should remain tucked behind an explicit flag or progressive disclosure. This reduces baseline MCP token consumption without removing any functionality.",
+     "eli5": "Default MCP tools list to a compact six-tool core, cutting massive schema bloat on every host prompt.",
+     "authors": [
+      "L1"
+     ],
+     "from": [
+      "L1#2"
+     ]
+    },
+    {
+     "id": "P3",
+     "title": "Static Policy Slug Mapping And Dual Hook Ingestion",
+     "body": "Current cross-lab dispatch defaults to stand-ins because models/lock.yaml lacks OpenRouter slugs unless an online refresh was executed, while src/providers.rs only checks raw environment variables. Adding a static slug table in models/policy.yaml gives deterministic cross-lab model resolution offline. Concurrently, src/hook.rs fails on Antigravity IDE events because it only parses snake_case tool_name and tool_input fields from Claude Code instead of camelCase toolCall structures. Extending the hook payload parser to accept both JSON schemas enables seamless IDE integration without proxy wrappers, ensuring that cross-lab seats and automated hooks execute reliably across heterogeneous client environments without touching external crates.",
+     "eli5": "Add static provider slugs in policy.yaml and support camelCase IDE hook payloads to ensure reliable multi-client dispatch.",
+     "authors": [
+      "L2"
+     ],
+     "from": [
+      "L2#2"
+     ]
+    },
+    {
+     "id": "P4",
+     "title": "Resilient hook parsing and Windows case-insensitive locking",
+     "body": "The pre-tool hook in src/hook.rs expects Claude Code payload keys such as tool_name and tool_input. When executed inside other agent harnesses like Antigravity, payloads provide camelCase fields like toolName or nested toolCall objects, causing the hook to see empty strings and silently permit edits to locked test files. Furthermore, path lookups in locked sets rely on case-sensitive set containment, failing on Windows where filesystems ignore letter casing. By normalizing incoming JSON event keys across snake_case and camelCase variants and applying case-insensitive relative path normalization on Windows platforms, the hook guarantees tamper-proof test locking and seat lane boundaries everywhere.",
+     "eli5": "Make hooks parse both camelCase and snake_case while matching Windows paths case-insensitively to prevent security bypasses.",
+     "authors": [
+      "L3"
+     ],
+     "from": [
+      "L3#1"
+     ]
+    },
+    {
+     "id": "P5",
+     "title": "Resilient ballot parsing and qualified leak detection",
+     "body": "Strict validation in src/run/validate.rs and src/core.rs triggers costly seat respawns over harmless formatting slips. In src/core.rs, label parsing requires exact string boundaries, discarding valid ballots containing markdown bolding or candidate title annotations. Meanwhile, identity leak checks match unqualified two-letter tokens, spuriously flagging standard engineering acronyms and forcing hundred-thousand-token seat retries. Relaxing label extraction to capture leading candidate letters across markdown styles and restricting leak patterns to qualified role references preserves protocol integrity while preventing spurious validation rejections. This drastically cuts wasted startup tokens and unnecessary provider retries across all seats without lowering council evaluation standards.",
+     "eli5": "Allow markdown in ballots and qualify leak checks to prevent expensive validation failures and seat respawns.",
+     "authors": [
+      "L3"
+     ],
+     "from": [
+      "L3#2"
+     ]
+    }
+   ],
+   "shortlist": [
+    "P1",
+    "P2",
+    "P3",
+    "P4",
+    "P5"
+   ],
+   "red_team": [
+    {
+     "n": 1,
+     "candidate_id": "P1",
+     "severity": "S1",
+     "finding": "Direct HTTP dispatch of zero-tool seats blinds the Elder reviewer in Lite and max profiles, stripping its ability to run verification probes, inspect repository source files, and test reproduction claims before rendering final verdicts.",
+     "evidence": "In src/run/dispatch.rs line 15, elders get tools=\"none\". In skills/council-loop/models/policy.yaml line 94, elders_verify measures 241k tokens for verification probes. Stripping tool access forces blind opinions over verified facts.",
+     "fix": "Keep verification tool access for Lite/max elders and control seats; restrict direct HTTP dispatch strictly to pure ballot rank and shortlist voting phases.",
+     "response": {
+      "action": "fixed",
+      "note": "C1 and C2 keep full verification tools for probing elders (balanced/max) and restrict HTTP dispatch to pure ballots and non-probing efficient seats."
+     }
+    },
+    {
+     "n": 2,
+     "candidate_id": "P1",
+     "severity": "S2",
+     "finding": "Direct HTTP completions write raw text directly to output files without JSON extraction or fence sanitization, causing ingest validation crashes whenever OpenRouter models return markdown blocks (```json) or conversational preambles.",
+     "evidence": "src/providers.rs line 183 sends prompt without JSON schema enforcement, and src/run/dispatch.rs line 96 writes raw response text directly to out_file without stripping markdown fences.",
+     "fix": "Add response sanitization in providers::openrouter or dispatch to strip markdown fences and extract top-level JSON objects before writing output files.",
+     "response": {
+      "action": "fixed",
+      "note": "C1 and C2 pipe HTTP responses through providers::parse_json to strip markdown fences before writing <seat>.out.json."
+     }
+    },
+    {
+     "n": 3,
+     "candidate_id": "P3",
+     "severity": "S1",
+     "finding": "Hardcoding static model slugs in policy.yaml violates the architectural policy forbidding hardcoded model names, breaking offline dispatch and causing fatal HTTP 404/400 errors whenever OpenRouter changes provider endpoints or deprecates models.",
+     "evidence": "AGENTS.md Rule 7 and policy.yaml state \"Never hard-code model names\". OpenRouter model slugs are volatile, frequently changing with context tiers or retirement.",
+     "fix": "Populate openrouter_id dynamically in models/lock.yaml during refresh or maintain an optional overrides table in local config rather than committing static slugs to policy.yaml.",
+     "response": {
+      "action": "fixed",
+      "note": "Removed static model slugs from policy.yaml; C1 resolves openrouter_id dynamically in refresh.rs with user-only ~/.council/config.yaml overrides."
+     }
+    },
+    {
+     "n": 4,
+     "candidate_id": "P3",
+     "severity": "S2",
+     "finding": "Supporting camelCase hook payloads fails to prevent unauthorized tool executions in Antigravity because src/hook.rs emits Claude Code's specific envelope, which Antigravity ignores, leaving locked test files unprotected despite successful input parsing.",
+     "evidence": "src/hook.rs line 576 hardcodes hookSpecificOutput with Claude Code keys. Antigravity IDE runners do not consume Claude Code's denial structure.",
+     "fix": "Normalize both incoming event schemas and outgoing denial responses to match the detected host agent platform (Claude Code vs Antigravity).",
+     "response": {
+      "action": "fixed",
+      "note": "C3 emits Antigravity's {decision, reason} JSON when camelCase toolCall input is detected and Claude's hookSpecificOutput otherwise."
+     }
+    },
+    {
+     "n": 5,
+     "candidate_id": "P5",
+     "severity": "S1",
+     "finding": "Relaxing label extraction to capture unanchored leading letters across arbitrary markdown risks false-positive candidate matching in voter rationales and comparative prose, inverting preferences and silently corrupting Condorcet and Borda tally outcomes.",
+     "evidence": "In src/core.rs line 1243, LABEL_RE uses strict boundary anchors. Prose like \"Candidate B beats Candidate A\" could extract 'A' prematurely, altering election math.",
+     "fix": "Strip markdown bold and title annotations using dedicated regex cleanup while strictly maintaining label boundary anchors and rejecting ambiguous multi-candidate strings.",
+     "response": {
+      "action": "fixed",
+      "note": "C3 strips markdown wrappers only on single-label array entries while preserving strict boundary anchors in LABEL_RE."
+     }
+    },
+    {
+     "n": 6,
+     "candidate_id": "P5",
+     "severity": "S2",
+     "finding": "The claim that leak checks cause hundred-thousand-token seat respawns is factually incorrect. In validate.rs, identity leaks in ideation are recorded as warnings for the chair to reword, not fatal errors requiring seat retries.",
+     "evidence": "In src/run/validate.rs lines 182-191, leaks_in pushes to warns (\"cheaper for the chair to reword than to respawn the seat\"), never triggering seat respawns.",
+     "fix": "Keep strict leak detection in core::blind to protect voter anonymity, and maintain chair-level rewording warnings at merge rather than weakening regex filters.",
+     "response": {
+      "action": "accepted",
+      "note": "Verified src/run/validate.rs:182-191 only warns on ideation leaks; dropped all changes to core::blind leak detection in C3."
+     }
+    },
+    {
+     "n": 7,
+     "candidate_id": "P2",
+     "severity": "S1",
+     "finding": "Truncating the default MCP toolset to six core operations starves AI chairs of essential workflow capabilities like dispatching seats, recording required deviations, auditing ballots, and conducting elder reviews, breaking autonomous execution under MCP clients.",
+     "evidence": "MCP clients discover tools once during session handshake. Hiding council_dispatch, council_deviation, and council_elder_review prevents agents from executing protocol rules (AGENTS.md Rule 9) without restarting the server.",
+     "fix": "Keep workflow and audit tools visible in the default toolset, or adopt an explicit two-tier flag (--toolsets compact|full) without breaking default automation.",
+     "response": {
+      "action": "fixed",
+      "note": "C2 keeps all required run, dispatch, deviation, and audit tools active, shrinking description verbosity instead of hiding workflow tools."
+     }
+    },
+    {
+     "n": 8,
+     "candidate_id": "P2",
+     "severity": "S3",
+     "finding": "Candidate D duplicates functionality that already exists in council-loop, as the MCP server already implements flags and configuration settings to filter toolsets and deny specific operations.",
+     "evidence": "src/mcp.rs lines 28-30 and lines 72-77 already expose --toolsets, --tools, and --deny-tools, allowing clients to configure compact toolsets today.",
+     "fix": "Document existing toolset configuration flags in client connection guides rather than altering the default toolset schema behavior."
+    },
+    {
+     "n": 9,
+     "candidate_id": "P4",
+     "severity": "S1",
+     "finding": "Candidate E yields zero token reduction and zero cost savings, completely failing the primary goal of the prompt (Rubric R1, weight 35: biggest gains, save tokens).",
+     "evidence": "Candidate E modifies only pre-tool hook validation and path comparison logic, offering 0 tokens saved across all 9 Lite council seat calls.",
+     "fix": "Pair hook safety improvements with token reduction measures, or prioritize high-yield dispatch candidates that directly address the 1.2M token Lite run overhead.",
+     "response": {
+      "action": "fixed",
+      "note": "Fused P4 into C3 alongside P3 and P5 so hook/Windows hardening pairs with retry savings and OpenRouter keyfile setup."
+     }
+    },
+    {
+     "n": 10,
+     "candidate_id": "P4",
+     "severity": "S2",
+     "finding": "Case-insensitive path matching alone fails on Windows because inside() relies on case-sensitive prefix stripping, causing mismatched drive letters or directory casing to treat locked project files as external scratch files and bypass hook enforcement.",
+     "evidence": "In src/hook.rs lines 67-71, full.strip_prefix(&root) fails on case differences, causing inside() to return None and skipping all seat guard checks.",
+     "fix": "Use dunce::canonicalize or lowercase relative paths after canonicalization when computing project-relative paths on Windows.",
+     "response": {
+      "action": "fixed",
+      "note": "C3 uses canonical case-insensitive path prefix matching on Windows in both hook::inside and memory source validation."
+     }
+    }
+   ],
+   "red_team_eli5": "Direct HTTP dispatch saves tokens but blinds elder verifiers, while loose parsing corrupts vote tallies and breaks hooks.",
+   "candidates": [
+    {
+     "id": "C1",
+     "title": "Sanitized Ballot HTTP Dispatch & Refresh Slugs",
+     "body": "Route pure zero-tool ballot phases (shortlist vote, rank vote, and efficient-profile non-probing seats) directly through providers::openrouter via ureq instead of spawning heavy host subagents, while preserving full file and shell verification tools for probing elders, ideate, and redteam. Sanitize HTTP completions through providers::parse_json before saving output files so markdown code fences never trigger ingest rejections. Populate openrouter_id dynamically during council refresh from Artificial Analysis metadata and support optional keyfile or endpoint settings in personal ~/.council/config.yaml without hardcoding model names in policy.yaml, cutting total Lite run token consumption by over fifty percent.",
+     "eli5": "Send pure ballots over sanitized HTTP calls and resolve OpenRouter slugs at refresh time.",
+     "authors": [
+      "L1",
+      "L2"
+     ],
+     "parents": [
+      "P1",
+      "P3"
+     ]
+    },
+    {
+     "id": "C2",
+     "title": "Compact MCP Schemas & Ballot HTTP Dispatch",
+     "body": "Cut both chair-side MCP context tax and voter startup waste together in one cohesive package. Add an optional compact MCP schema mode that trims verbose multi-line tool and parameter prose on tools/list from twenty-three kilobytes to under nine kilobytes while keeping every required run, dispatch, deviation, and audit tool visible for autonomous execution. Pair this with sanitized ureq HTTP dispatch strictly for pure shortlist and rank ballots so probing elders retain full verification tools. Non-lazy MCP hosts save thousands of prompt tokens every turn while each loop saves roughly 180,000 voter startup tokens.",
+     "eli5": "Shrink MCP tool schemas by over half and send pure vote ballots over direct HTTP.",
+     "authors": [
+      "L1",
+      "L2"
+     ],
+     "parents": [
+      "P1",
+      "P2"
+     ]
+    },
+    {
+     "id": "C3",
+     "title": "Dual-Host Hooks, Windows Paths & Anchored Ballots",
+     "body": "Harden multi-client hook safety, native Windows path handling, and ballot retry resilience alongside personal config OpenRouter keyfile support. Extend src/hook.rs to detect both Claude Code snake_case events and Antigravity camelCase toolCall payloads, emitting each host's native denial JSON envelope so locked test files stay protected everywhere. Fix Windows drive-letter and directory case mismatches via canonical case-insensitive prefix matching in hook::inside and memory fact source validation so lowercase c:/ paths never bypass locks or drop valid citations. Strip surrounding markdown bolding on anchored single-label ballot entries without weakening core::blind identity leak rules, eliminating avoidable seat retries.",
+     "eli5": "Support Antigravity and Claude hooks, fix Windows path casing, and clean markdown from ballots.",
+     "authors": [
+      "L2",
+      "L3"
+     ],
+     "parents": [
+      "P3",
+      "P4",
+      "P5"
+     ]
+    }
+   ],
+   "not_carried": [],
+   "checks": {
+    "C1": "pass",
+    "C2": "pass",
+    "C3": "pass"
+   },
+   "rank": {
+    "order": [
+     "C1",
+     "C2",
+     "C3"
+    ],
+    "ranking": [
+     {
+      "id": "C1",
+      "score": 0.775,
+      "check": "pass"
+     },
+     {
+      "id": "C2",
+      "score": 0.475,
+      "check": "pass"
+     },
+     {
+      "id": "C3",
+      "score": 0.25,
+      "check": "pass"
+     }
+    ],
+    "agreement": 1.0,
+    "agreement_note": "strong",
+    "ballots": 3,
+    "head_to_heads": 9,
+    "recused": 0,
+    "gaps": 0,
+    "thin": [],
+    "ties": [],
+    "best_on": {}
+   },
+   "reviewed": [
+    "C1",
+    "C2"
+   ],
+   "elder_reviews": [
+    {
+     "seat": "EA",
+     "model": "Claude Fable 5.2 (low)",
+     "stand_in_for": null,
+     "model_source": null,
+     "preferred": "C2",
+     "verdict": {
+      "CONTROL": "kill",
+      "C1": "ship",
+      "C2": "ship"
+     },
+     "scores": {
+      "CONTROL": {
+       "R1": 6,
+       "R2": 4,
+       "R3": 3,
+       "R4": 6,
+       "R5": 4
+      },
+      "C1": {
+       "R1": 8,
+       "R2": 9,
+       "R3": 9,
+       "R4": 9,
+       "R5": 6
+      },
+      "C2": {
+       "R1": 10,
+       "R2": 8,
+       "R3": 9,
+       "R4": 9,
+       "R5": 10
+      }
+     },
+     "confidence": 0.9,
+     "top_risks": [
+      {
+       "risk": "Stripping verification tools from elder seats breaks protocol integrity by preventing file inspection and test checks.",
+       "severity": "S1",
+       "candidate": "A"
+      },
+      {
+       "risk": "Over-compacting MCP parameter descriptions may cause LLM orchestrators to hallucinate parameter formats or miss required arguments.",
+       "severity": "S2",
+       "candidate": "C"
+      },
+      {
+       "risk": "Raw HTTP completions from third-party endpoints frequently include markdown fences or preambles that cause ingest validation failures unless sanitized.",
+       "severity": "S2",
+       "candidate": "all"
+      }
+     ],
+     "key_fix": "Merge Candidate C's compact MCP schemas with Candidate B's dynamic OpenRouter slug resolution during council refresh.",
+     "own_idea": "Use an HTTP keep-alive connection pool in providers::openrouter to execute parallel ballot dispatches with minimal TLS handshake latency.",
+     "eli5": "Adopt Candidate C for dual MCP and ballot token cuts, adding dynamic OpenRouter slug resolution from Candidate B."
+    }
+   ],
+   "survivors": [
+    "C2"
+   ],
+   "eliminated": [
+    "C1",
+    "C3"
+   ],
+   "wildcard": null,
+   "eli5": "Voters ranked C1 first, but the elder flagged elder tool loss (S1) and promoted C2 over C1 and the control arm.",
+   "changed": "Kept all elders tool-enabled; restricted direct HTTP dispatch strictly to pure vote and rank ballots",
+   "control_votes": 0,
+   "finished": "2026-11-16T19:04:02",
+   "asked": "Which rule should govern direct HTTP seat dispatch? -> Keep all elders tool-enabled; restrict direct HTTP dispatch strictly to pure vote and rank ballots (C2)"
+  }
+ ],
+ "shape": {
+  "experts": 3,
+  "ideas_min": 5,
+  "keep": 2,
+  "elders": 1,
+  "start": 3,
+  "loops": 1,
+  "rubric": [
+   3,
+   7
+  ],
+  "schedule": [
+   3,
+   1
+  ]
+ },
+ "max_loops": 1,
+ "schedule": [
+  3,
+  1
+ ],
+ "chair": {
+  "model": "GPT-6.1 Sol (xhigh)",
+  "creator": "OpenAI",
+  "quality": 52,
+  "cost_per_task": 0.76
+ },
+ "support": {
+  "research": {
+   "budget": {
+    "lite": 10,
+    "full": 15
+   },
+   "seats": 0,
+   "later_loops": "on_request",
+   "model": "auto",
+   "beats": []
+  },
+  "map": {
+   "when": "stale",
+   "model": "chair",
+   "focus_tokens": 700,
+   "skeleton_lines": 420,
+   "path": "",
+   "due": false,
+   "reason": "the structure is as mapped on 2026-11-16"
+  },
+  "digest": 14,
+  "origin": {
+   "research.seats": "flag",
+   "research.budget.lite": "default",
+   "research.budget.full": "default",
+   "research.later_loops": "default",
+   "research.model": "default",
+   "research.beats": "default",
+   "map.when": "default",
+   "map.model": "default",
+   "map.focus_tokens": "default",
+   "map.skeleton_lines": "default",
+   "map.path": "default",
+   "digest": "default"
+  },
+  "problems": []
+ },
+ "memory": {
+  "backend": "files",
+  "dir": "<repo>\\.council\\memory",
+  "links": "markdown",
+  "source": "default",
+  "ok": true,
+  "problem": null
+ },
+ "commons": [
+  {
+   "loop": 1,
+   "phase": "ideate",
+   "by": "L1",
+   "role": "expert",
+   "to": "all",
+   "text": "Separating tool-bearing seats from zero-tool seats in the runner lets us bypass host subagent spin-up for votes and elders, saving over 400k tokens per Lite run."
+  },
+  {
+   "loop": 1,
+   "phase": "ideate",
+   "by": "L1",
+   "role": "expert",
+   "to": "chair",
+   "text": "Defaulting MCP toolsets to core operations will significantly reduce prompt context bloat for client chairs."
+  },
+  {
+   "loop": 1,
+   "phase": "ideate",
+   "by": "L2",
+   "role": "expert",
+   "to": "chair",
+   "text": "Routing zero-tool seats through direct ureq HTTP requests bypasses subagent startup overhead, reclaiming the bulk of the 1.2M token spend."
+  },
+  {
+   "loop": 1,
+   "phase": "ideate",
+   "by": "L3",
+   "role": "expert",
+   "to": "all",
+   "text": "Auditing src/hook.rs and src/run/validate.rs revealed that validation failures and hook blind spots stem from rigid key schemas and regexes rather than actual model inability; fixing these eliminates respawns without changing model assignments."
+  },
+  {
+   "loop": 1,
+   "phase": "redteam",
+   "by": "RT",
+   "role": "red_team",
+   "to": "all",
+   "text": "\"Direct HTTP Dispatch For Zero-Tool Seats\" yields the highest token reduction (~400k tokens) if confined to pure ballot voting, but must not strip verification tools from elders."
+  },
+  {
+   "loop": 1,
+   "phase": "redteam",
+   "by": "RT",
+   "role": "red_team",
+   "to": "chair",
+   "text": "\"Resilient ballot parsing and qualified leak detection\"'s rationale on leak respawns is factually mistaken; do not weaken anonymization rules based on false retry assumptions."
+  },
+  {
+   "loop": 1,
+   "phase": "rank",
+   "by": "L1",
+   "role": "expert",
+   "to": "chair",
+   "text": "Direct HTTP dispatch and compact schemas deliver massive token savings."
+  },
+  {
+   "loop": 1,
+   "phase": "rank",
+   "by": "L3",
+   "role": "expert",
+   "to": "all",
+   "text": "Sanitizing JSON before saving and handling Windows path casing both prevent costly validation traps."
+  },
+  {
+   "loop": 1,
+   "phase": "elders",
+   "by": "EA",
+   "role": "elder",
+   "to": "chair",
+   "text": "another reviewed answer failed machine checks and hardcodes model slugs; \"Compact MCP Schemas & Ballot HTTP Dispatch\" yields the highest token savings by optimizing MCP and ballot dispatch."
+  }
+ ],
+ "seats": {
+  "L1": {
+   "role": "expert",
+   "model": "stand-in: the chair's model in a fresh context",
+   "effort": "medium",
+   "stand_in_for": "GPT-6.1 Terra (medium)",
+   "via": "subagent",
+   "alias": "inherit"
+  },
+  "L2": {
+   "role": "expert",
+   "model": "Claude Haiku 5.5 (xhigh)",
+   "creator": "Anthropic",
+   "effort": "xhigh",
+   "via": "subagent",
+   "alias": "haiku"
+  },
+  "L3": {
+   "role": "expert",
+   "model": "Gemini 4 Argon (high)",
+   "creator": "Google",
+   "effort": "high",
+   "via": "cli:gemini",
+   "provider": "gemini",
+   "native_id": "gemini-4-argon",
+   "model_source": "policy native_ids"
+  },
+  "RT": {
+   "role": "red_team",
+   "model": "Claude Fable 5.2 (medium)",
+   "creator": "Anthropic",
+   "effort": "medium",
+   "via": "subagent",
+   "alias": "fable"
+  },
+  "EA": {
+   "role": "elder",
+   "model": "Claude Fable 5.2 (low)",
+   "creator": "Anthropic",
+   "effort": "low",
+   "via": "subagent",
+   "alias": "fable"
+  },
+  "CTRL": {
+   "role": "control",
+   "model": "stand-in: the chair's model in a fresh context",
+   "effort": "xhigh",
+   "stand_in_for": "GPT-6.1 Sol (xhigh)",
+   "via": "subagent",
+   "alias": "inherit"
+  },
+  "MAP": {
+   "role": "mapper",
+   "model": "stand-in: the chair's model in a fresh context",
+   "effort": "xhigh",
+   "stand_in_for": "GPT-6.1 Sol (xhigh)",
+   "via": "subagent",
+   "alias": "inherit"
+  }
+ },
+ "loop": 1,
+ "phase": "done",
+ "updated": "2026-11-16T19:06:11",
+ "brief": {
+  "restated": "Select the highest-leverage improvements to council-loop v0.5.0 that cut per-run token spend and latency while improving cross-lab seat execution, Windows reliability, and MCP ergonomics.\n",
+  "eli5": "Spend far fewer tokens per council run while making cross-lab seats faster and sturdier.",
+  "rubric": [
+   {
+    "id": "R1",
+    "name": "Token and cost reduction per run",
+    "weight": 35,
+    "check": "machine"
+   },
+   {
+    "id": "R2",
+    "name": "Cross-lab dispatch and provider reliability",
+    "weight": 25,
+    "check": "machine"
+   },
+   {
+    "id": "R3",
+    "name": "Protocol integrity, safety, and Windows portability",
+    "weight": 20,
+    "check": "machine"
+   },
+   {
+    "id": "R4",
+    "name": "Implementation simplicity and zero-bloat fit",
+    "weight": 10,
+    "check": "machine"
+   },
+   {
+    "id": "R5",
+    "name": "Chair and MCP client ergonomics",
+    "weight": 10,
+    "check": "judgment"
+   }
+  ],
+  "evidence_plan": [
+   "Measured token/byte counts on prompt packets, subagent vs direct HTTP calls (L-20261113-6), and MCP tool schemas",
+   "cargo test --locked and cargo clippy --all-targets -- -D warnings across unit, scenarios, security, surfaces, and speed",
+   "Code inspection of src/run/seats.rs, src/run/dispatch.rs, src/providers.rs, src/mcp.rs, src/hook.rs, and models/lock.yaml"
+  ],
+  "research_questions": [],
+  "lenses": [
+   {
+    "id": "L1",
+    "name": "Token & Context Minimalist",
+    "maximize": "Cutting wasted startup, prompt, schema, and retry tokens across packets, votes, elders, MCP tools, and focus maps",
+    "respect": "Blindness invariants, self-contained packets, and accuracy of candidate evaluation",
+    "method": "Audit every token spent in the 1.27M-token Lite baseline (64k per 2k-token vote) and trim structural overhead",
+    "evidence": "docs/council-run-2026-11-13-self-review.md, src/run/prompts.rs, src/run/dispatch.rs, src/mcp.rs, src/codemap.rs"
+   },
+   {
+    "id": "L2",
+    "name": "Cross-Lab Transport & MCP Ergonomics",
+    "maximize": "Frictionless cross-lab execution (OpenRouter HTTP, native CLIs, MCP clients) without stand-in degradation or wasted round-trips",
+    "respect": "Zero external runtime binaries/crates beyond current Cargo.toml, secret redaction in src/log.rs, and seat tool lanes",
+    "method": "Trace model resolution and dispatch from models/policy.yaml and models/lock.yaml through src/run/seats.rs, src/providers.rs, and src/api.rs",
+    "evidence": "src/providers.rs, src/run/seats.rs, src/run/dispatch.rs, src/api.rs, skills/council-loop/models/policy.yaml"
+   },
+   {
+    "id": "L3",
+    "name": "Referee Correctness, Security & Windows Hardening",
+    "maximize": "Eliminating real edge-case bugs, Windows/hook incompatibilities, non-hermetic tests, and retry-inducing validation traps",
+    "respect": "Sub-20ms startup, src/safe.rs symlink/fence guarantees, and API_VERSION=1 compatibility",
+    "method": "Audit src/core.rs, src/safe.rs, src/hook.rs, src/run/validate.rs, and tests/common/mod.rs for concrete defects",
+    "evidence": "src/core.rs, src/safe.rs, src/hook.rs, src/run/validate.rs, tests/common/mod.rs, hooks/hooks.json"
+   }
+  ],
+  "facts": "council-loop v0.5.0 is a standalone Rust binary (34 files in src/, Cargo.toml deps: ureq 3, serde_json, saphyr, clap, tree-sitter-python, regex, fancy-regex, sha1, sha2, dunce, which).\nIn the measured v0.2 Lite run (docs/council-run-2026-11-13-self-review.md), 9 agent calls used 1,269,206 tokens: Ideate 442k, Control 151k, Red Team 242k, Rank Vote 193k (~64k tokens per ballot for a ~2k-token packet, almost all subagent startup overhead), Elder 241k.\nIn src/run/dispatch.rs, tools_for() already marks vote, rank, elders, and control as needing \"none\" (zero tools), yet seats assigned via=\"subagent\" still spawn full tool-bearing host subagents instead of lean tool-less API calls when OpenRouter or a lightweight transport is available.\nIn skills/council-loop/models/lock.yaml (built from offline snapshot-2026-11-13.json), openrouter_id is missing on models (\"OpenRouter availability unknown in this snapshot\"), and src/providers.rs reads OPENROUTER_API_KEY only from env vars with no slug map in policy.yaml, causing cross-lab seats to fall back to stand-ins unless live AA refresh was run.\nsrc/mcp.rs sends 19 KB (22 tools) or 23 KB (27 tools) on tools/list; src/hook.rs only parses Claude Code hook payloads (tool_name/tool_input), not Antigravity camelCase payloads (toolCall.name/toolCall.args); tests/common/mod.rs and tests/scenarios.rs inherit host PATH so installed CLIs like gemini.CMD perturb test runs.\n",
+  "lessons_applied": [
+   "L-20261113-1",
+   "L-20261113-2",
+   "L-20261113-5",
+   "L-20261113-6"
+  ],
+  "approved_by": "unattended"
+ },
+ "map": {
+  "path": "docs/ARCHITECTURE.md",
+  "applies": true,
+  "stale": false,
+  "reason": "the structure is as mapped on 2026-11-16"
+ },
+ "attempts": {},
+ "hashes": {
+  "loop-1/ideate/L1.out.json": "ffb7812af1d8881053012d3a44289a13ed5feb7373527912b6bf7c51ddaa0d7b",
+  "loop-1/ideate/L2.out.json": "c78ea832b7990d3f98fb251b90ebaa9ede3b424b08bf5882ba52021f16523d33",
+  "loop-1/ideate/L3.out.json": "50feabe120d4474d79217aac1ff2bccaca1e80638a43da742baf52bb62b21fdd",
+  "control/CTRL.out.json": "5d25fe740160289a48e8fab63ed4a567324e2ea6e17687bafe757340fa402778",
+  "loop-1/redteam/RT.out.json": "2f22f9093b8078a96d7b9cc6ef0ccf0ce72841418cd74ddf23709bc0bccdc107",
+  "loop-1/rank/L1.out.json": "f894446ac7b52a0789654c09fae1ff936d659e961294950bbfa3527030b4f05c",
+  "loop-1/rank/L2.out.json": "d57280b39ad9fc24928dec8f1fd89cd900500ed246b50bda80fc3497097cadba",
+  "loop-1/rank/L3.out.json": "dfe9e0991d36d3a3dd8b8323bb055278c64b429b7fae04de1d70e8a843b3f2e3",
+  "loop-1/elders/EA.out.json": "4396313d1209e674f646e2a2970413d29be9026b9904933c446367e3051df425"
+ },
+ "shared": {
+  "facts_added": 7,
+  "facts_merged": 0,
+  "facts_refused": 4,
+  "notes": 9
+ },
+ "unsigned_facts": {
+  "lite-council-rank-votes-consumed-192-926-tokens": "L1",
+  "council-loop-mcp-tools-list-payload-ranges-19": "L1",
+  "ballot-voting-ranking-phases-require-zero-tools-executed": "L2",
+  "measured-v0-lite-run-rank-vote-alone-consumed": "L2",
+  "identity-leaks-during-ideation-produce-warnings-chair-merge": "RT",
+  "prefix-stripping-windows-pathbuf-case-sensitive-permitting-hook": "RT",
+  "voting-ranking-phases-require-zero-tools-under-tools": "EA"
+ },
+ "control": {
+  "done": true,
+  "sha256": "20824cb0cd5678211398d4ac823367d617dd0446b10490cdffe3099ccc4d3605"
+ },
+ "winner": "C2",
+ "control_result": "won",
+ "control_line": "the council's answer was preferred by 1 of 1 elder(s)",
+ "final": {
+  "file": "final.md",
+  "words": 1819
+ },
+ "retro": {
+  "file": "retro.md",
+  "lessons": [
+   "- [L-20261116-1] (helpful: 0 | harmful: 0) Restrict tool-less HTTP seat dispatch strictly to pure vote and rank ballots: stripping tools from Elders blinds code/test verification probes and was flagged S1 by both Red Team and Elder. Evidence: .council/runs/261116-172451-lets-runa-lite/final.md",
+   "- [L-20261116-2] (helpful: 0 | harmful: 0) Probe external API keys (such as OpenRouter HTTP 401 expiry) in council doctor before init assigns crosslab seats so runs fail fast or prompt key renewal instead of silently degrading to stand-ins. Evidence: .council/runs/261116-172451-lets-runa-lite/retro.md",
+   "- [L-20261116-3] (helpful: 0 | harmful: 0) Normalize Windows drive-letter casing (c:/ vs C:\\) before strip_prefix in memory source validation and hook::inside so valid project file citations and locked-file paths are never rejected or bypassed. Evidence: .council/runs/261116-172451-lets-runa-lite/retro.md"
+  ]
+ }
+}

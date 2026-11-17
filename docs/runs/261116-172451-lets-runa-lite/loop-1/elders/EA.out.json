@@ -1,0 +1,66 @@
+{
+  "scores": {
+    "A": {
+      "R1": 6,
+      "R2": 4,
+      "R3": 3,
+      "R4": 6,
+      "R5": 4
+    },
+    "B": {
+      "R1": 8,
+      "R2": 9,
+      "R3": 9,
+      "R4": 9,
+      "R5": 6
+    },
+    "C": {
+      "R1": 10,
+      "R2": 8,
+      "R3": 9,
+      "R4": 9,
+      "R5": 10
+    }
+  },
+  "verdict": {
+    "A": "kill",
+    "B": "ship",
+    "C": "ship"
+  },
+  "preferred": "C",
+  "confidence": 0.9,
+  "top_risks": [
+    {
+      "risk": "Stripping verification tools from elder seats breaks protocol integrity by preventing file inspection and test checks.",
+      "severity": "S1",
+      "candidate": "A"
+    },
+    {
+      "risk": "Over-compacting MCP parameter descriptions may cause LLM orchestrators to hallucinate parameter formats or miss required arguments.",
+      "severity": "S2",
+      "candidate": "C"
+    },
+    {
+      "risk": "Raw HTTP completions from third-party endpoints frequently include markdown fences or preambles that cause ingest validation failures unless sanitized.",
+      "severity": "S2",
+      "candidate": "all"
+    }
+  ],
+  "key_fix": "Merge Candidate C's compact MCP schemas with Candidate B's dynamic OpenRouter slug resolution during council refresh.",
+  "own_idea": "Use an HTTP keep-alive connection pool in providers::openrouter to execute parallel ballot dispatches with minimal TLS handshake latency.",
+  "eli5": "Adopt Candidate C for dual MCP and ballot token cuts, adding dynamic OpenRouter slug resolution from Candidate B.",
+  "research": [
+    {
+      "claim": "Voting and ranking phases require zero tools under tools_for, confirming pure REST dispatch is safe for ballots.",
+      "source": "src/run/dispatch.rs",
+      "quote": "_ => \"none\"",
+      "confidence": "high"
+    }
+  ],
+  "notes": [
+    {
+      "to": "chair",
+      "text": "Candidate A failed machine checks and hardcodes model slugs; Candidate C yields the highest token savings by optimizing MCP and ballot dispatch."
+    }
+  ]
+}

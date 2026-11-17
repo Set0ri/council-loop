@@ -1,0 +1,49 @@
+# Intent brief for run 261116-172451-lets-runa-lite.
+restated: >
+  Select the highest-leverage improvements to council-loop v0.5.0 that cut per-run token spend
+  and latency while improving cross-lab seat execution, Windows reliability, and MCP ergonomics.
+eli5: "Spend far fewer tokens per council run while making cross-lab seats faster and sturdier."
+
+rubric:
+  - {id: R1, name: "Token and cost reduction per run", weight: 35, check: machine}
+  - {id: R2, name: "Cross-lab dispatch and provider reliability", weight: 25, check: machine}
+  - {id: R3, name: "Protocol integrity, safety, and Windows portability", weight: 20, check: machine}
+  - {id: R4, name: "Implementation simplicity and zero-bloat fit", weight: 10, check: machine}
+  - {id: R5, name: "Chair and MCP client ergonomics", weight: 10, check: judgment}
+
+evidence_plan:
+  - "Measured token/byte counts on prompt packets, subagent vs direct HTTP calls (L-20261113-6), and MCP tool schemas"
+  - "cargo test --locked and cargo clippy --all-targets -- -D warnings across unit, scenarios, security, surfaces, and speed"
+  - "Code inspection of src/run/seats.rs, src/run/dispatch.rs, src/providers.rs, src/mcp.rs, src/hook.rs, and models/lock.yaml"
+
+research_questions: []
+
+lenses:
+  - id: L1
+    name: "Token & Context Minimalist"
+    maximize: "Cutting wasted startup, prompt, schema, and retry tokens across packets, votes, elders, MCP tools, and focus maps"
+    respect: "Blindness invariants, self-contained packets, and accuracy of candidate evaluation"
+    method: "Audit every token spent in the 1.27M-token Lite baseline (64k per 2k-token vote) and trim structural overhead"
+    evidence: "docs/council-run-2026-11-13-self-review.md, src/run/prompts.rs, src/run/dispatch.rs, src/mcp.rs, src/codemap.rs"
+  - id: L2
+    name: "Cross-Lab Transport & MCP Ergonomics"
+    maximize: "Frictionless cross-lab execution (OpenRouter HTTP, native CLIs, MCP clients) without stand-in degradation or wasted round-trips"
+    respect: "Zero external runtime binaries/crates beyond current Cargo.toml, secret redaction in src/log.rs, and seat tool lanes"
+    method: "Trace model resolution and dispatch from models/policy.yaml and models/lock.yaml through src/run/seats.rs, src/providers.rs, and src/api.rs"
+    evidence: "src/providers.rs, src/run/seats.rs, src/run/dispatch.rs, src/api.rs, skills/council-loop/models/policy.yaml"
+  - id: L3
+    name: "Referee Correctness, Security & Windows Hardening"
+    maximize: "Eliminating real edge-case bugs, Windows/hook incompatibilities, non-hermetic tests, and retry-inducing validation traps"
+    respect: "Sub-20ms startup, src/safe.rs symlink/fence guarantees, and API_VERSION=1 compatibility"
+    method: "Audit src/core.rs, src/safe.rs, src/hook.rs, src/run/validate.rs, and tests/common/mod.rs for concrete defects"
+    evidence: "src/core.rs, src/safe.rs, src/hook.rs, src/run/validate.rs, tests/common/mod.rs, hooks/hooks.json"
+
+facts: |
+  council-loop v0.5.0 is a standalone Rust binary (34 files in src/, Cargo.toml deps: ureq 3, serde_json, saphyr, clap, tree-sitter-python, regex, fancy-regex, sha1, sha2, dunce, which).
+  In the measured v0.2 Lite run (docs/council-run-2026-11-13-self-review.md), 9 agent calls used 1,269,206 tokens: Ideate 442k, Control 151k, Red Team 242k, Rank Vote 193k (~64k tokens per ballot for a ~2k-token packet, almost all subagent startup overhead), Elder 241k.
+  In src/run/dispatch.rs, tools_for() already marks vote, rank, elders, and control as needing "none" (zero tools), yet seats assigned via="subagent" still spawn full tool-bearing host subagents instead of lean tool-less API calls when OpenRouter or a lightweight transport is available.
+  In skills/council-loop/models/lock.yaml (built from offline snapshot-2026-11-13.json), openrouter_id is missing on models ("OpenRouter availability unknown in this snapshot"), and src/providers.rs reads OPENROUTER_API_KEY only from env vars with no slug map in policy.yaml, causing cross-lab seats to fall back to stand-ins unless live AA refresh was run.
+  src/mcp.rs sends 19 KB (22 tools) or 23 KB (27 tools) on tools/list; src/hook.rs only parses Claude Code hook payloads (tool_name/tool_input), not Antigravity camelCase payloads (toolCall.name/toolCall.args); tests/common/mod.rs and tests/scenarios.rs inherit host PATH so installed CLIs like gemini.CMD perturb test runs.
+
+lessons_applied: ["L-20261113-1", "L-20261113-2", "L-20261113-5", "L-20261113-6"]
+approved_by: "unattended"

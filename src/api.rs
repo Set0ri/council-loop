@@ -1087,6 +1087,28 @@ pub fn input_schema(op: &Operation) -> Value {
     schema
 }
 
+/// Compact JSON Schema of an operation's arguments: preserves every property key, type, enum,
+/// numeric bound, `additionalProperties: false`, and `required` list while omitting prose descriptions.
+pub fn compact_input_schema(op: &Operation) -> Value {
+    let mut properties = Map::new();
+    let mut required: Vec<&str> = Vec::new();
+    if op.project != Project::No {
+        properties.insert("project_dir".into(), json!({"type": "string"}));
+    }
+    for p in &op.params {
+        if p.default.is_none() {
+            required.push(p.name);
+        }
+        properties.insert(p.name.to_string(), kind_schema(p.kind));
+    }
+    let mut schema =
+        json!({"type": "object", "properties": properties, "additionalProperties": false});
+    if !required.is_empty() {
+        schema["required"] = json!(required);
+    }
+    schema
+}
+
 /// The JSON Schema of every operation's answer: the envelope.
 pub fn output_schema(op: &Operation) -> Value {
     let mut properties = json!({

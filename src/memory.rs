@@ -501,14 +501,53 @@ fn md_files(dir: &Path) -> Vec<PathBuf> {
 
 // ----------------------------------------------------------------------------- research notes (facts)
 
+/// Strip `#fragment` and `:line[:col]` anchors from a file source without splitting a Windows `C:\` drive prefix.
+fn source_file_part(src: &str) -> &str {
+    let no_hash = src.split('#').next().unwrap_or("");
+    let bytes = no_hash.as_bytes();
+    let has_drive = bytes.len() >= 3
+        && bytes[0].is_ascii_alphabetic()
+        && bytes[1] == b':'
+        && (bytes[2] == b'/' || bytes[2] == b'\\');
+    let search_from = if has_drive { 2 } else { 0 };
+    match no_hash[search_from..].find(':') {
+        Some(pos) => &no_hash[..search_from + pos],
+        None => no_hash,
+    }
+}
+
 /// A file source counts only when it names something inside the project (no `../` walks out of it).
 fn in_project(root: &Path, rel: &str) -> bool {
-    if py::strip(rel).is_empty() {
+    let trimmed = py::strip(rel);
+    if trimmed.is_empty() {
         return false;
     }
     let base = core::resolve(root);
-    let target = core::resolve(&root.join(rel));
-    target.exists() && target.starts_with(&base)
+    let candidate = py::path(trimmed);
+    let joined = if candidate.is_absolute() {
+        candidate
+    } else {
+        root.join(candidate)
+    };
+    let target = core::resolve(&joined);
+    if !target.exists() {
+        return false;
+    }
+    if target.starts_with(&base) {
+        return true;
+    }
+    if cfg!(windows) {
+        let t_pos = py::posix(&target);
+        let b_pos = py::posix(&base);
+        let b_pos = b_pos.trim_end_matches('/');
+        if t_pos.eq_ignore_ascii_case(b_pos) {
+            return true;
+        }
+        if let Some(head) = t_pos.get(..b_pos.len() + 1) {
+            return head[..b_pos.len()].eq_ignore_ascii_case(b_pos) && head.ends_with('/');
+        }
+    }
+    false
 }
 
 fn text_of(item: &Value, key: &str) -> String {
@@ -560,15 +599,7 @@ pub fn clean_fact(item: &Value, root: &Path) -> Result<Value, String> {
             kind = "other".to_string();
         } else if lower.starts_with("test:") {
             kind = "test".to_string();
-        } else if in_project(
-            root,
-            src.split(':')
-                .next()
-                .unwrap_or("")
-                .split('#')
-                .next()
-                .unwrap_or(""),
-        ) {
+        } else if in_project(root, source_file_part(&src)) {
             if !matches!(kind.as_str(), "code" | "data" | "docs" | "test") {
                 kind = "code".to_string();
             }

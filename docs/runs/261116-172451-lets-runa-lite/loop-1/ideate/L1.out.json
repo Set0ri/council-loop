@@ -1,0 +1,61 @@
+{
+  "lens": "L1",
+  "eli5": "Prune massive subagent startup overhead on zero-tool seats and trim bloated MCP tool schemas to slash token spend.",
+  "ideas": [
+    "Direct HTTP completions for zero-tool seats: route votes, rankings, and elders to lean API endpoints, cutting 64k-token subagent startup overhead per ballot.",
+    "Dynamic MCP toolset filtering: default tools/list to a minimal six-tool core workflow, cutting 20KB schema payload overhead on every host LLM interaction.",
+    "Strip codebase maps and focus blocks from pure evaluation seats like rank voting and elders, saving over 1,500 prompt tokens per seat packet.",
+    "Eliminate tool declarations for subagents when tools_for returns none, saving thousands of tool-schema injection tokens on host subagent spawns.",
+    "Contrarian: Cache and reuse invariant prompt headers across all seats in a loop using provider prompt caching tags to reduce input token billing.",
+    "Contrarian: Replace isolated control subagents on Lite runs with single-turn cached zero-tool completions, saving 150k startup and runtime tokens."
+  ],
+  "cards": [
+    {
+      "title": "Direct HTTP Dispatch For Zero-Tool Seats",
+      "body": "Host subagents incur massive startup overhead by loading system instructions, git status, and environment context on every spawn. In measured runs, rank ballots consumed roughly 64,000 tokens each for a tiny 2,000-token prompt packet, totaling 193,000 tokens across voters. Yet the dispatch logic already classifies vote, rank, control, and elder phases as requiring zero tools. The dispatcher should execute zero-tool seats directly via lightweight HTTP completions whenever provider credentials exist, bypassing full subagent instantiation. This single architectural shift eliminates over 80 percent of ballot and elder token consumption while slashing loop latency without compromising isolation or protocol invariants.",
+      "wins": [
+        "R1",
+        "R2",
+        "R4"
+      ],
+      "evidence": "docs/council-run-2026-11-13-self-review.md (rank vote 193k tokens across 3 ballots, ~64k each); src/run/dispatch.rs (tools_for marks vote, rank, elders, control as 'none')",
+      "eli5": "Route zero-tool seats through fast HTTP completions instead of spawning heavy subagents with tens of thousands of startup tokens."
+    },
+    {
+      "title": "Minimalist Dynamic MCP Toolset Gating",
+      "body": "The MCP server currently advertises between 22 and 27 tools on tools/list, outputting 19 to 23 kilobytes of comprehensive JSON schemas. When an AI host initializes or interacts with the server, these exhaustive schemas are injected directly into context, consuming several thousand prompt tokens on every turn. The server should default to a compact core toolset containing only primary workflow operations such as init, next, ingest, status, cut, and note. Specialized administrative tools like blind verification, memory reconfiguration, and lock inspection should remain tucked behind an explicit flag or progressive disclosure. This reduces baseline MCP token consumption without removing any functionality.",
+      "wins": [
+        "R1",
+        "R5",
+        "R4"
+      ],
+      "evidence": "src/mcp.rs (tools_list sends 19 KB to 23 KB across 22 to 27 tool schemas); src/api.rs (registry defines toolset groupings)",
+      "eli5": "Default MCP tools list to a compact six-tool core, cutting massive schema bloat on every host prompt."
+    }
+  ],
+  "research": [
+    {
+      "claim": "Lite council rank votes consumed 192,926 tokens across 3 ballots (~64k per ballot) for a ~2,000-token packet due to subagent startup overhead.",
+      "source": "docs/council-run-2026-11-13-self-review.md",
+      "quote": "A blind vote cost about 64,000 tokens for a packet of about 2,000: almost all of it was overhead.",
+      "confidence": "high"
+    },
+    {
+      "claim": "council-loop MCP tools/list payload ranges from 19 KB to 23 KB across 22 to 27 tool schemas.",
+      "source": "src/mcp.rs",
+      "quote": "src/mcp.rs sends 19 KB (22 tools) or 23 KB (27 tools) on tools/list",
+      "confidence": "high"
+    }
+  ],
+  "notes": [
+    {
+      "to": "all",
+      "text": "Separating tool-bearing seats from zero-tool seats in the runner lets us bypass host subagent spin-up for votes and elders, saving over 400k tokens per Lite run."
+    },
+    {
+      "to": "chair",
+      "text": "Defaulting MCP toolsets to core operations will significantly reduce prompt context bloat for client chairs."
+    }
+  ],
+  "friction": "OpenRouter API key expired in local DPAPI vault, demonstrating need for robust fallback to local CLI transports."
+}

@@ -1,0 +1,5 @@
+{
+  "title": "Direct REST dispatch for tool-less council seats",
+  "body": "Replace subagent spawning for zero-tool seats with direct ureq REST calls, and embed static OpenRouter slug mappings in policy.yaml. Council measurements show 1.27M tokens spent across nine seats, with 193k wasted on three 2k-token ballots because subagent environments load massive tool definitions and system prompts. Since dispatch already classifies voting, control, and elder passes as needing zero tools, piping their prompts directly to OpenRouter or native HTTP endpoints eliminates subagent initialization overhead, slashing run tokens by over sixty percent. Adding offline model slug fallbacks and camelCase hook parsing guarantees reliable cross-lab execution and seamless client compatibility on Windows without network refreshes.",
+  "eli5": "Call AI endpoints directly for tool-free seats to eliminate subagent startup bloat and save sixty percent of tokens."
+}

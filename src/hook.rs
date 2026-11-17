@@ -67,7 +67,109 @@ fn absolute(text: &str, base: &Path) -> PathBuf {
 fn inside(path: &Path, project: &Path) -> Option<String> {
     let full = crate::safe::real(path);
     let root = crate::safe::real(project);
-    full.strip_prefix(&root).ok().map(py::posix)
+    if let Ok(rel) = full.strip_prefix(&root) {
+        return Some(py::posix(rel));
+    }
+    if cfg!(windows) {
+        let full_s = py::posix(&full);
+        let root_s = py::posix(&root);
+        let root_s = root_s.trim_end_matches('/');
+        if full_s.eq_ignore_ascii_case(root_s) {
+            return Some(String::new());
+        }
+        if let Some(head) = full_s.get(..root_s.len() + 1) {
+            if head[..root_s.len()].eq_ignore_ascii_case(root_s) && head.ends_with('/') {
+                return Some(full_s[root_s.len() + 1..].to_string());
+            }
+        }
+    }
+    None
+}
+
+fn is_antigravity(event: &Value) -> bool {
+    event.get("toolCall").is_some_and(Value::is_object)
+        || (event.get("hookEventName").is_some() && event.get("hook_event_name").is_none())
+}
+
+fn event_name(event: &Value) -> &str {
+    let name = event.s("hook_event_name");
+    if !name.is_empty() {
+        name
+    } else {
+        event.s("hookEventName")
+    }
+}
+
+fn tool_name(event: &Value) -> &str {
+    let name = event.s("tool_name");
+    if !name.is_empty() {
+        name
+    } else {
+        event.at("toolCall").s("name")
+    }
+}
+
+fn tool_input(event: &Value) -> &Value {
+    if event.get("tool_input").is_some_and(Value::is_object) {
+        event.at("tool_input")
+    } else {
+        event.at("toolCall").at("args")
+    }
+}
+
+fn agent_type(event: &Value) -> &str {
+    let agent = event.s("agent_type");
+    if !agent.is_empty() {
+        agent
+    } else {
+        event.s("agentType")
+    }
+}
+
+fn is_write_tool(name: &str) -> bool {
+    matches!(
+        name,
+        "Edit"
+            | "Write"
+            | "MultiEdit"
+            | "NotebookEdit"
+            | "edit_file"
+            | "write_file"
+            | "multi_edit"
+            | "replace_file_content"
+            | "multi_replace_file_content"
+    )
+}
+
+fn is_shell_tool(name: &str) -> bool {
+    matches!(name, "Bash" | "PowerShell" | "run_command")
+}
+
+fn is_read_tool(name: &str) -> bool {
+    matches!(
+        name,
+        "Read" | "read_file" | "view_file" | "view_file_outline" | "view_code_item"
+    )
+}
+
+fn is_search_tool(name: &str) -> bool {
+    matches!(
+        name,
+        "Grep" | "Glob" | "grep_search" | "find_by_name" | "list_dir"
+    )
+}
+
+fn match_locked(candidate: &str, locked: &BTreeSet<String>) -> Option<String> {
+    if let Some(exact) = locked.get(candidate) {
+        return Some(exact.clone());
+    }
+    if cfg!(windows) {
+        return locked
+            .iter()
+            .find(|p| p.eq_ignore_ascii_case(candidate))
+            .cloned();
+    }
+    None
 }
 
 // ----------------------------------------------------------------------------- shell commands
@@ -270,15 +372,32 @@ fn locked_by(
     if rel.is_empty() {
         return locked.iter().next().cloned(); // the project folder itself
     }
-    if locked.contains(&rel) {
-        return Some(rel);
+    if let Some(hit) = match_locked(&rel, locked) {
+        return Some(hit);
     }
     let under = format!("{rel}/");
-    if let Some(hit) = locked.iter().find(|p| p.starts_with(&under)) {
+    if let Some(hit) = locked.iter().find(|p| {
+        if cfg!(windows) {
+            p.len() > under.len()
+                && p.is_char_boundary(under.len())
+                && p[..under.len()].eq_ignore_ascii_case(&under)
+        } else {
+            p.starts_with(&under)
+        }
+    }) {
         return Some(hit.clone());
     }
     if rel.contains(['*', '?', '[']) {
-        return locked.iter().find(|p| py::fnmatch(p, &rel)).cloned();
+        return locked
+            .iter()
+            .find(|p| {
+                if cfg!(windows) {
+                    py::fnmatch(&p.to_ascii_lowercase(), &rel.to_ascii_lowercase())
+                } else {
+                    py::fnmatch(p, &rel)
+                }
+            })
+            .cloned();
     }
     None
 }
@@ -372,8 +491,8 @@ fn shell_target(command: &str, project: &Path, locked: &BTreeSet<String>) -> Opt
             // a copy changes only where it lands
             n if COPY.contains(&n) => args.split_last().and_then(|(dest, sources)| {
                 let dest = arg_path(dest, base.as_deref(), project)?;
-                if locked.contains(&dest) {
-                    return Some(dest);
+                if let Some(hit) = match_locked(&dest, locked) {
+                    return Some(hit);
                 }
                 // into a folder: the file of the same name there is overwritten
                 sources.iter().find_map(|src| {
@@ -384,7 +503,7 @@ fn shell_target(command: &str, project: &Path, locked: &BTreeSet<String>) -> Opt
                     } else {
                         format!("{dest}/{name}")
                     };
-                    locked.contains(&landed).then_some(landed)
+                    match_locked(&landed, locked)
                 })
             }),
             "sed" => rest
@@ -442,24 +561,48 @@ fn locked_set(project: &Path) -> (BTreeSet<String>, Map<String, Value>) {
 
 /// The locked path this event would change, if any.
 pub fn locked_target(event: &Value, project: &Path, locked: &BTreeSet<String>) -> Option<String> {
-    let input = event.at("tool_input");
-    match event.s("tool_name") {
-        "Edit" | "Write" | "MultiEdit" | "NotebookEdit" => {
-            let target = first_text(input, &["file_path", "notebook_path", "path"]);
-            // locks are kept with forward slashes
-            let mut names: BTreeSet<String> = [target.clone(), target.replace('\\', "/")]
-                .into_iter()
-                .collect();
-            let full = crate::core::resolve(Path::new(&target));
-            if let Ok(rel) = full.strip_prefix(crate::core::resolve(project)) {
-                let rel = py::posix(rel);
-                names.insert(rel.replace('\\', "/"));
-                names.insert(rel);
-            }
-            names.into_iter().find(|n| locked.contains(n))
+    let input = tool_input(event);
+    let name = tool_name(event);
+    if is_write_tool(name) {
+        let target = first_text(
+            input,
+            &[
+                "file_path",
+                "notebook_path",
+                "path",
+                "Path",
+                "TargetFile",
+                "AbsolutePath",
+            ],
+        );
+        if target.is_empty() {
+            return None;
         }
-        "Bash" | "PowerShell" => shell_target(input.s("command"), project, locked),
-        _ => None,
+        let cwd = event.at("cwd").as_str().filter(|c| !c.is_empty());
+        let base = cwd
+            .map(PathBuf::from)
+            .unwrap_or_else(|| project.to_path_buf());
+        // locks are kept with forward slashes
+        let mut names: BTreeSet<String> = [target.clone(), target.replace('\\', "/")]
+            .into_iter()
+            .collect();
+        let abs = absolute(&target, &base);
+        if let Some(rel) = inside(&abs, project) {
+            names.insert(rel.replace('\\', "/"));
+            names.insert(rel);
+        }
+        let full = crate::core::resolve(&abs);
+        if let Ok(rel) = full.strip_prefix(crate::core::resolve(project)) {
+            let rel = py::posix(rel);
+            names.insert(rel.replace('\\', "/"));
+            names.insert(rel);
+        }
+        names.into_iter().find_map(|n| match_locked(&n, locked))
+    } else if is_shell_tool(name) {
+        let command = first_text(input, &["command", "CommandLine", "cmd"]);
+        shell_target(&command, project, locked)
+    } else {
+        None
     }
 }
 
@@ -467,7 +610,7 @@ pub fn locked_target(event: &Value, project: &Path, locked: &BTreeSet<String>) -
 
 /// The council agent an event comes from, without a plugin's prefix (`council-loop:council-elder`).
 fn seat_of(event: &Value) -> Option<&str> {
-    let name = event.s("agent_type").rsplit(':').next()?;
+    let name = agent_type(event).rsplit(':').next()?;
     SEATS.contains(&name).then_some(name)
 }
 
@@ -478,7 +621,7 @@ fn seat_of(event: &Value) -> Option<&str> {
 /// files are not a seat's to change. Until now the packet asked for this; here it is enforced.
 pub fn seat_guard(event: &Value, project: &Path) -> Option<String> {
     let seat = seat_of(event)?;
-    let input = event.at("tool_input");
+    let input = tool_input(event);
     let cwd = event.at("cwd").as_str().filter(|c| !c.is_empty());
     let base = cwd
         .map(PathBuf::from)
@@ -490,92 +633,113 @@ pub fn seat_guard(event: &Value, project: &Path) -> Option<String> {
                 .is_some_and(|own| crate::safe::within(path, own))
     };
     let name_of = |rel: &str| rel.rsplit('/').next().unwrap_or("").to_string();
-    match event.s("tool_name") {
-        "Write" | "Edit" | "MultiEdit" | "NotebookEdit" => {
-            let target = first_text(input, &["file_path", "notebook_path", "path"]);
-            if target.is_empty() {
-                return None;
-            }
-            let path = absolute(&target, &base);
-            if private(&path) {
-                return Some(
-                    "a council seat does not write in the council's own folders".to_string(),
-                );
-            }
-            let rel = inside(&path, project)?; // outside the project: a scratch file, not ours to judge
-            let name = name_of(&rel);
-            let own_output = (rel.starts_with(".council/runs/")
-                || rel.starts_with(".council/map/"))
-                && (name.ends_with(".out.json") || name.ends_with(".out.md"));
-            (!own_output).then(|| {
-                format!(
-                    "a council seat writes one file: the output file its packet names. {rel} is not one. \
-                     Never edit a project file; work on a copy outside the project if you need to try something."
-                )
-            })
+    let name = tool_name(event);
+    if is_write_tool(name) {
+        let target = first_text(
+            input,
+            &[
+                "file_path",
+                "notebook_path",
+                "path",
+                "Path",
+                "TargetFile",
+                "AbsolutePath",
+            ],
+        );
+        if target.is_empty() {
+            return None;
         }
-        "Read" => {
-            let target = first_text(input, &["file_path", "path"]);
-            if target.is_empty() {
-                return None;
-            }
-            let path = absolute(&target, &base);
-            if private(&path) {
-                return Some(
-                    "that folder holds who wrote which card: no seat opens it (the vote is blind)"
-                        .to_string(),
-                );
-            }
-            let rel = inside(&path, project);
-            if let Some(rel) = rel.as_deref().filter(|r| r.starts_with(".council/runs/")) {
-                let name = name_of(rel);
-                let packet = name.ends_with(".prompt.md")
-                    || name.ends_with(".retry.md")
-                    || name == "facts.md"
-                    || name == "skeleton.md";
-                return (!packet).then(|| {
-                    "inside the run's folders a seat opens only its own packet: the other files hold what a \
-                     blind vote must not see"
-                        .to_string()
-                });
-            }
-            (seat == "council-researcher").then(|| {
-                "a researcher reads the web and its own packet, nothing else: a seat that can open web pages \
-                 does not also read files (a page could talk it into sending one out)"
+        let path = absolute(&target, &base);
+        if private(&path) {
+            return Some("a council seat does not write in the council's own folders".to_string());
+        }
+        let rel = inside(&path, project)?; // outside the project: a scratch file, not ours to judge
+        let leaf = name_of(&rel);
+        let own_output = (rel.starts_with(".council/runs/") || rel.starts_with(".council/map/"))
+            && (leaf.ends_with(".out.json") || leaf.ends_with(".out.md"));
+        (!own_output).then(|| {
+            format!(
+                "a council seat writes one file: the output file its packet names. {rel} is not one. \
+                 Never edit a project file; work on a copy outside the project if you need to try something."
+            )
+        })
+    } else if is_read_tool(name) {
+        let target = first_text(
+            input,
+            &["file_path", "path", "Path", "AbsolutePath", "File"],
+        );
+        if target.is_empty() {
+            return None;
+        }
+        let path = absolute(&target, &base);
+        if private(&path) {
+            return Some(
+                "that folder holds who wrote which card: no seat opens it (the vote is blind)"
+                    .to_string(),
+            );
+        }
+        let rel = inside(&path, project);
+        if let Some(rel) = rel.as_deref().filter(|r| r.starts_with(".council/runs/")) {
+            let leaf = name_of(rel);
+            let packet = leaf.ends_with(".prompt.md")
+                || leaf.ends_with(".retry.md")
+                || leaf == "facts.md"
+                || leaf == "skeleton.md";
+            return (!packet).then(|| {
+                "inside the run's folders a seat opens only its own packet: the other files hold what a \
+                 blind vote must not see"
                     .to_string()
-            })
+            });
         }
-        "Grep" | "Glob" => {
-            if seat == "council-researcher" {
-                return Some(
-                    "a researcher does not search the project's files: it reads the web and its own packet"
-                        .to_string(),
-                );
-            }
-            let target = first_text(input, &["path"]);
-            let path = if target.is_empty() {
-                base.clone()
-            } else {
-                absolute(&target, &base)
-            };
-            let in_runs = inside(&path, project)
-                .is_some_and(|rel| rel == ".council/runs" || rel.starts_with(".council/runs/"));
-            (private(&path) || in_runs).then(|| {
-                "a seat does not search the run's folders: they hold what a blind vote must not see"
-                    .to_string()
-            })
+        (seat == "council-researcher").then(|| {
+            "a researcher reads the web and its own packet, nothing else: a seat that can open web pages \
+             does not also read files (a page could talk it into sending one out)"
+                .to_string()
+        })
+    } else if is_search_tool(name) {
+        if seat == "council-researcher" {
+            return Some(
+                "a researcher does not search the project's files: it reads the web and its own packet"
+                    .to_string(),
+            );
         }
-        _ => None,
+        let target = first_text(
+            input,
+            &[
+                "path",
+                "Path",
+                "SearchPath",
+                "SearchDirectory",
+                "DirectoryPath",
+            ],
+        );
+        let path = if target.is_empty() {
+            base.clone()
+        } else {
+            absolute(&target, &base)
+        };
+        let in_runs = inside(&path, project)
+            .is_some_and(|rel| rel == ".council/runs" || rel.starts_with(".council/runs/"));
+        (private(&path) || in_runs).then(|| {
+            "a seat does not search the run's folders: they hold what a blind vote must not see"
+                .to_string()
+        })
+    } else {
+        None
     }
 }
 
 // ----------------------------------------------------------------------------- the two events
 
-fn deny(reason: &str) -> String {
-    Json::LINE.dumps(
-        &json!({"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny",
-                                        "permissionDecisionReason": reason}}),
-    )
+fn deny_for(event: &Value, reason: &str) -> String {
+    if is_antigravity(event) {
+        Json::LINE.dumps(&json!({"decision": "deny", "reason": reason}))
+    } else {
+        Json::LINE.dumps(
+            &json!({"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny",
+                                            "permissionDecisionReason": reason}}),
+        )
+    }
 }
 
 fn allow_locked() -> bool {
@@ -585,7 +749,7 @@ fn allow_locked() -> bool {
 /// Before a tool runs: the JSON line that denies it, or `None` to let it pass.
 fn before(event: &Value, project: &Path) -> Option<String> {
     if let Some(why) = seat_guard(event, project) {
-        return Some(deny(&why));
+        return Some(deny_for(event, &why));
     }
     if allow_locked() {
         return None;
@@ -595,13 +759,17 @@ fn before(event: &Value, project: &Path) -> Option<String> {
         return None;
     }
     if let Some(hit) = locked_target(event, project, &locked) {
-        return Some(deny(&format!(
-            "{hit} is locked by the Council Loop (tests/answer key). Fix the code, not the test. Ask the requester to unlock if the test is wrong."
-        )));
+        return Some(deny_for(
+            event,
+            &format!(
+                "{hit} is locked by the Council Loop (tests/answer key). Fix the code, not the test. Ask the requester to unlock if the test is wrong."
+            ),
+        ));
     }
-    let shell = matches!(event.s("tool_name"), "Bash" | "PowerShell");
-    if shell && relocks(event.at("tool_input").s("command")) {
-        return Some(deny(
+    let command = first_text(tool_input(event), &["command", "CommandLine", "cmd"]);
+    if is_shell_tool(tool_name(event)) && relocks(&command) {
+        return Some(deny_for(
+            event,
             "council lock-tests would replace the locks that are in force. Only the requester re-locks, after \
              approving the test change (they set COUNCIL_ALLOW_LOCKED=1 for the session). Ask them.",
         ));
@@ -734,13 +902,14 @@ pub fn decide(raw: &[u8]) -> Option<String> {
                 .map(str::to_string)
         });
     let project = PathBuf::from(project.unwrap_or_else(|| ".".to_string()));
-    let verdict = match event.s("hook_event_name") {
+    let ev_name = event_name(&event);
+    let verdict = match ev_name {
         "PostToolUse" => after(&event, &project),
         "" | "PreToolUse" => before(&event, &project),
         _ => None,
     };
-    crate::diag!(Debug, "hook", "{} {}: {}", event.s("hook_event_name"), event.s("tool_name"),
-                 if verdict.is_some() { "objected" } else { "passed" }; "agent" => event.s("agent_type"));
+    crate::diag!(Debug, "hook", "{} {}: {}", ev_name, tool_name(&event),
+                 if verdict.is_some() { "objected" } else { "passed" }; "agent" => agent_type(&event));
     verdict
 }
 

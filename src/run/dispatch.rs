@@ -40,13 +40,40 @@ pub fn cmd_dispatch(run_id: Option<&str>, seat: Option<&str>, dry_run: bool) -> 
     let (run, d) = load(run_id)?;
     let only = seat.filter(|s| !s.is_empty());
     let phase = run.s("phase").to_string();
+    // Only pure ballot steps (vote/rank) may dispatch subagent/self seats over tool-less HTTP.
+    // Elders, ideation, red-team, researchers, mapper and control seats keep their full tools.
+    let ballot_only = matches!(phase.as_str(), "vote" | "rank");
+    let has_openrouter = ballot_only && providers::has_openrouter_key();
     let (mut todo, mut capped): (Vec<Job>, Vec<String>) = (Vec::new(), Vec::new());
     for f in seat_files(&run, &d)? {
         let v = run.at("seats").at(&f.seat);
         let via = v.s("via");
-        if only.is_some_and(|s| s != f.seat) || !(via.starts_with("cli:") || via == "openrouter") {
+        if only.is_some_and(|s| s != f.seat) {
             continue;
         }
+        let how = if via.starts_with("cli:") || via == "openrouter" {
+            v.clone()
+        } else if has_openrouter && matches!(via, "subagent" | "self") {
+            let model_hint = if v.truthy("stand_in_for") {
+                v.s("stand_in_for")
+            } else {
+                v.s("model")
+            };
+            let Some(slug) = providers::openrouter_slug(
+                Some(model_hint),
+                v.at("creator").as_str(),
+                v.at("native_id").as_str(),
+            ) else {
+                continue;
+            };
+            let mut routed = v.clone();
+            routed["provider"] = json!("openrouter");
+            routed["native_id"] = json!(slug);
+            routed["via"] = json!("openrouter");
+            routed
+        } else {
+            continue;
+        };
         if f.out.exists() && only.is_none() {
             continue;
         }
@@ -65,7 +92,7 @@ pub fn cmd_dispatch(run_id: Option<&str>, seat: Option<&str>, dry_run: bool) -> 
         )?;
         todo.push(Job {
             seat: f.seat,
-            how: v.clone(),
+            how,
             prompt,
             out: f.out,
         });
@@ -79,6 +106,7 @@ pub fn cmd_dispatch(run_id: Option<&str>, seat: Option<&str>, dry_run: bool) -> 
         say!("nothing to dispatch: no CLI/API seat of this step is missing an output");
         return Ok(0);
     }
+    let timeout = if ballot_only { 120 } else { 900 };
     let timed: Vec<(Value, u64)> = providers::in_parallel(&todo, 8, |job| {
         let v = &job.how;
         let (model, effort) = (v.at("native_id").as_str(), v.at("effort").as_str());
@@ -88,14 +116,35 @@ pub fn cmd_dispatch(run_id: Option<&str>, seat: Option<&str>, dry_run: bool) -> 
             &job.prompt,
             model,
             effort,
-            900,
+            timeout,
             dry_run,
             tools_for(v, &phase),
         );
         if res.truthy("ok") && !dry_run {
-            if let Err(err) = core::write_text(&job.out, res.s("text")) {
-                res["ok"] = json!(false);
-                res["error"] = json!(format!("the answer could not be saved: {err:#}"));
+            let is_json_out = job
+                .out
+                .extension()
+                .is_some_and(|ext| ext.eq_ignore_ascii_case("json"));
+            let to_save = if v.s("provider") == "openrouter" && is_json_out {
+                match providers::parse_json(res.s("text")) {
+                    Some(parsed) => Some(Json::ONE.dumps(&parsed)),
+                    None => {
+                        res["ok"] = json!(false);
+                        res["error"] = json!(format!(
+                            "the reply did not contain a JSON object: {}",
+                            py::head(&py::squash(res.s("text")), 200)
+                        ));
+                        None
+                    }
+                }
+            } else {
+                Some(res.s("text").to_string())
+            };
+            if let Some(payload) = to_save {
+                if let Err(err) = core::write_text(&job.out, &payload) {
+                    res["ok"] = json!(false);
+                    res["error"] = json!(format!("the answer could not be saved: {err:#}"));
+                }
             }
         }
         if res.truthy("error") {

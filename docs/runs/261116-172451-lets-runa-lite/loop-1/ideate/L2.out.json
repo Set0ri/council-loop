@@ -1,0 +1,56 @@
+{
+  "lens": "L2",
+  "eli5": "Slash token spend with direct HTTP dispatch for zero-tool seats and harden cross-lab IDE hook ingestion.",
+  "ideas": [
+    "Direct HTTP ureq OpenRouter transport for zero-tool phases bypassing subagent shell forks to eliminate 1.1M startup tokens.",
+    "Dual hook payload parser in src/hook.rs supporting snake_case Claude and camelCase Antigravity toolCall formats for IDE integration.",
+    "Static model slug mapping in policy.yaml mapping AA display names directly to OpenRouter slugs, eliminating stand-in fallback.",
+    "Dynamic lazy tool filtering in src/mcp.rs exposing only active phase verbs to slash 23KB tools/list MCP payload down to 3KB.",
+    "Sanitized PATH isolation in test harness modules to prevent host CLI shims like gemini.CMD from corrupting scenario test outcomes."
+  ],
+  "cards": [
+    {
+      "title": "Direct HTTP Dispatch For Zero-Tool Council Seats",
+      "body": "In measured Lite runs, ballot votes consumed 193k tokens across three calls because host subagent wrappers introduced roughly 60k tokens of startup overhead per packet. Protocol validation in src/run/dispatch.rs already flags vote, rank, elder, and control phases as requiring zero tools. When an OpenRouter key or compatible endpoint is present, council dispatch should route zero-tool seats directly through providers::openrouter using the existing ureq client rather than spawning external subagent processes. This eliminates subagent initialization payloads entirely, preserves strict timeout envelopes, and guarantees clean JSON completions while cutting total run spend by over sixty percent without new crate dependencies.",
+      "wins": [
+        "R1",
+        "R2",
+        "R4"
+      ],
+      "evidence": "src/run/dispatch.rs:9-16, src/providers.rs:179-214, docs/council-run-2026-11-13-self-review.md",
+      "eli5": "Execute tool-free seats via direct HTTP API calls to eliminate massive subagent startup token overhead."
+    },
+    {
+      "title": "Static Policy Slug Mapping And Dual Hook Ingestion",
+      "body": "Current cross-lab dispatch defaults to stand-ins because models/lock.yaml lacks OpenRouter slugs unless an online refresh was executed, while src/providers.rs only checks raw environment variables. Adding a static slug table in models/policy.yaml gives deterministic cross-lab model resolution offline. Concurrently, src/hook.rs fails on Antigravity IDE events because it only parses snake_case tool_name and tool_input fields from Claude Code instead of camelCase toolCall structures. Extending the hook payload parser to accept both JSON schemas enables seamless IDE integration without proxy wrappers, ensuring that cross-lab seats and automated hooks execute reliably across heterogeneous client environments without touching external crates.",
+      "wins": [
+        "R2",
+        "R3",
+        "R5"
+      ],
+      "evidence": "src/providers.rs:180-182, src/hook.rs:15-35, skills/council-loop/models/policy.yaml",
+      "eli5": "Add static provider slugs in policy.yaml and support camelCase IDE hook payloads to ensure reliable multi-client dispatch."
+    }
+  ],
+  "research": [
+    {
+      "claim": "Ballot voting and ranking phases require zero tools and can be executed via pure HTTP completions without subagent tool scaffolding.",
+      "source": "src/run/dispatch.rs",
+      "quote": "tools_for() already marks vote, rank, elders, and control as needing 'none' (zero tools)",
+      "confidence": "high"
+    },
+    {
+      "claim": "In the measured v0.2 Lite run, rank vote alone consumed 193k tokens across three ballots due to subagent context overhead.",
+      "source": "docs/council-run-2026-11-13-self-review.md",
+      "quote": "Rank Vote 193k (~64k tokens per ballot for a ~2k-token packet, almost all subagent startup overhead)",
+      "confidence": "high"
+    }
+  ],
+  "notes": [
+    {
+      "to": "chair",
+      "text": "Routing zero-tool seats through direct ureq HTTP requests bypasses subagent startup overhead, reclaiming the bulk of the 1.2M token spend."
+    }
+  ],
+  "friction": "OpenRouter API key returned HTTP 401 (expired); seat L2 executed via subagent fresh context."
+}

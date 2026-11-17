@@ -1,0 +1,106 @@
+{
+  "findings": [
+    {
+      "candidate": "Candidate A",
+      "severity": "S1",
+      "finding": "Direct HTTP dispatch of zero-tool seats blinds the Elder reviewer in Lite and max profiles, stripping its ability to run verification probes, inspect repository source files, and test reproduction claims before rendering final verdicts.",
+      "evidence": "In src/run/dispatch.rs line 15, elders get tools=\"none\". In skills/council-loop/models/policy.yaml line 94, elders_verify measures 241k tokens for verification probes. Stripping tool access forces blind opinions over verified facts.",
+      "fix": "Keep verification tool access for Lite/max elders and control seats; restrict direct HTTP dispatch strictly to pure ballot rank and shortlist voting phases."
+    },
+    {
+      "candidate": "Candidate A",
+      "severity": "S2",
+      "finding": "Direct HTTP completions write raw text directly to output files without JSON extraction or fence sanitization, causing ingest validation crashes whenever OpenRouter models return markdown blocks (```json) or conversational preambles.",
+      "evidence": "src/providers.rs line 183 sends prompt without JSON schema enforcement, and src/run/dispatch.rs line 96 writes raw response text directly to out_file without stripping markdown fences.",
+      "fix": "Add response sanitization in providers::openrouter or dispatch to strip markdown fences and extract top-level JSON objects before writing output files."
+    },
+    {
+      "candidate": "Candidate B",
+      "severity": "S1",
+      "finding": "Hardcoding static model slugs in policy.yaml violates the architectural policy forbidding hardcoded model names, breaking offline dispatch and causing fatal HTTP 404/400 errors whenever OpenRouter changes provider endpoints or deprecates models.",
+      "evidence": "AGENTS.md Rule 7 and policy.yaml state \"Never hard-code model names\". OpenRouter model slugs are volatile, frequently changing with context tiers or retirement.",
+      "fix": "Populate openrouter_id dynamically in models/lock.yaml during refresh or maintain an optional overrides table in local config rather than committing static slugs to policy.yaml."
+    },
+    {
+      "candidate": "Candidate B",
+      "severity": "S2",
+      "finding": "Supporting camelCase hook payloads fails to prevent unauthorized tool executions in Antigravity because src/hook.rs emits Claude Code's specific envelope, which Antigravity ignores, leaving locked test files unprotected despite successful input parsing.",
+      "evidence": "src/hook.rs line 576 hardcodes hookSpecificOutput with Claude Code keys. Antigravity IDE runners do not consume Claude Code's denial structure.",
+      "fix": "Normalize both incoming event schemas and outgoing denial responses to match the detected host agent platform (Claude Code vs Antigravity)."
+    },
+    {
+      "candidate": "Candidate C",
+      "severity": "S1",
+      "finding": "Relaxing label extraction to capture unanchored leading letters across arbitrary markdown risks false-positive candidate matching in voter rationales and comparative prose, inverting preferences and silently corrupting Condorcet and Borda tally outcomes.",
+      "evidence": "In src/core.rs line 1243, LABEL_RE uses strict boundary anchors. Prose like \"Candidate B beats Candidate A\" could extract 'A' prematurely, altering election math.",
+      "fix": "Strip markdown bold and title annotations using dedicated regex cleanup while strictly maintaining label boundary anchors and rejecting ambiguous multi-candidate strings."
+    },
+    {
+      "candidate": "Candidate C",
+      "severity": "S2",
+      "finding": "The claim that leak checks cause hundred-thousand-token seat respawns is factually incorrect. In validate.rs, identity leaks in ideation are recorded as warnings for the chair to reword, not fatal errors requiring seat retries.",
+      "evidence": "In src/run/validate.rs lines 182-191, leaks_in pushes to warns (\"cheaper for the chair to reword than to respawn the seat\"), never triggering seat respawns.",
+      "fix": "Keep strict leak detection in core::blind to protect voter anonymity, and maintain chair-level rewording warnings at merge rather than weakening regex filters."
+    },
+    {
+      "candidate": "Candidate D",
+      "severity": "S1",
+      "finding": "Truncating the default MCP toolset to six core operations starves AI chairs of essential workflow capabilities like dispatching seats, recording required deviations, auditing ballots, and conducting elder reviews, breaking autonomous execution under MCP clients.",
+      "evidence": "MCP clients discover tools once during session handshake. Hiding council_dispatch, council_deviation, and council_elder_review prevents agents from executing protocol rules (AGENTS.md Rule 9) without restarting the server.",
+      "fix": "Keep workflow and audit tools visible in the default toolset, or adopt an explicit two-tier flag (--toolsets compact|full) without breaking default automation."
+    },
+    {
+      "candidate": "Candidate D",
+      "severity": "S3",
+      "finding": "Candidate D duplicates functionality that already exists in council-loop, as the MCP server already implements flags and configuration settings to filter toolsets and deny specific operations.",
+      "evidence": "src/mcp.rs lines 28-30 and lines 72-77 already expose --toolsets, --tools, and --deny-tools, allowing clients to configure compact toolsets today.",
+      "fix": "Document existing toolset configuration flags in client connection guides rather than altering the default toolset schema behavior."
+    },
+    {
+      "candidate": "Candidate E",
+      "severity": "S1",
+      "finding": "Candidate E yields zero token reduction and zero cost savings, completely failing the primary goal of the prompt (Rubric R1, weight 35: biggest gains, save tokens).",
+      "evidence": "Candidate E modifies only pre-tool hook validation and path comparison logic, offering 0 tokens saved across all 9 Lite council seat calls.",
+      "fix": "Pair hook safety improvements with token reduction measures, or prioritize high-yield dispatch candidates that directly address the 1.2M token Lite run overhead."
+    },
+    {
+      "candidate": "Candidate E",
+      "severity": "S2",
+      "finding": "Case-insensitive path matching alone fails on Windows because inside() relies on case-sensitive prefix stripping, causing mismatched drive letters or directory casing to treat locked project files as external scratch files and bypass hook enforcement.",
+      "evidence": "In src/hook.rs lines 67-71, full.strip_prefix(&root) fails on case differences, causing inside() to return None and skipping all seat guard checks.",
+      "fix": "Use dunce::canonicalize or lowercase relative paths after canonicalization when computing project-relative paths on Windows."
+    }
+  ],
+  "eli5": "Direct HTTP dispatch saves tokens but blinds elder verifiers, while loose parsing corrupts vote tallies and breaks hooks.",
+  "research": [
+    {
+      "claim": "Identity leaks during ideation produce warnings for chair merge rather than triggering seat respawns.",
+      "source": "src/run/validate.rs",
+      "quote": "cheaper for the chair to reword than to respawn the seat",
+      "confidence": "high"
+    },
+    {
+      "claim": "In MCP, tools available to an agent are fixed during initialization handshake and cannot be dynamically discovered.",
+      "source": "modelcontextprotocol.io/specification/server/tools",
+      "quote": "Tools are declared during the initialization phase via tools/list.",
+      "confidence": "high"
+    },
+    {
+      "claim": "Prefix stripping on Windows PathBuf is case-sensitive, permitting hook bypasses on letter-case mismatches.",
+      "source": "src/hook.rs",
+      "quote": "full.strip_prefix(&root).ok().map(py::posix)",
+      "confidence": "high"
+    }
+  ],
+  "notes": [
+    {
+      "to": "all",
+      "text": "Candidate A yields the highest token reduction (~400k tokens) if confined to pure ballot voting, but must not strip verification tools from elders."
+    },
+    {
+      "to": "chair",
+      "text": "Candidate C's rationale on leak respawns is factually mistaken; do not weaken anonymization rules based on false retry assumptions."
+    }
+  ],
+  "friction": "OpenRouter API key expired on test machine (HTTP 401); red team analysis performed via verified code audit stand-in."
+}

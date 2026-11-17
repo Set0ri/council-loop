@@ -1,0 +1,76 @@
+- `src/core.rs`
+  - `pub fn cut` · used in 4 other files
+  - `pub fn read_text` · used in 9 other files
+  - `pub fn home_dir` · used in 3 other files
+  - `pub fn user_config_path` · used in 6 other files
+  - `pub fn project_root` · used in 11 other files
+  - `pub fn write_text` · used in 11 other files
+  - `pub fn sha_file` · used in 1 other file
+- `src/lib.rs`
+  - `pub mod run` · used in 20 other files
+  - `pub mod out` · used in 36 other files
+  - `pub mod core` · used in 24 other files
+  - `pub mod safe` · used in 17 other files
+- `tests/common/mod.rs`
+  - `pub fn run` · used in 20 other files
+  - `pub fn council` · used in 8 other files
+  - `pub fn new` · used in 34 other files
+  - `pub fn write` · used in 11 other files
+- `src/run/mod.rs`
+  - `pub(crate) fn save` · used in 6 other files
+  - `pub(crate) fn loop_dir` · used in 6 other files
+  - `pub(crate) fn show` · used in 20 other files
+  - `pub(crate) fn now` · used in 18 other files
+- `src/demo.rs`
+  - `pub fn run` · used in 20 other files
+  - `pub fn council` · used in 8 other files
+  - `pub fn new` · used in 34 other files
+  - `pub fn out_path` · used in 1 other file
+- `src/hook.rs`
+  - `pub fn run` · used in 20 other files
+- `src/refresh.rs`
+  - `pub fn run` · used in 20 other files
+- `src/memory.rs`
+  - `pub fn tokens` · used in 4 other files
+- `src/py.rs`
+  - `pub fn path` · used in 29 other files
+  - `pub fn len` · used in 33 other files
+  - `pub fn str_repr` · used in 10 other files
+  - `pub fn truthy` · used in 21 other files
+  - `pub fn is_space` · used in 4 other files
+  - `pub fn to_str` · used in 22 other files
+  - `pub fn head` · used in 18 other files
+  - `pub fn lines` · used in 17 other files
+  - `pub fn words` · used in 14 other files
+- `src/safe.rs`
+  - `pub fn read_own` · used in 6 other files
+  - `pub fn write_text` · used in 11 other files
+  - `pub fn plain_file` · used in 6 other files
+- `src/log.rs`
+  - `pub fn name` · used in 27 other files
+  - `pub fn took` · used in 6 other files
+  - `pub fn level` · used in 3 other files
+- `src/run/prompts.rs`
+  - `pub(crate) fn push` · used in 31 other files
+- `src/api.rs`
+  - `pub fn name` · used in 27 other files
+  - `pub fn find` · used in 18 other files
+- `src/assets.rs`
+  - `pub fn models_dir` · used in 2 other files
+  - `pub fn read` · used in 14 other files
+- `src/codemap.rs`
+  - `pub struct Read` · used in 5 other files
+- `src/val.rs`
+  - `pub fn items` · used in 20 other files
+- `src/clock.rs`
+  - `pub fn now` · used in 18 other files
+- `src/mcp.rs`
+  - `pub fn new` · used in 34 other files
+- `src/pyrand.rs`
+  - `pub fn new` · used in 34 other files
+- `src/out.rs`
+  - `pub fn line` · used in 19 other files
+- `src/pyread.rs`
+  - `pub fn read` · used in 14 other files
+- `src/welcome.rs`
+  - `pub fn lines` · used in 17 other files

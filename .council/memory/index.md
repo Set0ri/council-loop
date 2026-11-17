@@ -1,18 +1,26 @@
 ---
 type: "index"
 tags: ["council/index"]
-updated: "2026-11-13"
+updated: "2026-11-16"
 ---
 
 # Council memory
 
-Shared by every council run in this project. Written only by `council.py`; safe to read, link and tag.
+Shared by every council run in this project. Written only by `council`; safe to read, link and tag.
 
-- **Research** (38 notes): one sourced fact per note, in `research/`.
-- **Commons** (0 runs): what members said to each other, in `commons/`.
+- **Research** (45 notes): one sourced fact per note, in `research/`.
+- **Commons** (1 run): what members said to each other, in `commons/`.
+- **Codebase map**: `docs/ARCHITECTURE.md` in the project.
 
 ## Newest research
 
+- [Voting and ranking phases require zero tools under tools_for, confirming pure REST dispatch is safe for ballots.](research/voting-ranking-phases-require-zero-tools-under-tools.md) (high, n.d.)
+- [Prefix stripping on Windows PathBuf is case-sensitive, permitting hook bypasses on letter-case mismatches.](research/prefix-stripping-windows-pathbuf-case-sensitive-permitting-hook.md) (high, n.d.)
+- [In the measured v0.2 Lite run, rank vote alone consumed 193k tokens across three ballots due to subagent context overhead.](research/measured-v0-lite-run-rank-vote-alone-consumed.md) (high, n.d.)
+- [Lite council rank votes consumed 192,926 tokens across 3 ballots (~64k per ballot) for a ~2,000-token packet due to subagent startup overhead.](research/lite-council-rank-votes-consumed-192-926-tokens.md) (high, n.d.)
+- [Identity leaks during ideation produce warnings for chair merge rather than triggering seat respawns.](research/identity-leaks-during-ideation-produce-warnings-chair-merge.md) (high, n.d.)
+- [council-loop MCP tools/list payload ranges from 19 KB to 23 KB across 22 to 27 tool schemas.](research/council-loop-mcp-tools-list-payload-ranges-19.md) (high, n.d.)
+- [Ballot voting and ranking phases require zero tools and can be executed via pure HTTP completions without subagent tool scaffolding.](research/ballot-voting-ranking-phases-require-zero-tools-executed.md) (high, n.d.)
 - [A vendor-written comparison puts full-dump tools such as Repomix at 50k to 500k tokens for a 10k-line repository and aider's repo map at about 1k; the figures are unsourced](research/vendor-written-comparison-puts-full-dump-tools-such.md) (low, 2026-04-13)
 - [The tree-sitter-language-pack Python package is MIT licensed and ships pre-compiled grammars for 371 languages](research/tree-sitter-language-pack-python-package-mit-licensed.md) (high, n.d.)
 - [STORM's paper reports articles judged more organized by a 25 percent absolute increase and broader in coverage by 10 percent than an outline-driven baseline](research/storm-paper-reports-articles-judged-organized-25-percent.md) (high, 2024-02-22)
@@ -46,14 +54,13 @@ Shared by every council run in this project. Written only by `council.py`; safe 
 - [Anthropic found that every research subagent needs an objective, an output format, guidance on tools and sources, and clear task boundaries](research/anthropic-found-research-subagent-needs-objective-output-format.md) (high, 2025-06-13)
 - [Anthropic's early research agents picked search-optimised content farms over authoritative sources until given source-quality heuristics](research/anthropic-early-research-agents-picked-search-optimised-content.md) (high, 2025-06-13)
 - [Aider's repo map defaults to a budget of 1,024 tokens and fits the map by binary search until it is within 15 percent of the budget](research/aider-repo-map-defaults-budget-024-tokens-fits.md) (high, n.d.)
-- [Aider's repo map builds a graph with edges from the file that references a name to the file that defines it, then ranks with PageRank](research/aider-repo-map-builds-graph-edges-file-references.md) (high, n.d.)
-- [Aider replaced its ctags-based repo map with a tree-sitter one that needs no separate ctags install and shows full signatures](research/aider-replaced-ctags-based-repo-map-tree-sitter.md) (high, 2023-10-22)
-- [Aider multiplies an edge weight by 0.1 for names starting with an underscore and for names defined in more than five files, and takes the square root of the reference count](research/aider-multiplies-edge-weight-names-starting-underscore-names.md) (high, n.d.)
-- [Aider multiplies an edge weight by 10 for identifiers the chat mentions and by 10 for snake, kebab or camel case names of 8 or more characters](research/aider-multiplies-edge-weight-10-identifiers-chat-mentions.md) (high, n.d.)
-- [Aider is licensed under the Apache License, Version 2.0](research/aider-licensed-under-apache-license-version.md) (high, n.d.)
+
+## Commons by run
+
+- [261116-172451-lets-runa-lite](commons/261116-172451-lets-runa-lite.md)
 
 ## Use it
 
-- Find: `council.py memory search "<words>"`
-- Add by hand: `council.py memory add --claim "…" --source <url or file> --quote "…"`
-- Where this folder lives: `council.py memory status`
+- Find: `council memory search "<words>"`
+- Add by hand: `council memory add --claim "…" --source <url or file> --quote "…"`
+- Where this folder lives: `council memory status`

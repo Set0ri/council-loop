@@ -153,6 +153,16 @@ fn load_live(policy: &Value, models_dir: &Path) -> Result<Option<Loaded>> {
             .get("name")
             .map(py::to_str)
             .unwrap_or_else(|| "?".to_string());
+        let openrouter_id = if py::truthy(row.at("openrouter_api_id")) {
+            row.at("openrouter_api_id").clone()
+        } else if py::truthy(row.at("openrouter_id")) {
+            row.at("openrouter_id").clone()
+        } else if py::truthy(row.at("openrouter")) {
+            crate::providers::openrouter_slug(Some(&name), Some(&creator), None)
+                .map_or(Value::Null, Value::String)
+        } else {
+            Value::Null
+        };
         models.push(Model {
             name,
             creator,
@@ -165,7 +175,7 @@ fn load_live(policy: &Value, models_dir: &Path) -> Result<Option<Loaded>> {
             minutes: secs.map(|s| s / 60.0),
             open_weights: py::truthy(dig(row, &["licensing", "is_open_weights"])),
             restricted: row.truthy("trusted_access"),
-            openrouter_id: row.at("openrouter_api_id").clone(),
+            openrouter_id,
         });
     }
     let today = crate::clock::today_iso();
